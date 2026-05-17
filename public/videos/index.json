@@ -1,5 +1,25 @@
 [
   {
+    "id": "news-anime-bot-2026-05-16",
+    "format": "short",
+    "show": "news-anime-bot",
+    "title": "Cisco stock pops 15% on 4,000 layoffs and an AI order surge",
+    "desc": "Daily AI news satire. Cisco cuts ~4,000 jobs, books $5.3B in AI infrastructure orders, raises guidance to $9B — and lays off the engineers who built the networks.",
+    "shippedAt": "2026-05-16",
+    "durationSec": 67,
+    "thumbnailUrl": "https://i.ytimg.com/vi/1Ai641l38oc/oardefault.jpg"
+  },
+  {
+    "id": "news-anime-bot-2026-05-15",
+    "format": "short",
+    "show": "news-anime-bot",
+    "title": "Anthropic vs OpenAI: 271 bugs found, three of them real",
+    "desc": "Daily AI news satire. Rival labs launch competing cybersecurity AIs — Claude Mythos flags 271 Firefox bugs (3 real), OpenAI answers with Daybreak.",
+    "shippedAt": "2026-05-15",
+    "durationSec": 63,
+    "thumbnailUrl": "https://i.ytimg.com/vi/trx2a5jYTf8/oardefault.jpg"
+  },
+  {
     "id": "spoolcast-dev-log-06",
     "format": "long",
     "show": null,

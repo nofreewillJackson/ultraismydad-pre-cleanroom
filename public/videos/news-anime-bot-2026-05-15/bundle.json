@@ -1,0 +1,211 @@
+{
+  "id": "news-anime-bot-2026-05-15",
+  "format": "short",
+  "show": "news-anime-bot",
+  "title": "Anthropic vs OpenAI: 271 bugs found, three of them real",
+  "desc": "Daily AI news satire. Rival labs launch competing cybersecurity AIs — Claude Mythos flags 271 Firefox bugs (3 real), OpenAI answers with Daybreak.",
+  "shippedAt": "2026-05-15",
+  "durationSec": 63,
+  "topicTier": "GREEN",
+  "video": {
+    "youtubeId": "trx2a5jYTf8",
+    "tiktokId": "7639822885837720862",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7639822885837720862",
+    "mp4Url": null,
+    "thumbnailUrl": "https://i.ytimg.com/vi/trx2a5jYTf8/oardefault.jpg"
+  },
+  "preRoll": {
+    "burnedText": "⚠ SATIRE — AI-GENERATED PARODY — NOT REAL",
+    "voiceTag": "FAUX7 News. Satire."
+  },
+  "characters": [
+    {
+      "name": "altman",
+      "kind": "character",
+      "imageUrl": "/videos/news-anime-bot-2026-05-15/assets/characters/altman.webp",
+      "description": "",
+      "usedInBeats": [
+        9,
+        10,
+        11
+      ]
+    }
+  ],
+  "beats": [
+    {
+      "n": 1,
+      "name": "dojo-cold-open-two-warriors",
+      "durationSec": 5,
+      "narration": "The two largest A.I. labs both launched competing cybersecurity divisions this month.",
+      "character": "-",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-15/assets/beats/01-dojo-cold-open-two-warriors.webp"
+    },
+    {
+      "n": 2,
+      "name": "mythos-slashes-firefox-scroll",
+      "durationSec": 5,
+      "narration": "Anthropic's new Claude Mythos model was turned loose on the Firefox codebase.",
+      "character": "-",
+      "sourceChyron": "ANTHROPIC CLAUDE MYTHOS",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-15/assets/beats/02-mythos-slashes-firefox-scroll.webp"
+    },
+    {
+      "n": 3,
+      "name": "271-shards-rise",
+      "durationSec": 5,
+      "narration": "Per Mozilla, it identified two hundred seventy-one vulnerabilities.",
+      "character": "-",
+      "sourceChyron": "271 BUGS REPORTED",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-15/assets/beats/03-271-shards-rise.webp"
+    },
+    {
+      "n": 4,
+      "name": "mozilla-fox-spirit-quote",
+      "durationSec": 5,
+      "narration": "Mozilla called the model just as capable as an elite human researcher.",
+      "character": "-",
+      "sourceChyron": "PER MOZILLA",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-15/assets/beats/04-mozilla-fox-spirit-quote.webp"
+    },
+    {
+      "n": 5,
+      "name": "three-shards-glow-gold",
+      "durationSec": 5,
+      "narration": "Mozilla's official advisory credits three of those as actual security CVEs.",
+      "character": "-",
+      "sourceChyron": "3 CVES IN FIREFOX 150",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-15/assets/beats/05-three-shards-glow-gold.webp"
+    },
+    {
+      "n": 6,
+      "name": "smith-receives-curl-scroll",
+      "durationSec": 5,
+      "narration": "A separate test was run on the curl codebase. The maintainer reviewed five reported issues.",
+      "character": "-",
+      "sourceChyron": "CURL CODEBASE - 178K LOC",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-15/assets/beats/06-smith-receives-curl-scroll.webp"
+    },
+    {
+      "n": 7,
+      "name": "smith-returns-one-low",
+      "durationSec": 5,
+      "narration": "Three were already known. One wasn't a security bug at all. One was real, rated low.",
+      "character": "-",
+      "sourceChyron": "1 LOW SEVERITY",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-15/assets/beats/07-smith-returns-one-low.webp"
+    },
+    {
+      "n": 8,
+      "name": "smith-quote-card",
+      "durationSec": 5,
+      "narration": "The curl maintainer Daniel Stenberg said the hype around the model was, in his words, primarily marketing.",
+      "character": "-",
+      "sourceChyron": "PRIMARILY MARKETING",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-15/assets/beats/08-smith-quote-card.webp"
+    },
+    {
+      "n": 9,
+      "name": "altman-enters-three-blades",
+      "durationSec": 5,
+      "narration": "OpenAI's response, announced two days ago, is called Daybreak.",
+      "character": "altman",
+      "sourceChyron": "OPENAI DAYBREAK - MAY 13",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-15/assets/beats/09-altman-enters-three-blades.webp"
+    },
+    {
+      "n": 10,
+      "name": "altman-quote-chyron",
+      "durationSec": 5,
+      "narration": "Sam Altman said A.I. is already good, and about to get super good, at cybersecurity.",
+      "character": "altman",
+      "sourceChyron": "SAM ALTMAN",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-15/assets/beats/10-altman-quote-chyron.webp"
+    },
+    {
+      "n": 11,
+      "name": "partner-army-marches",
+      "durationSec": 5,
+      "narration": "Eight enterprise security firms have signed on as launch partners.",
+      "character": "altman",
+      "sourceChyron": "8 LAUNCH PARTNERS",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-15/assets/beats/11-partner-army-marches.webp"
+    },
+    {
+      "n": 12,
+      "name": "both-warriors-return-to-forge",
+      "durationSec": 6,
+      "narration": "Both labs will continue shipping the larger coding models that write next quarter's bugs.",
+      "character": "-",
+      "sourceChyron": "BOTH RETURN TO THE FORGE",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-15/assets/beats/12-both-warriors-return-to-forge.webp"
+    }
+  ],
+  "sources": [
+    {
+      "fact": "",
+      "attribution": "Mozilla says it patched 271 Firefox vulnerabilities thanks to Anthropic's Claude Mythos (Engadget)",
+      "url": "https://www.engadget.com/ai/mozilla-says-it-patched-271-firefox-vulnerabilities-thanks-to-anthropics-claude-mythos-224330023.html"
+    },
+    {
+      "fact": "",
+      "attribution": "Claude Mythos Finds 271 Firefox Vulnerabilities (SecurityWeek)",
+      "url": "https://www.securityweek.com/claude-mythos-finds-271-firefox-vulnerabilities/"
+    },
+    {
+      "fact": "",
+      "attribution": "Claude Mythos Finds Only One Curl Vulnerability; Experts Divided on What It Really Means (SecurityWeek)",
+      "url": "https://www.securityweek.com/claude-mythos-finds-only-one-curl-vulnerability-experts-divided-on-what-it-really-means/"
+    },
+    {
+      "fact": "",
+      "attribution": "Daybreak is OpenAI's answer to the AI arms race in cybersecurity (CyberScoop)",
+      "url": "https://cyberscoop.com/openai-daybreak-gpt-5-5-anthropic-mythos-cybersecurity/"
+    },
+    {
+      "fact": "",
+      "attribution": "OpenAI Launches Daybreak for AI-Powered Vulnerability Detection and Patch Validation (The Hacker News)",
+      "url": "https://thehackernews.com/2026/05/openai-launches-daybreak-for-ai-powered.html"
+    }
+  ],
+  "transcript": "The two largest A.I. labs both launched competing cybersecurity divisions this month. Anthropic's new Claude Mythos model was turned loose on the Firefox codebase. Per Mozilla, it identified two hundred seventy-one vulnerabilities. Mozilla called the model just as capable as an elite human researcher. Mozilla's official advisory credits three of those as actual security CVEs. A separate test was run on the curl codebase. The maintainer reviewed five reported issues. Three were already known. One wasn't a security bug at all. One was real, rated low. The curl maintainer Daniel Stenberg said the hype around the model was, in his words, primarily marketing. OpenAI's response, announced two days ago, is called Daybreak. Sam Altman said A.I. is already good, and about to get super good, at cybersecurity. Eight enterprise security firms have signed on as launch partners. Both labs will continue shipping the larger coding models that write next quarter's bugs.",
+  "summary": {
+    "writing": {
+      "author": "Claude",
+      "role": "script · beat plan · narration · sources audit"
+    },
+    "videoClips": {
+      "platform": "kie.ai",
+      "models": [
+        "Seedance 2.0 Fast"
+      ],
+      "clipCount": 12
+    },
+    "audio": {
+      "tts": "Google Cloud TTS",
+      "voice": "Schedar",
+      "beatCount": 12
+    },
+    "render": {
+      "engine": "ffmpeg",
+      "passed": true
+    },
+    "cost": "~$5.00."
+  },
+  "showcase": {
+    "hiddenBeatNs": [],
+    "notes": "Episode 9 of news-anime-bot."
+  }
+}

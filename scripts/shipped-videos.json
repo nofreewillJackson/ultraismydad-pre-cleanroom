@@ -1,5 +1,33 @@
 [
   {
+    "id": "news-anime-bot-2026-05-16",
+    "format": "short",
+    "show": "news-anime-bot",
+    "sessionDate": "2026-05-15-b",
+    "title": "Cisco stock pops 15% on 4,000 layoffs and an AI order surge",
+    "desc": "Daily AI news satire. Cisco cuts ~4,000 jobs, books $5.3B in AI infrastructure orders, raises guidance to $9B — and lays off the engineers who built the networks.",
+    "youtubeId": "1Ai641l38oc",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7640196025990368542",
+    "shippedAt": "2026-05-16",
+    "durationSec": 67,
+    "hiddenBeatNs": [],
+    "notes": "Episode 10 of news-anime-bot. Session dir is 2026-05-15-b."
+  },
+  {
+    "id": "news-anime-bot-2026-05-15",
+    "format": "short",
+    "show": "news-anime-bot",
+    "sessionDate": "2026-05-15",
+    "title": "Anthropic vs OpenAI: 271 bugs found, three of them real",
+    "desc": "Daily AI news satire. Rival labs launch competing cybersecurity AIs — Claude Mythos flags 271 Firefox bugs (3 real), OpenAI answers with Daybreak.",
+    "youtubeId": "trx2a5jYTf8",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7639822885837720862",
+    "shippedAt": "2026-05-15",
+    "durationSec": 63,
+    "hiddenBeatNs": [],
+    "notes": "Episode 9 of news-anime-bot."
+  },
+  {
     "id": "spoolcast-dev-log-06",
     "title": "why ai makes things up about its own work — spoolcast dev log 6",
     "youtubeId": "c1tWTNh2D1Y",

@@ -553,13 +553,19 @@ async function buildShortBundle(shipped) {
   try { scriptText = await readFile(path.join(episodeDir, "script.md"), "utf8"); } catch {}
   const scriptData = scriptText ? parseShortScriptMd(scriptText) : null;
 
-  // Find the rendered episode mp4 (episode-NN.mp4).
+  // Find the rendered episode mp4 (episode-NN.mp4 or episode-NN-vM.mp4).
+  // When multiple versions exist, prefer the highest -vM (base file = v1).
   let episodeMp4 = null;
   const epOutDir = path.join(episodeDir, "out");
   if (existsSync(epOutDir)) {
-    const files = await readdir(epOutDir);
-    const ep = files.find(f => /^episode-\d+\.mp4$/.test(f));
-    if (ep) episodeMp4 = path.join(epOutDir, ep);
+    const files = (await readdir(epOutDir))
+      .filter(f => /^episode-\d+(-v\d+)?\.mp4$/.test(f))
+      .sort((a, b) => {
+        const vA = parseInt((a.match(/-v(\d+)\.mp4$/) || [, "1"])[1]);
+        const vB = parseInt((b.match(/-v(\d+)\.mp4$/) || [, "1"])[1]);
+        return vB - vA;
+      });
+    if (files[0]) episodeMp4 = path.join(epOutDir, files[0]);
   }
 
   // Showcase thumbnail: prefer YouTube's vertical Shorts thumbnail (the

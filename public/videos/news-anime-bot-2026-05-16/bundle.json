@@ -1,0 +1,189 @@
+{
+  "id": "news-anime-bot-2026-05-16",
+  "format": "short",
+  "show": "news-anime-bot",
+  "title": "Cisco stock pops 15% on 4,000 layoffs and an AI order surge",
+  "desc": "Daily AI news satire. Cisco cuts ~4,000 jobs, books $5.3B in AI infrastructure orders, raises guidance to $9B — and lays off the engineers who built the networks.",
+  "shippedAt": "2026-05-16",
+  "durationSec": 67,
+  "topicTier": "GREEN",
+  "video": {
+    "youtubeId": "1Ai641l38oc",
+    "tiktokId": "7640196025990368542",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7640196025990368542",
+    "mp4Url": null,
+    "thumbnailUrl": "https://i.ytimg.com/vi/1Ai641l38oc/oardefault.jpg"
+  },
+  "preRoll": {
+    "burnedText": "⚠ SATIRE — AI-GENERATED PARODY — NOT REAL",
+    "voiceTag": "FAUX7 News. Satire."
+  },
+  "characters": [],
+  "beats": [
+    {
+      "n": 1,
+      "name": "temple-cisco-cold-open",
+      "durationSec": 5,
+      "narration": "Cisco announced its largest restructuring in years on Wednesday.",
+      "character": "-",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-16/assets/beats/01-temple-cisco-cold-open.webp"
+    },
+    {
+      "n": 2,
+      "name": "earnings-scroll-unfurls",
+      "durationSec": 5,
+      "narration": "The company will cut close to four thousand jobs this quarter.",
+      "character": "-",
+      "sourceChyron": "CISCO Q3 FY26",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-16/assets/beats/02-earnings-scroll-unfurls.webp"
+    },
+    {
+      "n": 3,
+      "name": "workers-file-out",
+      "durationSec": 5,
+      "narration": "That is just under five percent of its global workforce.",
+      "character": "-",
+      "sourceChyron": "~4,000 JOBS CUT",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-16/assets/beats/03-workers-file-out.webp"
+    },
+    {
+      "n": 4,
+      "name": "empty-temple-wide",
+      "durationSec": 5,
+      "narration": "The layoffs are part of a deeper pivot into A.I. infrastructure.",
+      "character": "-",
+      "sourceChyron": "UNDER 5 PCT OF WORKFORCE",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-16/assets/beats/04-empty-temple-wide.webp"
+    },
+    {
+      "n": 5,
+      "name": "shrine-pulses-brighter",
+      "durationSec": 5,
+      "narration": "Per CNBC, Cisco's stock rose roughly fifteen percent on the news of the cuts.",
+      "character": "-",
+      "sourceChyron": "STOCK UP ~15 PCT",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-16/assets/beats/05-shrine-pulses-brighter.webp"
+    },
+    {
+      "n": 6,
+      "name": "stock-ticker-climbs-wall",
+      "durationSec": 5,
+      "narration": "The company also reported record quarterly revenue of fifteen point eight billion dollars.",
+      "character": "-",
+      "sourceChyron": "RECORD REV $15.8B",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-16/assets/beats/06-stock-ticker-climbs-wall.webp"
+    },
+    {
+      "n": 7,
+      "name": "ingot-pile-grows",
+      "durationSec": 5,
+      "narration": "Cisco said it has booked five point three billion dollars in A.I. infrastructure orders this fiscal year.",
+      "character": "-",
+      "sourceChyron": "$5.3B AI ORDERS YTD",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-16/assets/beats/07-ingot-pile-grows.webp"
+    },
+    {
+      "n": 8,
+      "name": "guidance-scroll-raised",
+      "durationSec": 5,
+      "narration": "It raised its annual A.I. order guidance from five billion to nine billion dollars.",
+      "character": "-",
+      "sourceChyron": "FY GUIDE $5B TO $9B",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-16/assets/beats/08-guidance-scroll-raised.webp"
+    },
+    {
+      "n": 9,
+      "name": "ceo-silhouette-blesses-shrine",
+      "durationSec": 5,
+      "narration": "Chief Executive Chuck Robbins said in a blog post that becoming a winner in A.I. meant making hard decisions.",
+      "character": "-",
+      "sourceChyron": "PER COMPANY BLOG",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-16/assets/beats/09-ceo-silhouette-blesses-shrine.webp"
+    },
+    {
+      "n": 10,
+      "name": "blog-post-scroll-publish",
+      "durationSec": 5,
+      "narration": "The blog post went up the same day the cuts were announced.",
+      "character": "-",
+      "sourceChyron": "SAME-DAY POST",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-16/assets/beats/10-blog-post-scroll-publish.webp"
+    },
+    {
+      "n": 11,
+      "name": "titans-bring-monoliths",
+      "durationSec": 5,
+      "narration": "Per the company, the order surge is driven by its hyperscaler customers — the firms running the largest A.I. data centers.",
+      "character": "-",
+      "sourceChyron": "HYPERSCALER ORDERS",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-16/assets/beats/11-titans-bring-monoliths.webp"
+    },
+    {
+      "n": 12,
+      "name": "shrine-reads-layoff-list",
+      "durationSec": 6,
+      "narration": "The workers being let go are largely the ones who built the networks those data centers run on.",
+      "character": "-",
+      "sourceChyron": "THE NETWORKS THEY BUILT",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-16/assets/beats/12-shrine-reads-layoff-list.webp"
+    }
+  ],
+  "sources": [
+    {
+      "fact": "",
+      "attribution": "Cisco's stock pops 15% on surging AI orders, as company says it's cutting almost 4,000 jobs (CNBC)",
+      "url": "https://www.cnbc.com/2026/05/13/cisco-csco-q3-earnings-report-2026.html"
+    },
+    {
+      "fact": "",
+      "attribution": "Cisco layoffs loom as company pivots deeper into AI after strong quarter (Fox Business)",
+      "url": "https://www.foxbusiness.com/technology/cisco-cut-thousands-jobs-ai-push-accelerates-earnings-beat"
+    },
+    {
+      "fact": "Cisco Layoffs 2026",
+      "attribution": "Workforce Cuts Under 5% as Company Pivots to AI and Posts Record Revenue (IndexBox)",
+      "url": "https://www.indexbox.io/blog/cisco-plans-layoffs-of-under-4000-jobs-to-focus-on-ai/"
+    }
+  ],
+  "transcript": "Cisco announced its largest restructuring in years on Wednesday. The company will cut close to four thousand jobs this quarter. That is just under five percent of its global workforce. The layoffs are part of a deeper pivot into A.I. infrastructure. Per CNBC, Cisco's stock rose roughly fifteen percent on the news of the cuts. The company also reported record quarterly revenue of fifteen point eight billion dollars. Cisco said it has booked five point three billion dollars in A.I. infrastructure orders this fiscal year. It raised its annual A.I. order guidance from five billion to nine billion dollars. Chief Executive Chuck Robbins said in a blog post that becoming a winner in A.I. meant making hard decisions. The blog post went up the same day the cuts were announced. Per the company, the order surge is driven by its hyperscaler customers — the firms running the largest A.I. data centers. The workers being let go are largely the ones who built the networks those data centers run on.",
+  "summary": {
+    "writing": {
+      "author": "Claude",
+      "role": "script · beat plan · narration · sources audit"
+    },
+    "videoClips": {
+      "platform": "kie.ai",
+      "models": [
+        "Seedance 2.0 Fast"
+      ],
+      "clipCount": 12
+    },
+    "audio": {
+      "tts": "Google Cloud TTS",
+      "voice": "Schedar",
+      "beatCount": 12
+    },
+    "render": {
+      "engine": "ffmpeg",
+      "passed": true
+    },
+    "cost": "~$5.25."
+  },
+  "showcase": {
+    "hiddenBeatNs": [],
+    "notes": "Episode 10 of news-anime-bot. Session dir is 2026-05-15-b."
+  }
+}
