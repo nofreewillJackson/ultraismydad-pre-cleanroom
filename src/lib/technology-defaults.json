@@ -1,0 +1,770 @@
+[
+  {
+    "id": "astro",
+    "name": "Astro",
+    "category": "frontend",
+    "aliases": ["astro"],
+    "visibility": "public",
+    "sortOrder": 10
+  },
+  {
+    "id": "react",
+    "name": "React",
+    "category": "frontend",
+    "aliases": ["react", "react 19"],
+    "visibility": "public",
+    "sortOrder": 20
+  },
+  {
+    "id": "vite",
+    "name": "Vite",
+    "category": "frontend",
+    "aliases": ["vite"],
+    "visibility": "public",
+    "sortOrder": 30
+  },
+  {
+    "id": "html",
+    "name": "HTML",
+    "category": "frontend",
+    "aliases": ["html"],
+    "visibility": "public",
+    "sortOrder": 40
+  },
+  {
+    "id": "css",
+    "name": "CSS",
+    "category": "frontend",
+    "aliases": ["css", "css grid"],
+    "visibility": "public",
+    "sortOrder": 50
+  },
+  {
+    "id": "javascript",
+    "name": "JavaScript",
+    "category": "frontend",
+    "aliases": ["javascript", "js", "vanilla js", "vanilla html/css/js", "iframe srcdoc", "html5 drag api"],
+    "visibility": "public",
+    "sortOrder": 60
+  },
+  {
+    "id": "typescript",
+    "name": "TypeScript",
+    "category": "frontend",
+    "aliases": ["typescript"],
+    "visibility": "public",
+    "sortOrder": 70
+  },
+  {
+    "id": "tailwind",
+    "name": "Tailwind CSS",
+    "category": "frontend",
+    "aliases": ["tailwind", "tailwind css", "tailwind 4"],
+    "visibility": "public",
+    "sortOrder": 80
+  },
+  {
+    "id": "shadcn-ui",
+    "name": "shadcn/ui",
+    "category": "frontend",
+    "aliases": ["shadcn/ui"],
+    "visibility": "public",
+    "sortOrder": 90
+  },
+  {
+    "id": "motion-react",
+    "name": "motion/react",
+    "category": "frontend",
+    "aliases": ["motion/react"],
+    "visibility": "public",
+    "sortOrder": 100
+  },
+  {
+    "id": "lucide-react",
+    "name": "lucide-react",
+    "category": "frontend",
+    "aliases": ["lucide-react"],
+    "visibility": "public",
+    "sortOrder": 110
+  },
+  {
+    "id": "react-router",
+    "name": "React Router",
+    "category": "frontend",
+    "aliases": ["react router"],
+    "visibility": "public",
+    "sortOrder": 120
+  },
+  {
+    "id": "babel-standalone",
+    "name": "Babel standalone",
+    "category": "frontend",
+    "aliases": ["babel standalone"],
+    "visibility": "public",
+    "sortOrder": 130
+  },
+  {
+    "id": "chart-js",
+    "name": "Chart.js",
+    "category": "frontend",
+    "aliases": ["chart.js"],
+    "visibility": "public",
+    "sortOrder": 140
+  },
+  {
+    "id": "recharts",
+    "name": "Recharts",
+    "category": "frontend",
+    "aliases": ["recharts"],
+    "visibility": "public",
+    "sortOrder": 150
+  },
+  {
+    "id": "chrome-extension",
+    "name": "Chrome Extension",
+    "category": "frontend",
+    "aliases": ["chrome extension", "chrome extension manifest v3", "hrome extension manifest v3"],
+    "visibility": "public",
+    "sortOrder": 160
+  },
+  {
+    "id": "chrome-storage-api",
+    "name": "Chrome Storage API",
+    "category": "frontend",
+    "aliases": ["chrome storage api"],
+    "visibility": "public",
+    "sortOrder": 170
+  },
+  {
+    "id": "css-variables",
+    "name": "CSS variables",
+    "category": "frontend",
+    "aliases": ["css variables"],
+    "visibility": "public",
+    "sortOrder": 180
+  },
+  {
+    "id": "dom-automation",
+    "name": "DOM Automation",
+    "category": "frontend",
+    "aliases": ["dom automation", "dom parsing", "mutationobserver"],
+    "visibility": "public",
+    "sortOrder": 190
+  },
+  {
+    "id": "web-workers",
+    "name": "Web Workers",
+    "category": "frontend",
+    "aliases": ["web workers"],
+    "visibility": "public",
+    "sortOrder": 200
+  },
+  {
+    "id": "node-js",
+    "name": "Node.js",
+    "category": "backend",
+    "aliases": ["node", "node.js", "node 22", "nodejs"],
+    "visibility": "public",
+    "sortOrder": 10
+  },
+  {
+    "id": "python",
+    "name": "Python",
+    "category": "backend",
+    "aliases": ["python"],
+    "visibility": "public",
+    "sortOrder": 20
+  },
+  {
+    "id": "express",
+    "name": "Express",
+    "category": "backend",
+    "aliases": ["express"],
+    "visibility": "public",
+    "sortOrder": 30
+  },
+  {
+    "id": "trpc",
+    "name": "tRPC",
+    "category": "backend",
+    "aliases": ["trpc", "trpc 11"],
+    "visibility": "public",
+    "sortOrder": 40
+  },
+  {
+    "id": "mcp",
+    "name": "MCP",
+    "category": "backend",
+    "aliases": ["mcp", "mcp sdk"],
+    "visibility": "public",
+    "sortOrder": 50
+  },
+  {
+    "id": "firebase-admin",
+    "name": "Firebase Admin",
+    "category": "backend",
+    "aliases": ["firebase admin"],
+    "visibility": "public",
+    "sortOrder": 60
+  },
+  {
+    "id": "netlify-functions",
+    "name": "Netlify Functions",
+    "category": "backend",
+    "aliases": ["netlify functions"],
+    "visibility": "public",
+    "sortOrder": 70
+  },
+  {
+    "id": "firebase-cloud-functions",
+    "name": "Firebase Cloud Functions",
+    "category": "backend",
+    "aliases": ["firebase cloud functions"],
+    "visibility": "public",
+    "sortOrder": 80
+  },
+  {
+    "id": "pm2",
+    "name": "PM2",
+    "category": "backend",
+    "aliases": ["pm2"],
+    "visibility": "public",
+    "sortOrder": 90
+  },
+  {
+    "id": "cron",
+    "name": "cron",
+    "category": "backend",
+    "aliases": ["node-cron", "manus cron", "cron"],
+    "visibility": "public",
+    "sortOrder": 100
+  },
+  {
+    "id": "ethers-js",
+    "name": "ethers.js",
+    "category": "backend",
+    "aliases": ["ethers.js"],
+    "visibility": "public",
+    "sortOrder": 110
+  },
+  {
+    "id": "matrix-js-sdk",
+    "name": "matrix-js-sdk",
+    "category": "backend",
+    "aliases": ["matrix-js-sdk", "subnet-client"],
+    "visibility": "public",
+    "sortOrder": 120
+  },
+  {
+    "id": "stripe",
+    "name": "Stripe",
+    "category": "backend",
+    "aliases": ["stripe", "stripe checkout", "stripe webhooks"],
+    "visibility": "public",
+    "sortOrder": 130
+  },
+  {
+    "id": "oauth",
+    "name": "OAuth",
+    "category": "backend",
+    "aliases": ["oauth 1.0a"],
+    "visibility": "public",
+    "sortOrder": 140
+  },
+  {
+    "id": "aes-256-gcm",
+    "name": "AES-256-GCM",
+    "category": "backend",
+    "aliases": ["aes-256-gcm"],
+    "visibility": "public",
+    "sortOrder": 150
+  },
+  {
+    "id": "puppeteer",
+    "name": "Puppeteer",
+    "category": "backend",
+    "aliases": ["puppeteer", "headless browser worker"],
+    "visibility": "public",
+    "sortOrder": 160
+  },
+  {
+    "id": "pullpush-api",
+    "name": "PullPush API",
+    "category": "backend",
+    "aliases": ["pullpush api"],
+    "visibility": "public",
+    "sortOrder": 170
+  },
+  {
+    "id": "x-api",
+    "name": "X API",
+    "category": "backend",
+    "aliases": ["x api"],
+    "visibility": "public",
+    "sortOrder": 180
+  },
+  {
+    "id": "moonshot-api",
+    "name": "Moonshot API",
+    "category": "backend",
+    "aliases": ["moonshot api"],
+    "visibility": "public",
+    "sortOrder": 190
+  },
+  {
+    "id": "firestore",
+    "name": "Firestore",
+    "category": "data",
+    "aliases": ["firestore", "firebase firestore", "firestore onsnapshot"],
+    "visibility": "public",
+    "sortOrder": 10
+  },
+  {
+    "id": "firebase-auth",
+    "name": "Firebase Auth",
+    "category": "data",
+    "aliases": ["firebase auth"],
+    "visibility": "public",
+    "sortOrder": 20
+  },
+  {
+    "id": "firebase-storage",
+    "name": "Firebase Storage",
+    "category": "data",
+    "aliases": ["firebase storage"],
+    "visibility": "public",
+    "sortOrder": 30
+  },
+  {
+    "id": "firebase-realtime-db",
+    "name": "Firebase RealtimeDB",
+    "category": "data",
+    "aliases": ["firebase realtime database"],
+    "visibility": "public",
+    "sortOrder": 40
+  },
+  {
+    "id": "firebase",
+    "name": "Firebase",
+    "category": "data",
+    "aliases": ["firebase"],
+    "visibility": "public",
+    "sortOrder": 50
+  },
+  {
+    "id": "postgres",
+    "name": "Postgres",
+    "category": "data",
+    "aliases": ["postgres"],
+    "visibility": "public",
+    "sortOrder": 60
+  },
+  {
+    "id": "mysql",
+    "name": "MySQL",
+    "category": "data",
+    "aliases": ["mysql"],
+    "visibility": "public",
+    "sortOrder": 70
+  },
+  {
+    "id": "drizzle",
+    "name": "Drizzle",
+    "category": "data",
+    "aliases": ["drizzle", "drizzle orm"],
+    "visibility": "public",
+    "sortOrder": 80
+  },
+  {
+    "id": "dataforseo",
+    "name": "DataForSEO",
+    "category": "data",
+    "aliases": ["dataforseo", "dataforseo api"],
+    "visibility": "public",
+    "sortOrder": 90
+  },
+  {
+    "id": "google-ads",
+    "name": "Google Ads",
+    "category": "data",
+    "aliases": ["google ads", "google ads planning"],
+    "visibility": "public",
+    "sortOrder": 100
+  },
+  {
+    "id": "meta-graph-api",
+    "name": "Meta Graph API",
+    "category": "data",
+    "aliases": ["meta graph api"],
+    "visibility": "public",
+    "sortOrder": 110
+  },
+  {
+    "id": "openpyxl",
+    "name": "OpenPyXL",
+    "category": "data",
+    "aliases": ["openpyxl"],
+    "visibility": "public",
+    "sortOrder": 120
+  },
+  {
+    "id": "sheetjs",
+    "name": "SheetJS",
+    "category": "data",
+    "aliases": ["sheetjs"],
+    "visibility": "public",
+    "sortOrder": 130
+  },
+  {
+    "id": "csv-parsing",
+    "name": "CSV parsing",
+    "category": "data",
+    "aliases": ["csv parsing"],
+    "visibility": "public",
+    "sortOrder": 140
+  },
+  {
+    "id": "netlify",
+    "name": "Netlify",
+    "category": "infra",
+    "aliases": ["netlify"],
+    "visibility": "public",
+    "sortOrder": 10
+  },
+  {
+    "id": "cloudflare-pages",
+    "name": "Cloudflare Pages",
+    "category": "infra",
+    "aliases": ["cloudflare pages"],
+    "visibility": "public",
+    "sortOrder": 20
+  },
+  {
+    "id": "railway",
+    "name": "Railway",
+    "category": "infra",
+    "aliases": ["railway"],
+    "visibility": "public",
+    "sortOrder": 30
+  },
+  {
+    "id": "github-actions",
+    "name": "GitHub Actions",
+    "category": "infra",
+    "aliases": ["github actions", "cron", "node-cron", "manus cron", "scheduled workflow"],
+    "visibility": "public",
+    "sortOrder": 40
+  },
+  {
+    "id": "upstash",
+    "name": "Upstash",
+    "category": "infra",
+    "aliases": ["upstash", "qstash", "upstash qstash"],
+    "visibility": "public",
+    "sortOrder": 45
+  },
+  {
+    "id": "github-api",
+    "name": "GitHub API",
+    "category": "infra",
+    "aliases": ["github public api", "github api"],
+    "visibility": "public",
+    "sortOrder": 50
+  },
+  {
+    "id": "cloud-run",
+    "name": "Cloud Run",
+    "category": "infra",
+    "aliases": ["cloud run"],
+    "visibility": "public",
+    "sortOrder": 60
+  },
+  {
+    "id": "cloud-tasks",
+    "name": "Cloud Tasks",
+    "category": "infra",
+    "aliases": ["cloud tasks"],
+    "visibility": "public",
+    "sortOrder": 70
+  },
+  {
+    "id": "browserless",
+    "name": "Browserless.io",
+    "category": "infra",
+    "aliases": ["browserless.io"],
+    "visibility": "public",
+    "sortOrder": 80
+  },
+  {
+    "id": "hetzner",
+    "name": "Hetzner",
+    "category": "infra",
+    "aliases": ["hetzner"],
+    "visibility": "public",
+    "sortOrder": 90
+  },
+  {
+    "id": "cloudflare-dns",
+    "name": "Cloudflare DNS",
+    "category": "infra",
+    "aliases": ["cloudflare dns"],
+    "visibility": "public",
+    "sortOrder": 100
+  },
+  {
+    "id": "cloudflare-email-routing",
+    "name": "Cloudflare Email Routing",
+    "category": "infra",
+    "aliases": ["cloudflare email routing"],
+    "visibility": "public",
+    "sortOrder": 110
+  },
+  {
+    "id": "google-colab",
+    "name": "Google Colab",
+    "category": "infra",
+    "aliases": ["google colab"],
+    "visibility": "public",
+    "sortOrder": 120
+  },
+  {
+    "id": "spoolcast",
+    "name": "spoolcast",
+    "category": "media",
+    "aliases": ["spoolcast"],
+    "visibility": "public",
+    "sortOrder": 10
+  },
+  {
+    "id": "remotion",
+    "name": "Remotion",
+    "category": "media",
+    "aliases": ["remotion"],
+    "visibility": "public",
+    "sortOrder": 20
+  },
+  {
+    "id": "ffmpeg",
+    "name": "ffmpeg",
+    "category": "media",
+    "aliases": ["ffmpeg"],
+    "visibility": "public",
+    "sortOrder": 30
+  },
+  {
+    "id": "cwebp",
+    "name": "cwebp",
+    "category": "media",
+    "aliases": ["cwebp"],
+    "visibility": "public",
+    "sortOrder": 40
+  },
+  {
+    "id": "seedance",
+    "name": "Seedance 2.0 Fast",
+    "category": "media",
+    "aliases": ["seedance 2.0 fast"],
+    "visibility": "public",
+    "sortOrder": 50
+  },
+  {
+    "id": "google-cloud-tts",
+    "name": "Google Cloud TTS",
+    "category": "media",
+    "aliases": ["google cloud tts", "google tts", "tts", "google cloud tts (chirp3-hd)", "google cloud tts (puck)", "google chirp3-hd tts"],
+    "visibility": "public",
+    "sortOrder": 60
+  },
+  {
+    "id": "gpt-image-2",
+    "name": "gpt-image-2",
+    "category": "media",
+    "aliases": ["gpt-image-2", "kie.ai (gpt-image-2)"],
+    "visibility": "public",
+    "sortOrder": 70
+  },
+  {
+    "id": "kie-ai",
+    "name": "kie.ai",
+    "category": "media",
+    "aliases": ["kie.ai", "kie.ai (nano-banana-2)", "ai image generation"],
+    "visibility": "public",
+    "sortOrder": 80
+  },
+  {
+    "id": "kling",
+    "name": "Kling",
+    "category": "media",
+    "aliases": ["kling 3.0"],
+    "visibility": "public",
+    "sortOrder": 90
+  },
+  {
+    "id": "openai-api",
+    "name": "OpenAI API",
+    "category": "media",
+    "aliases": ["openai api", "openai"],
+    "visibility": "public",
+    "sortOrder": 100
+  },
+  {
+    "id": "anthropic-api",
+    "name": "Anthropic API",
+    "category": "media",
+    "aliases": ["anthropic api", "claude api"],
+    "visibility": "public",
+    "sortOrder": 110
+  },
+  {
+    "id": "openrouter",
+    "name": "OpenRouter",
+    "category": "media",
+    "aliases": ["openrouter", "qwen-vl via openrouter"],
+    "visibility": "public",
+    "sortOrder": 120
+  },
+  {
+    "id": "opencv",
+    "name": "OpenCV",
+    "category": "media",
+    "aliases": ["opencv"],
+    "visibility": "public",
+    "sortOrder": 130
+  },
+  {
+    "id": "youtube",
+    "name": "YouTube",
+    "category": "media",
+    "aliases": ["youtube"],
+    "visibility": "public",
+    "sortOrder": 140
+  },
+  {
+    "id": "tiktok",
+    "name": "TikTok",
+    "category": "media",
+    "aliases": ["tiktok"],
+    "visibility": "public",
+    "sortOrder": 150
+  },
+  {
+    "id": "ai-image-generation",
+    "name": "AI image generation",
+    "category": "media",
+    "aliases": ["ai image generation"],
+    "visibility": "public",
+    "sortOrder": 160
+  },
+  {
+    "id": "prompt-design",
+    "name": "Prompt Design",
+    "category": "media",
+    "aliases": ["prompt design"],
+    "visibility": "public",
+    "sortOrder": 170
+  },
+  {
+    "id": "hugging-face",
+    "name": "Hugging Face",
+    "category": "media",
+    "aliases": ["hugging face"],
+    "visibility": "public",
+    "sortOrder": 180
+  },
+  {
+    "id": "pytorch",
+    "name": "PyTorch",
+    "category": "media",
+    "aliases": ["pytorch"],
+    "visibility": "public",
+    "sortOrder": 190
+  },
+  {
+    "id": "numpy",
+    "name": "NumPy",
+    "category": "media",
+    "aliases": ["numpy"],
+    "visibility": "public",
+    "sortOrder": 200
+  },
+  {
+    "id": "whisperx",
+    "name": "WhisperX",
+    "category": "media",
+    "aliases": ["whisperx"],
+    "visibility": "public",
+    "sortOrder": 210
+  },
+  {
+    "id": "libass",
+    "name": "libass",
+    "category": "media",
+    "aliases": ["libass"],
+    "visibility": "public",
+    "sortOrder": 220
+  },
+  {
+    "id": "rsvg-convert",
+    "name": "rsvg-convert",
+    "category": "media",
+    "aliases": ["rsvg-convert"],
+    "visibility": "public",
+    "sortOrder": 230
+  },
+  {
+    "id": "tribe-v2",
+    "name": "TRIBE v2",
+    "category": "media",
+    "aliases": ["tribe v2"],
+    "visibility": "public",
+    "sortOrder": 240
+  },
+  {
+    "id": "codex",
+    "name": "Codex",
+    "category": "agents",
+    "aliases": ["codex", "chatgpt"],
+    "visibility": "public",
+    "sortOrder": 10
+  },
+  {
+    "id": "claude",
+    "name": "Claude",
+    "category": "agents",
+    "aliases": ["claude", "claude code", "claude skill"],
+    "visibility": "public",
+    "sortOrder": 20
+  },
+  {
+    "id": "manus",
+    "name": "Manus",
+    "category": "agents",
+    "aliases": ["manus"],
+    "visibility": "public",
+    "sortOrder": 30
+  },
+  {
+    "id": "gemini",
+    "name": "Gemini",
+    "category": "agents",
+    "aliases": ["gemini"],
+    "visibility": "public",
+    "sortOrder": 40
+  },
+  {
+    "id": "chatgpt",
+    "name": "ChatGPT",
+    "category": "agents",
+    "aliases": ["chatgpt"],
+    "visibility": "public",
+    "sortOrder": 50
+  },
+  {
+    "id": "other",
+    "name": "Other / unmapped",
+    "category": "other",
+    "aliases": ["other", "unmapped"],
+    "visibility": "public",
+    "sortOrder": 999
+  }
+]

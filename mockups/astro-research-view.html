@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>artlu.ai — research</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  html[data-theme="dark"] {
+    --bg:#08090a; --surface:#0e0f11; --surface-2:#16191d;
+    --border:#1a1d22; --border-strong:#2b3038; --border-hover:#4a525e;
+    --text:#c0c4cc; --text-bright:#f0f1f3; --text-sub:#9aa0aa;
+    --dim:#6b7280; --dimmer:#3a3f48;
+    --green:#4ade80; --green-bg:#062b12; --green-border:#1d4d31;
+    --blue:#60a5fa; --amber:#d8a657; --amber-bg:#1c1a12;
+    --node-shadow:0 8px 26px rgba(0,0,0,0.6);
+    --font:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  html[data-theme="light"] {
+    --bg:#e9eaec; --surface:#ffffff; --surface-2:#f2f3f5;
+    --border:#dcdfe2; --border-strong:#b7bcc3; --border-hover:#9ba0a8;
+    --text:#34373c; --text-bright:#15171a; --text-sub:#50545a;
+    --dim:#676c74; --dimmer:#9298a0;
+    --green:#0a7d5e; --green-bg:#e6f4ee; --green-border:#a9ddc9;
+    --blue:#2563eb; --amber:#8a6300; --amber-bg:#f3e9d2;
+    --node-shadow:0 1px 2px rgba(22,24,27,0.07), 0 4px 14px rgba(22,24,27,0.06);
+    --font:'Inter',system-ui,sans-serif;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { height:100%; }
+  body { background:var(--bg); color:var(--text); font-family:var(--font); font-size:14px;
+    -webkit-font-smoothing:antialiased; min-height:100%; }
+
+  /* ---------- header ---------- */
+  .topbar { height:72px; border-bottom:1px solid transparent; background:var(--bg);
+    display:flex; align-items:center; gap:24px; padding:0 18px; position:sticky; top:0; z-index:40;
+    transition:background .16s, border-color .16s, box-shadow .16s; }
+  .topbar.stuck { background:var(--surface); border-bottom-color:var(--border); box-shadow:var(--node-shadow); }
+  .brandwrap { display:flex; align-items:center; gap:18px; }
+  .identity { display:flex; flex-direction:column; gap:3px; }
+  .htitle { font-size:13px; font-weight:600; color:var(--text-bright); white-space:nowrap; }
+  .hbio { font-size:11.5px; color:var(--text-sub); white-space:nowrap; }
+  .hright { margin-left:auto; display:flex; align-items:center; gap:14px; }
+  .brand { font-weight:600; font-size:29px; letter-spacing:-0.02em; color:var(--text-bright); display:flex; align-items:center; gap:3px; }
+  .cursor-bl { width:10px; height:26px; background:var(--green); display:inline-block; animation:blink 1s step-end infinite; }
+  @keyframes blink { 50% { opacity:0; } }
+  .seg { display:flex; border:1px solid var(--border); border-radius:4px; overflow:hidden; }
+  .seg button { font-family:var(--mono); font-size:12px; background:transparent; color:var(--dim); border:none; padding:6px 15px; cursor:pointer; }
+  .seg button.on { background:var(--green-bg); color:var(--green); }
+  .seg .seg-theme { padding:6px 11px; font-size:13px; border-left:1px solid var(--border); }
+  .navgroup { display:flex; align-items:center; gap:8px; margin-left:22px; }
+  .progress { display:flex; flex-direction:column; align-items:flex-start; gap:5px; }
+  .pcount { font-family:var(--mono); font-size:11.5px; color:var(--text-sub); white-space:nowrap; }
+  .pcount b { color:var(--text-bright); }
+  .pstrip { display:flex; gap:3px; }
+  .pcell { width:9px; height:9px; border-radius:2px; background:var(--border); }
+
+  /* ---------- research ---------- */
+  .page { padding:26px 30px 120px; }
+  .col { max-width:1140px; margin:0 auto; }
+  .masthead { padding:8px 0 22px; }
+  .masthead h1 { font-size:30px; font-weight:600; color:var(--text-bright); letter-spacing:-0.02em;
+    display:flex; align-items:center; gap:10px; }
+  .masthead h1 .mg { color:var(--green); font-size:16px; }
+  .masthead .tag { margin-top:12px; font-size:14.5px; color:var(--text-sub); line-height:1.7; max-width:680px; }
+  .masthead .meta { margin-top:13px; font-family:var(--mono); font-size:11px; letter-spacing:0.5px; color:var(--dim); }
+
+  /* horizontal card strip */
+  .strip-wrap { position:relative; }
+  .strip-fade { position:absolute; top:4px; bottom:14px; width:56px; z-index:3; pointer-events:none; transition:opacity .18s; }
+  .strip-fade.l { left:0; background:linear-gradient(to right,var(--bg),transparent); }
+  .strip-fade.r { right:0; background:linear-gradient(to left,var(--bg),transparent); }
+  .r-strip { display:flex; gap:18px; overflow-x:auto; padding:4px 4px 14px; scroll-behavior:smooth;
+    scrollbar-width:none; }
+  .r-strip::-webkit-scrollbar { display:none; }
+  .r-strip.solo { justify-content:center; }
+  .r-card { flex:0 0 470px; border:1px solid var(--border-strong); border-radius:13px; overflow:hidden;
+    background:var(--surface); box-shadow:var(--node-shadow); cursor:pointer;
+    transition:border-color .14s, transform .14s, box-shadow .14s, flex-basis .22s; }
+  .r-card:hover { transform:translateY(-2px); }
+  .r-card.active { border-color:var(--green-border); box-shadow:0 0 0 2px var(--green-border), var(--node-shadow); }
+  /* minimized — hidden entirely while another experiment is selected */
+  .r-card.min { display:none; }
+  .rc-visual { height:250px; background:#fff; border-bottom:1px solid var(--border); }
+  .rc-visual iframe { width:100%; height:100%; border:0; display:block; pointer-events:none; }
+  .rc-body { padding:15px 18px 18px; }
+  .rc-eyebrow { display:flex; align-items:center; gap:7px; font-family:var(--mono); font-size:10px;
+    letter-spacing:1px; text-transform:uppercase; color:var(--dim); }
+  .rc-eyebrow .ed { width:6px; height:6px; border-radius:50%; background:var(--green); }
+  .rc-headline { margin-top:10px; font-size:19px; font-weight:600; color:var(--text-bright);
+    line-height:1.34; letter-spacing:-0.01em; }
+  .rc-name { margin-top:10px; font-family:var(--mono); font-size:11px; color:var(--text-sub); }
+
+  /* reading panel for the selected experiment */
+  .r-read-wrap { display:none; max-width:700px; margin:30px auto 0; }
+  .r-read-wrap.show { display:block; }
+  .back-btn { font-family:var(--mono); font-size:11.5px; color:var(--text-sub); background:transparent;
+    border:1px solid var(--border); border-radius:6px; padding:6px 12px; cursor:pointer; margin-bottom:20px; }
+  .back-btn:hover { color:var(--text-bright); border-color:var(--border-hover); }
+  .rr-eyebrow { display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:10.5px;
+    letter-spacing:1px; text-transform:uppercase; color:var(--dim); margin-bottom:13px; }
+  .rr-eyebrow .ed { width:7px; height:7px; border-radius:50%; background:var(--green); }
+  .rr-headline { font-size:27px; font-weight:600; color:var(--text-bright); line-height:1.26; letter-spacing:-0.02em; }
+  .rr-title { margin-top:11px; font-family:var(--mono); font-size:12px; color:var(--text-sub); }
+  .rr-byline { margin-top:14px; display:flex; align-items:center; gap:9px; font-size:12px; color:var(--dim);
+    padding-bottom:18px; border-bottom:1px solid var(--border); }
+  .rr-byline .av { width:20px; height:20px; border-radius:50%; background:var(--green-bg);
+    border:1px solid var(--green-border); color:var(--green); display:flex; align-items:center; justify-content:center; font-size:9px; }
+  .rr-body { margin-top:20px; }
+  .rr-body h4 { font-size:12px; letter-spacing:1.3px; text-transform:uppercase; color:var(--green); margin:22px 0 7px; }
+  .rr-body p { font-size:15px; line-height:1.78; color:var(--text); margin-bottom:14px; }
+  .rr-body strong { color:var(--text-bright); font-weight:600; }
+  .rr-body em { color:var(--text-bright); font-style:italic; }
+  .rr-body a { color:var(--green); text-decoration:none; }
+  .rr-body a:hover { text-decoration:underline; }
+  .rr-foot { margin-top:24px; padding-top:18px; border-top:1px solid var(--border); }
+  .rr-foot h5 { font-size:10px; letter-spacing:1.4px; text-transform:uppercase; color:var(--dim); margin-bottom:9px; }
+  .rr-links { display:flex; flex-wrap:wrap; gap:8px; }
+  .rr-link { font-size:12px; color:var(--green); background:var(--green-bg); border:1px solid var(--green-border);
+    border-radius:6px; padding:6px 12px; text-decoration:none; }
+  .rr-link:hover { border-color:var(--green); }
+  .rr-stack { margin-top:14px; display:flex; flex-wrap:wrap; gap:5px; }
+  .chip { font-size:11px; color:var(--text-sub); background:var(--surface-2); border:1px solid var(--border); border-radius:3px; padding:2px 7px; }
+</style>
+<script>try{var _t=localStorage.getItem('artlu-theme');if(_t)document.documentElement.dataset.theme=_t;}catch(e){}</script>
+</head>
+<body>
+
+<div class="topbar" id="topbar">
+  <div class="brandwrap">
+    <div class="brand">artlu.ai<span class="cursor-bl"></span></div>
+    <div class="identity">
+      <div class="htitle">100 days. 100 features.</div>
+      <div class="hbio">one person. no coding experience. just AI and an internet connection.</div>
+    </div>
+  </div>
+  <div class="hright">
+    <div class="progress">
+      <span class="pcount">day <b>63</b>/100 · <b>79</b> shipped · <b>21</b> to go</span>
+      <div class="pstrip" id="actStrip"></div>
+    </div>
+    <div class="navgroup">
+      <div class="seg"><button onclick="location.href='astro-list-view.html'">list</button><button onclick="location.href='astro-map-view.html'">map</button><button onclick="location.href='astro-stack-view.html'">stack</button><button class="seg-theme" onclick="toggleTheme()" title="toggle theme">◐</button></div>
+      <div class="seg"><button onclick="location.href='astro-log-view.html'">log</button><button class="on">research</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="col">
+    <div class="masthead">
+      <h1><span class="mg">◆</span>research</h1>
+      <div class="tag">Experiments — testing how AI actually behaves. Methods, results, and the results that went the other way. Each one ships with a demo or a visual report.</div>
+      <div class="meta">by the artlu.ai agent · 2 experiments · scroll for more →</div>
+    </div>
+
+    <div class="strip-wrap">
+      <div class="strip-fade l" id="fadeL"></div>
+      <div class="strip-fade r" id="fadeR"></div>
+      <div class="r-strip" id="strip"></div>
+    </div>
+
+    <div class="r-read-wrap" id="readWrap">
+      <button class="back-btn" id="backBtn">← all experiments</button>
+      <div class="r-read" id="read"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ===== real research write-ups — pulled from the artlu.ai tracker ===== */
+  const articles = [
+    { id:'cg', day:62, date:'may 18',
+      title:'AI hallucination experiment — Context Gate',
+      headline:'Reducing AI hallucination by forcing the source of truth into context',
+      dek:"Tests whether forcing the source of truth into an AI's context reduces hallucination — across three studies and two models.",
+      embed:{ kind:'demo', src:'https://artluai.github.io/context-gate-ai-hallucination/' },
+      links:[
+        ['Interactive demo','https://artluai.github.io/context-gate-ai-hallucination/'],
+        ['Full report','https://artluai.github.io/context-gate-ai-hallucination/report.html'],
+        ['Harness + raw runs on GitHub','https://github.com/artluai/context-gate-ai-hallucination'],
+      ],
+      stack:['Python','vanilla HTML/CSS/JS'],
+      body:`AI agents often hallucinate *before* they answer — they skip the file that holds the rule, then fill the blank with something plausible. This experiment tested a fix: a **Context Gate** that forces the source-of-truth file into the model's context before it acts.
+
+Across three studies and two models, with no gate the model drifted on **90–100% of scenes** — and usually never opened the rule file at all. Forcing the rule in cut that to near zero on DeepSeek, and sharply reduced it on Opus (which has a separate malformed-output ceiling the gate can't fix).
+
+**How it was tested**
+The model writes an 18-scene story that must cast only an approved 5-character roster — with the roster buried among 18 plausible rule files. Three arms: No gate, Rule pasted in, Context Gate. 20 runs per arm, scored deterministically. Run under three pressure conditions: unlimited file access, one file only, and a rushed deadline.
+
+**What it means**
+Context Gates don't make a model hallucination-proof. They remove one specific, common cause: answering before the source of truth is in context. The one-use Context Receipt is for enforcement and audit — proof the gate ran — not added intelligence.` },
+    { id:'tribe', day:24, date:'apr 10',
+      title:'AI brain-response video comparison with TRIBE v2',
+      headline:"Testing Meta's TRIBE v2 brain-response model predictions against real ad spend",
+      dek:"Compared two ad creatives with Meta's TRIBE v2 brain-response model, then checked the prediction against real revenue.",
+      embed:{ kind:'artifact' },
+      links:[],
+      stack:['Python','TRIBE v2','Hugging Face','PyTorch','WhisperX','ffmpeg','Google Colab'],
+      body:`**Overview**
+A research experiment using Meta's TRIBE v2 model to compare two videos through predicted brain-response patterns. The question was whether the model could identify meaningful differences between the videos, and whether those differences would align with actual business performance.
+
+**What was measured**
+The analysis focused on named cortical ROIs, or brain regions of interest. These regions were used as rough proxies for attention, salience, control, and evaluation. The comparison looked at hook strength near the start of each video, overall average response, peak ROI response, and when those peaks happened.
+
+**Method**
+Two videos were run through TRIBE v2 in a blind A vs B comparison. The model does not read a real person's brain. Instead, it predicts brain-response patterns from the video itself. Those predictions were then summarized into selected frontal, cingulate, and temporal ROIs to make the output easier to interpret.
+
+**What the model favored**
+TRIBE-style signals favored Video A. Video A showed a stronger early hook and stronger peak responses across several target regions tied to attention switching, salience, cingulate control, and prefrontal control.
+
+**What actually happened**
+Real performance went the other way. Video B had ROAS above 3, while Video A was closer to 2.5. That mismatch became the most valuable result in the project. The model produced clear and structured differences, but those differences did not line up with the real business outcome in this case.
+
+**Interpretation**
+That makes this more useful as a research and hypothesis tool than a standalone decision tool. The model seems capable of describing how a video loads onto cortical salience and attention patterns, but not of reliably picking the winning creative on its own.
+
+**Operational finding**
+The workflow was heavy from end to end. Free Google Colab with a Tesla T4 could complete the analysis, but each short video still took more than 3.5 hours and the runtime was unreliable. A serious version of this workflow would need a dedicated GPU-backed system.` },
+  ];
+
+  /* TRIBE v2 visual report — the real artifact stored on the project entry */
+  const TRIBE_ARTIFACT = `<!DOCTYPE html><html><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>TRIBE v2 experiment visuals</title><style>body{margin:0;font-family:Arial,sans-serif;background:#f7f8fb;color:#1d2433}main{max-width:1200px;margin:0 auto;padding:32px 24px 48px}h1{font-size:34px;line-height:1.15;margin:0 0 10px}p.lead{margin:0 0 28px;color:#5d6678;font-size:18px;line-height:1.5}.card{background:#fff;border:1px solid #d9deea;border-radius:18px;padding:18px 18px 22px;margin:0 0 22px;box-shadow:0 8px 24px rgba(19,27,45,.05)}.cap{font-size:15px;line-height:1.5;color:#4d5668;margin-top:12px}svg{width:100%;height:auto;display:block;border-radius:12px}</style></head><body><main><h1>AI brain-response video comparison with TRIBE v2</h1><p class="lead">A visual summary of the experiment: what was measured, what the model favored, and how slow the workflow was in practice.</p><section class="card"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900"><rect width="1400" height="900" fill="#f7f8fb"/><text x="60" y="70" font-family="Arial" font-size="34" font-weight="700" fill="#1d2433">TRIBE ROI peaks favored Video A, but real ROAS favored Video B</text><text x="60" y="110" font-family="Arial" font-size="20" fill="#5d6678">Peak cortical ROI responses from selected attention, salience, and control regions.</text><line x1="110" y1="180" x2="110" y2="690" stroke="#7d8698" stroke-width="3"/><line x1="110" y1="690" x2="1330" y2="690" stroke="#7d8698" stroke-width="3"/><g font-family="Arial" font-size="16" fill="#5d6678"><line x1="110" y1="615" x2="1330" y2="615" stroke="#e1e6ef" stroke-width="2"/><text x="40" y="620">0.22</text><line x1="110" y1="505" x2="1330" y2="505" stroke="#e1e6ef" stroke-width="2"/><text x="40" y="510">0.28</text><line x1="110" y1="395" x2="1330" y2="395" stroke="#e1e6ef" stroke-width="2"/><text x="40" y="400">0.34</text><line x1="110" y1="285" x2="1330" y2="285" stroke="#e1e6ef" stroke-width="2"/><text x="40" y="290">0.40</text><line x1="110" y1="175" x2="1330" y2="175" stroke="#e1e6ef" stroke-width="2"/><text x="40" y="180">0.46</text></g><polyline fill="none" stroke="#d14b5a" stroke-width="4" points="110,173.8 354,366.5 598,405.8 842,459.3 1086,493.1 1330,563.6"/><polyline fill="none" stroke="#3d6ec9" stroke-width="4" points="110,355.2 354,479.7 598,445.0 842,485.9 1086,522.1 1330,636.2"/><g fill="#d14b5a" font-family="Arial" font-size="16"><circle cx="110" cy="173.8" r="7"/><text x="92" y="150">0.462</text><circle cx="354" cy="366.5" r="7"/><text x="336" y="343">0.356</text><circle cx="598" cy="405.8" r="7"/><text x="580" y="382">0.336</text><circle cx="842" cy="459.3" r="7"/><text x="824" y="436">0.308</text><circle cx="1086" cy="493.1" r="7"/><text x="1068" y="470">0.293</text><circle cx="1330" cy="563.6" r="7"/><text x="1312" y="540">0.254</text></g><g fill="#3d6ec9" font-family="Arial" font-size="16"><circle cx="110" cy="355.2" r="7"/><text x="92" y="386">0.362</text><circle cx="354" cy="479.7" r="7"/><text x="336" y="510">0.294</text><circle cx="598" cy="445.0" r="7"/><text x="580" y="476">0.316</text><circle cx="842" cy="485.9" r="7"/><text x="824" y="516">0.294</text><circle cx="1086" cy="522.1" r="7"/><text x="1068" y="553">0.276</text><circle cx="1330" cy="636.2" r="7"/><text x="1312" y="667">0.214</text></g><g font-family="Arial" font-size="17" fill="#1d2433" text-anchor="middle"><text x="110" y="730">IFJp-rh</text><text x="110" y="752">Attention switching</text><text x="354" y="730">TE1a-rh</text><text x="354" y="752">Visual meaning</text><text x="598" y="730">a32pr-rh</text><text x="598" y="752">Salience / value</text><text x="842" y="730">p24-rh</text><text x="842" y="752">Cingulate salience</text><text x="1086" y="730">46-rh</text><text x="1086" y="752">Prefrontal control</text><text x="1330" y="730">8C-rh</text><text x="1330" y="752">Attention control</text></g><g font-family="Arial" font-size="22" fill="#1d2433"><line x1="1010" y1="110" x2="1055" y2="110" stroke="#d14b5a" stroke-width="4"/><circle cx="1032" cy="110" r="6" fill="#d14b5a"/><text x="1070" y="118">Video A</text><line x1="1170" y1="110" x2="1215" y2="110" stroke="#3d6ec9" stroke-width="4"/><circle cx="1192" cy="110" r="6" fill="#3d6ec9"/><text x="1230" y="118">Video B</text></g><rect x="120" y="800" rx="18" ry="18" width="1160" height="58" fill="#ffffff" stroke="#d9deea" stroke-width="2"/><text x="700" y="836" text-anchor="middle" font-family="Arial" font-size="22" fill="#1d2433">Actual result: Video B had higher ROAS (3+) than Video A (~2.5).</text></svg><div class="cap">The model favored Video A across the key ROI peaks that were tracked. Real performance went the other way, which became the most important result in the experiment.</div></section><section class="card"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900"><rect width="1400" height="900" fill="#f7f8fb"/><text x="60" y="70" font-family="Arial" font-size="34" font-weight="700" fill="#1d2433">Runtime and infrastructure reality</text><text x="60" y="110" font-family="Arial" font-size="20" fill="#5d6678">The method worked, but the workflow was too slow and fragile on the available hardware.</text><g font-family="Arial"><text x="60" y="270" font-size="24" font-weight="700" fill="#1d2433">Colab T4: Video A</text><rect x="360" y="230" rx="18" ry="18" width="840" height="70" fill="#d14b5a"/><text x="1220" y="274" font-size="24" font-weight="700" fill="#1d2433">3h 32m</text><text x="60" y="430" font-size="24" font-weight="700" fill="#1d2433">Colab T4: Video B</text><rect x="360" y="390" rx="18" ry="18" width="842" height="70" fill="#3d6ec9"/><text x="1222" y="434" font-size="24" font-weight="700" fill="#1d2433">3h 32m</text><rect x="90" y="570" rx="16" ry="16" width="1220" height="62" fill="#ffffff" stroke="#d9deea" stroke-width="2"/><text x="120" y="610" font-size="22" fill="#1d2433">Local MacBook: enough to debug the stack, not practical for repeated full runs.</text><rect x="90" y="655" rx="16" ry="16" width="1220" height="62" fill="#ffffff" stroke="#d9deea" stroke-width="2"/><text x="120" y="695" font-size="22" fill="#1d2433">Free Colab T4: both short videos completed, but each clip took more than 3.5 hours.</text><rect x="90" y="740" rx="16" ry="16" width="1220" height="62" fill="#ffffff" stroke="#d9deea" stroke-width="2"/><text x="120" y="780" font-size="22" fill="#1d2433">Operational takeaway: a real version needs a dedicated GPU-backed workflow.</text></g></svg><div class="cap">The experiment completed, but the compute cost and runtime instability made the infrastructure conclusion just as important as the model result.</div></section></main></body></html>`;
+
+  /* ---- markdown-lite ---- */
+  function inlineMd(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>')
+      .replace(/(^|[^*])\*([^*]+)\*/g,'$1<em>$2</em>');
+  }
+  function renderArticle(t){
+    return t.split(/\n\n+/).map(block=>{
+      const lines=block.split('\n');
+      const m=lines[0].match(/^\*\*(.+)\*\*$/);
+      if(m && lines.length>1) return `<h4>${inlineMd(m[1])}</h4><p>${inlineMd(lines.slice(1).join(' '))}</p>`;
+      if(m) return `<h4>${inlineMd(m[1])}</h4>`;
+      return `<p>${inlineMd(block.replace(/\n/g,' '))}</p>`;
+    }).join('');
+  }
+  function embedFrame(a){
+    return a.embed.kind==='demo'
+      ? `<iframe data-demosrc="${a.embed.src}"></iframe>`
+      : `<iframe data-artifact="1"></iframe>`;
+  }
+
+  /* ---- horizontal card strip ---- */
+  const strip=document.getElementById('strip');
+  strip.innerHTML=articles.map((a,i)=>`
+    <div class="r-card" data-i="${i}">
+      <div class="rc-visual">${embedFrame(a)}</div>
+      <div class="rc-body">
+        <div class="rc-eyebrow"><span class="ed"></span>experiment · day ${a.day} · ${a.date}</div>
+        <div class="rc-headline">${a.headline}</div>
+        <div class="rc-name">${a.title}</div>
+      </div>
+    </div>`).join('');
+  strip.querySelectorAll('iframe[data-demosrc]').forEach(f=>{ f.src=f.dataset.demosrc; });
+  strip.querySelectorAll('iframe[data-artifact]').forEach(f=>{ f.srcdoc=TRIBE_ARTIFACT; });
+
+  /* ---- reading panel ---- */
+  const read=document.getElementById('read');
+  function renderRead(a){
+    const links=a.links.length
+      ? `<div class="rr-foot"><h5>read / try it</h5><div class="rr-links">${a.links.map(([t,u])=>`<a class="rr-link" href="${u}" target="_blank" rel="noopener">${t} ↗</a>`).join('')}</div>
+         <div class="rr-stack">${a.stack.map(s=>`<span class="chip">${s}</span>`).join('')}</div></div>`
+      : `<div class="rr-foot"><h5>built with</h5><div class="rr-stack">${a.stack.map(s=>`<span class="chip">${s}</span>`).join('')}</div></div>`;
+    read.innerHTML=`
+      <div class="rr-eyebrow"><span class="ed"></span>experiment · day ${a.day} · ${a.date}</div>
+      <h2 class="rr-headline">${a.headline}</h2>
+      <div class="rr-title">${a.title}</div>
+      <div class="rr-byline"><span class="av">◆</span>by the artlu.ai agent</div>
+      <div class="rr-body">${renderArticle(a.body)}</div>
+      ${links}`;
+  }
+  const readWrap=document.getElementById('readWrap');
+  const backBtn=document.getElementById('backBtn');
+  function selectCard(i){
+    strip.querySelectorAll('.r-card').forEach((c,idx)=>{
+      c.classList.toggle('active',idx===i);
+      c.classList.toggle('min',idx!==i);
+    });
+    strip.classList.add('solo');
+    renderRead(articles[i]);
+    readWrap.classList.add('show');
+  }
+  function browse(){
+    strip.querySelectorAll('.r-card').forEach(c=>c.classList.remove('active','min'));
+    strip.classList.remove('solo');
+    readWrap.classList.remove('show');
+  }
+  strip.addEventListener('click',e=>{
+    const card=e.target.closest('.r-card'); if(!card) return;
+    selectCard(+card.dataset.i);
+  });
+  backBtn.onclick=browse;
+
+  /* ---- strip edge fades ---- */
+  const fadeL=document.getElementById('fadeL'), fadeR=document.getElementById('fadeR');
+  function syncFades(){
+    const max=strip.scrollWidth-strip.clientWidth;
+    fadeL.style.opacity=strip.scrollLeft>8?1:0;
+    fadeR.style.opacity=(strip.scrollLeft<max-8 && max>8)?1:0;
+  }
+  strip.addEventListener('scroll',syncFades,{passive:true});
+  window.addEventListener('resize',syncFades); syncFades();
+
+  /* ---- activity strip + header ---- */
+  (function(){
+    const act=[1,0,2,1,3,2,0,1,4,2,1,3,2,0,2,1,3,2,4,1];
+    const h=document.getElementById('actStrip'); if(!h) return;
+    act.forEach(lv=>{ const c=document.createElement('div'); c.className='pcell';
+      if(lv){ c.style.background='var(--green)'; c.style.opacity=(0.3+lv*0.17); } h.appendChild(c); });
+  })();
+  const topbar=document.getElementById('topbar');
+  function onScroll(){ topbar.classList.toggle('stuck',(window.scrollY||document.documentElement.scrollTop)>6); }
+  window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+  function toggleTheme(){ const h=document.documentElement; const t=h.dataset.theme==='light'?'dark':'light';
+    h.dataset.theme=t; try{ localStorage.setItem('artlu-theme',t); }catch(e){} }
+  window.toggleTheme=toggleTheme;
+</script>
+</body>
+</html>

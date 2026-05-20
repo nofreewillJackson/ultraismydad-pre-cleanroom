@@ -1,0 +1,78 @@
+[
+  {
+    "id": "spoolcast",
+    "name": "spoolcast",
+    "meta": "video pipeline",
+    "desc": "The AI-to-video pipeline powering shorts, devlogs, and media experiments.",
+    "repoUrl": "https://github.com/artluai/spoolcast",
+    "heroImg": "https://img.youtube.com/vi/7p43_3gHJj0/maxresdefault.jpg",
+    "visibility": "public",
+    "sortOrder": 10
+  },
+  {
+    "id": "research",
+    "name": "research",
+    "meta": "experiments + writeups",
+    "desc": "AI research experiments, evaluations, and reproducible reports.",
+    "heroImg": "/images/project-thumbnails/context-gate-style-library.png",
+    "visibility": "public",
+    "sortOrder": 20
+  },
+  {
+    "id": "pipelinecpc",
+    "name": "PipelineCPC",
+    "meta": "ads planning SaaS",
+    "desc": "Paid-search keyword research and agent-assisted Google Ads planning.",
+    "siteUrl": "https://pipelinecpc.com",
+    "visibility": "public",
+    "sortOrder": 30
+  },
+  {
+    "id": "adsmetri",
+    "name": "AdsMetri",
+    "meta": "meta ads ops",
+    "desc": "Meta Ads performance intelligence for operators running multiple accounts.",
+    "siteUrl": "https://adsmetri.com",
+    "logoUrl": "https://adsmetri.com/logo-mark.svg",
+    "visibility": "public",
+    "sortOrder": 40
+  },
+  {
+    "id": "vibeskill",
+    "name": "VibeSkill",
+    "meta": "skill map",
+    "desc": "Interactive skill-tree progress tracking for everything a builder has shipped.",
+    "demoUrl": "https://vsmockup-d.pages.dev/",
+    "heroImg": "/images/project-thumbnails/vibeskill-demo.png",
+    "visibility": "public",
+    "sortOrder": 50
+  },
+  {
+    "id": "costintel",
+    "name": "CostIntel",
+    "meta": "fulfillment automation",
+    "desc": "eCommerce fulfillment automation and cost analytics.",
+    "demoUrl": "https://costintel-automator-demo.pages.dev/",
+    "heroImg": "/images/project-thumbnails/costintel-demo.png",
+    "visibility": "public",
+    "sortOrder": 60
+  },
+  {
+    "id": "artlu",
+    "name": "artlu.ai",
+    "meta": "this tracker",
+    "desc": "The build-in-public tracker behind the 100 day project.",
+    "siteUrl": "https://artlu.ai",
+    "heroImg": "/images/project-thumbnails/artlu-stack-view.png",
+    "visibility": "public",
+    "sortOrder": 70
+  },
+  {
+    "id": "other",
+    "name": "other builds",
+    "meta": "experiments",
+    "desc": "Standalone utilities, experiments, and one-off shipped tools.",
+    "visibility": "public",
+    "sortOrder": 999
+  }
+]

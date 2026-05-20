@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>artlu.ai — node canvas</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  html[data-theme="dark"] {
+    --bg:#08090a; --surface:#0e0f11; --surface-2:#16191d;
+    --border:#1a1d22; --border-strong:#2b3038; --border-hover:#4a525e;
+    --text:#c0c4cc; --text-bright:#f0f1f3; --text-sub:#9aa0aa;
+    --dim:#6b7280; --dimmer:#3a3f48;
+    --green:#4ade80; --green-bg:#062b12; --green-border:#1d4d31;
+    --blue:#60a5fa; --amber:#d8a657; --amber-bg:#1c1a12;
+    --sub-border:#3a3320; --proj-border:#27412f; --port:#3a6f4c;
+    --grid-line:#0d1014; --grid-dot:#15181d; --timeline:#262b33;
+    --node-shadow:0 8px 26px rgba(0,0,0,0.6);
+    --new-shadow:0 0 0 1px var(--green-border), 0 8px 30px rgba(74,222,128,0.15);
+    --peg-glow:0 0 8px rgba(74,222,128,0.5); --px-bg:rgba(0,0,0,0.3); --hud-bg:rgba(8,9,10,0.9);
+    --wire:#34543f;
+    --panel-bg:linear-gradient(180deg,#101216,#0c0d10); --feat-head:#0f1722; --head-dot:#1a2030;
+    --font:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  html[data-theme="light"] {
+    --bg:#e9eaec; --surface:#ffffff; --surface-2:#f2f3f5;
+    --border:#dcdfe2; --border-strong:#b7bcc3; --border-hover:#9ba0a8;
+    --text:#34373c; --text-bright:#15171a; --text-sub:#50545a;
+    --dim:#676c74; --dimmer:#9298a0;
+    --green:#0a7d5e; --green-bg:#e6f4ee; --green-border:#a9ddc9;
+    --blue:#2563eb; --amber:#8a6300; --amber-bg:#f3e9d2;
+    --sub-border:#e1d5aa; --proj-border:#b0dac6; --port:#9298a0;
+    --grid-line:transparent; --grid-dot:transparent; --timeline:#b7bcc3;
+    --node-shadow:0 1px 2px rgba(22,24,27,0.07), 0 4px 14px rgba(22,24,27,0.06);
+    --new-shadow:0 0 0 1.5px var(--green), 0 4px 14px rgba(10,125,94,0.16);
+    --peg-glow:0 0 0 3px var(--green-bg); --px-bg:#eef0f2; --hud-bg:rgba(255,255,255,0.95);
+    --wire:#a8adb5;
+    --panel-bg:#ffffff; --feat-head:#eef1f4; --head-dot:transparent;
+    --font:'Inter',system-ui,sans-serif;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; }
+  body { background:var(--bg); color:var(--text); font-family:var(--font); font-size:14px; overflow:hidden; -webkit-font-smoothing:antialiased; }
+  .theme-tog { width:30px; height:28px; border:1px solid var(--border); background:transparent; color:var(--text-sub); border-radius:5px; cursor:pointer; font-size:13px; }
+
+  .topbar { height:72px; border-bottom:1px solid transparent; background:var(--bg); display:flex; align-items:center; gap:24px; padding:0 18px; position:relative; z-index:40; transition:background .16s, border-color .16s, box-shadow .16s; }
+  .topbar.stuck { background:var(--surface); border-bottom-color:var(--border); box-shadow:var(--node-shadow); }
+  .brandwrap { display:flex; align-items:center; gap:18px; }
+  .identity { display:flex; flex-direction:column; gap:3px; }
+  .htitle { font-size:13px; font-weight:600; color:var(--text-bright); white-space:nowrap; }
+  .hbio { font-size:11.5px; color:var(--text-sub); white-space:nowrap; }
+  .hright { margin-left:auto; display:flex; align-items:center; gap:14px; }
+  .brand { font-weight:600; font-size:29px; letter-spacing:-0.02em; color:var(--text-bright); display:flex; align-items:center; gap:3px; }
+  .cursor-bl { width:10px; height:26px; background:var(--green); display:inline-block; animation:blink 1s step-end infinite; }
+  @keyframes blink { 50% { opacity:0; } }
+  .seg { display:flex; border:1px solid var(--border); border-radius:4px; overflow:hidden; }
+  .seg button { font-family:var(--mono); font-size:12px; background:transparent; color:var(--dim); border:none; padding:6px 15px; cursor:pointer; }
+  .seg button.on { background:var(--green-bg); color:var(--green); }
+  .seg .seg-theme { padding:6px 11px; font-size:13px; border-left:1px solid var(--border); }
+  .navgroup { display:flex; align-items:center; gap:8px; }
+  .tip { margin-left:auto; font-size:12.5px; color:var(--dim); }
+  .tip b { color:var(--text-sub); font-weight:500; }
+
+  .viewport {
+    position:absolute; top:72px; left:0; right:0; bottom:0; overflow:hidden; cursor:grab;
+    background:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
+      radial-gradient(circle, var(--grid-dot) 1.5px, transparent 1.5px);
+    background-size:160px 160px, 160px 160px, 32px 32px;
+  }
+  .viewport.grabbing { cursor:grabbing; }
+  svg.wires path { stroke:var(--wire); }
+  .world { position:absolute; top:0; left:0; width:1760px; height:3600px; transform-origin:0 0; }
+  .world.busy iframe { pointer-events:none; }
+  svg.wires { position:absolute; top:0; left:0; width:1760px; height:3600px; overflow:visible; pointer-events:none; z-index:1; }
+
+  .col-head { position:absolute; top:124px; font-size:13px; color:var(--dim); letter-spacing:1.5px; text-transform:uppercase; }
+  .timeline { position:absolute; top:176px; left:86px; border-left:1px solid var(--timeline); }
+  .tick { position:absolute; left:86px; transform:translate(-50%,-50%); }
+  .tick .lbl { font-size:15px; font-weight:600; color:var(--text-bright); background:var(--bg); padding:4px 11px; border:1px solid var(--border-strong); border-radius:5px; white-space:nowrap; }
+
+  .node {
+    position:absolute; z-index:2; background:var(--surface);
+    border:1px solid var(--border-strong); border-radius:8px;
+    box-shadow:var(--node-shadow); cursor:pointer; overflow:hidden;
+  }
+  .node.feature { width:330px; }
+  .node.feature.lh { display:flex; height:240px; }
+  .node.journal { width:250px; }
+  .node.sub  { width:262px; border-color:var(--sub-border); }
+  .node.proj { width:264px; border-color:var(--proj-border); }
+  .node:hover { border-color:var(--border-hover); }
+  .node.dragging { z-index:25; box-shadow:0 16px 42px rgba(0,0,0,0.8); }
+  .node.new { box-shadow:var(--node-shadow); }
+  .node.sel { box-shadow:var(--node-shadow), 0 0 0 2px var(--border-hover); }
+  .follower { transition:top .12s ease-out, opacity .15s; }
+
+  .nhead { display:flex; align-items:center; gap:8px; padding:9px 11px; background:var(--surface-2); border-bottom:1px solid var(--border); cursor:grab; }
+  .node.journal .nhead { background:var(--amber-bg); }
+  .node.sub  .nhead { background:var(--amber-bg); }
+  .node.proj .nhead { background:var(--green-bg); }
+  .node.follower .nhead { cursor:pointer; }
+  .sdot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .sdot.launched, .sdot.research { background:var(--green); }
+  .sdot.video { background:var(--blue); }
+  .sdot.journal { background:var(--amber); }
+  .glyph.sub { color:var(--amber); } .glyph.proj { color:var(--green); }
+  .nname {
+    color:var(--text-bright); font-weight:600; font-size:14px; line-height:1.38;
+    overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+  }
+  .node.journal .nname { font-size:12.5px; color:var(--amber); }
+  .ntag { margin-left:auto; flex-shrink:0; font-size:11px; color:var(--dim); border:1px solid var(--border); border-radius:3px; padding:2px 7px; }
+  .node.journal .ntag { color:var(--amber); border-color:#3a3320; }
+  .node.sub .ntag { color:var(--amber); border-color:#3a3320; }
+  .node.proj .ntag { color:var(--green); border-color:var(--green-border); }
+
+  /* media area — vertical videos = strip on the left, others = on top */
+  .fmedia { background:#000; }
+  .fmedia.h, .fmedia.d { border-bottom:1px solid var(--border); }
+  .fmedia.h { width:100%; aspect-ratio:16/9; }
+  .fmedia.d { width:100%; height:198px; }
+  .fmedia.v { width:112px; flex-shrink:0; border-right:1px solid var(--border); }
+  .fmedia iframe { width:100%; height:100%; border:0; display:block; }
+  .fcol { flex:1; min-width:0; display:flex; flex-direction:column; }
+  .lh .nbody { flex:1; display:flex; flex-direction:column; }
+  .lh .nfoot { margin-top:auto; }
+
+  .nbody { padding:10px 11px; }
+  .ndesc { color:var(--text-sub); font-size:13px; line-height:1.55; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+  .node.journal .ndesc { font-style:italic; -webkit-line-clamp:2; }
+  .stack { margin-top:8px; display:flex; flex-wrap:wrap; gap:5px; }
+  .chip { font-size:11px; color:var(--text-sub); background:var(--surface-2); border:1px solid var(--border); border-radius:3px; padding:2px 7px; }
+  .nfoot { margin-top:9px; display:flex; align-items:center; gap:8px; font-size:12px; color:var(--dim); }
+  .node.journal .nfoot { color:var(--amber); }
+  .status { padding:2px 7px; border-radius:3px; font-size:11px; }
+  .status-launched { background:var(--green-bg); color:var(--green); }
+  .new-tag { font-size:11px; color:var(--green); border:1px solid var(--green-border); background:var(--green-bg); border-radius:3px; padding:1px 7px; }
+
+  .port { display:none; }
+
+  /* detail panel */
+  .panel {
+    position:absolute; top:72px; right:0; bottom:0; width:466px; z-index:38;
+    background:var(--panel-bg); border-left:1px solid var(--border-strong);
+    box-shadow:0 8px 40px rgba(0,0,0,0.22);
+    transform:translateX(102%); transition:transform .22s cubic-bezier(.2,.7,.2,1);
+    display:flex; flex-direction:column;
+  }
+  .panel.open { transform:translateX(0); }
+  .panel .peg { position:absolute; left:-8px; width:13px; height:13px; border-radius:50%; background:var(--surface); border:2px solid var(--green); box-shadow:var(--peg-glow); }
+  .panel .peg:nth-child(1){ top:90px; } .panel .peg:nth-child(2){ top:50%; } .panel .peg:nth-child(3){ bottom:90px; }
+  .p-head { padding:15px 18px; border-bottom:1px solid var(--border); position:relative; background-image:radial-gradient(circle,var(--head-dot) 1px,transparent 1px); background-size:18px 18px; }
+  .panel.feature .p-head { background-color:var(--feat-head); }
+  .panel.journal .p-head, .panel.sub .p-head { background-color:var(--amber-bg); }
+  .panel.proj .p-head { background-color:var(--green-bg); }
+  .p-kicker { display:flex; align-items:center; gap:8px; }
+  .p-kind { font-size:11.5px; letter-spacing:1.5px; text-transform:uppercase; color:var(--dim); }
+  .p-x { margin-left:auto; width:28px; height:28px; border:1px solid var(--border-strong); background:var(--px-bg); color:var(--text-sub); border-radius:6px; cursor:pointer; font-size:15px; }
+  .p-title { margin-top:11px; font-size:22px; font-weight:600; color:var(--text-bright); line-height:1.32; }
+  .p-meta { margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; }
+  .p-meta span { font-size:11.5px; color:var(--text-sub); border:1px solid var(--border); border-radius:3px; padding:3px 8px; }
+  .p-body { flex:1; overflow-y:auto; padding:16px 18px; }
+  .p-embed { border:1px solid var(--border-strong); border-radius:8px; overflow:hidden; background:#000; box-shadow:0 6px 20px rgba(0,0,0,0.5); }
+  .p-embed.h { aspect-ratio:16/9; } .p-embed.d { height:360px; }
+  .p-embed.v { width:248px; height:440px; margin:0 auto; }
+  .p-embed iframe { width:100%; height:100%; border:0; display:block; }
+  .p-text { margin-top:14px; color:var(--text); font-size:15px; line-height:1.72; }
+  .p-text p { margin-bottom:11px; }
+  .p-sec { margin-top:20px; }
+  .p-sec h4 { font-size:11px; letter-spacing:1.3px; text-transform:uppercase; color:var(--green); margin-bottom:9px; display:flex; align-items:center; gap:7px; }
+  .p-sec h4::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--green); }
+  .panel.journal .p-sec h4, .panel.sub .p-sec h4 { color:var(--amber); }
+  .panel.journal .p-sec h4::before, .panel.sub .p-sec h4::before { background:var(--amber); }
+  .p-chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .pill-row { display:flex; flex-direction:column; gap:7px; }
+  .pill { display:flex; align-items:center; gap:9px; padding:10px 12px; cursor:pointer; border:1px solid var(--border); border-radius:6px; background:var(--surface-2); font-size:14px; color:var(--text-sub); }
+  .pill:hover { border-color:var(--green-border); color:var(--text-bright); }
+  .pill .pg { color:var(--green); font-size:10px; }
+  .pill.amber .pg { color:var(--amber); }
+  .p-foot { padding:14px 18px; border-top:1px solid var(--border); }
+  .open-page { display:flex; align-items:center; justify-content:center; gap:8px; padding:13px; border-radius:7px; background:var(--green-bg); border:1px solid var(--green-border); color:var(--green); font-size:14px; font-weight:500; text-decoration:none; }
+  .open-page small { color:var(--dim); font-size:10px; }
+
+  .hud { position:absolute; left:16px; bottom:14px; z-index:25; font-size:11.5px; color:var(--dim); background:var(--hud-bg); border:1px solid var(--border); border-radius:5px; padding:8px 12px; }
+  .world-intro { position:absolute; left:86px; top:12px; width:1040px; z-index:2; }
+  .world-intro .wi-h { font-size:15px; font-weight:600; color:var(--text-bright); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:9px; }
+  .world-intro .wi-p { font-size:13.5px; color:var(--text-sub); line-height:1.72; max-width:980px; }
+  .zoomctl { position:absolute; right:16px; bottom:14px; z-index:25; display:flex; gap:5px; }
+  .zoomctl button { width:28px; height:28px; background:var(--surface); border:1px solid var(--border); color:var(--text-sub); border-radius:5px; cursor:pointer; font-size:14px; font-family:var(--mono); }
+
+  /* progress block in the header */
+  .progress { display:flex; flex-direction:column; align-items:flex-start; gap:5px; }
+  .pcount { font-family:var(--mono); font-size:11.5px; color:var(--text-sub); white-space:nowrap; }
+  .pcount b { color:var(--text-bright); }
+  .pstrip { display:flex; gap:3px; }
+  .pcell { width:9px; height:9px; border-radius:2px; background:var(--border); position:relative; }
+  .pcell:hover { outline:1.5px solid var(--text-sub); outline-offset:1px; }
+  .pcell:hover::after { content:attr(data-tip); position:absolute; top:17px; left:50%; transform:translateX(-50%);
+    background:var(--surface-2); border:1px solid var(--border-strong); border-radius:5px; padding:5px 9px;
+    font-size:11px; color:var(--text-bright); white-space:nowrap; z-index:60; box-shadow:var(--node-shadow); pointer-events:none; }
+</style>
+<script>try{var _t=localStorage.getItem('artlu-theme');if(_t)document.documentElement.dataset.theme=_t;}catch(e){}</script>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brandwrap">
+    <div class="brand">artlu.ai<span class="cursor-bl"></span></div>
+    <div class="identity">
+      <div class="htitle">100 days. 100 features.</div>
+      <div class="hbio">one person. no coding experience. just AI and an internet connection.</div>
+    </div>
+  </div>
+  <div class="hright">
+    <div class="progress">
+      <span class="pcount">day <b>63</b>/100 · <b>79</b> shipped · <b>21</b> to go</span>
+      <div class="pstrip" id="actStrip"></div>
+    </div>
+    <div class="navgroup">
+      <div class="seg"><button onclick="location.href='astro-list-view.html'">list</button><button class="on">map</button><button onclick="location.href='astro-stack-view.html'">stack</button><button class="seg-theme" onclick="toggleTheme()" title="toggle theme">◐</button></div>
+      <div class="seg"><button onclick="location.href='astro-log-view.html'">log</button><button onclick="location.href='astro-research-view.html'">research</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="viewport" id="viewport">
+  <div class="world" id="world"><svg class="wires" id="wires"></svg>
+    <div class="world-intro">
+      <div class="wi-h">what is this?</div>
+      <div class="wi-p">A live map of everything shipped on artlu.ai — each feature traces back through its journal entry, series, and the main project it belongs to. Drag to pan, scroll to zoom, click any node to read more.</div>
+    </div>
+  </div>
+</div>
+
+<aside class="panel" id="panel">
+  <div class="p-head">
+    <div class="p-kicker"><span class="p-kind" id="pkind"></span>
+      <button class="p-x" onclick="closePanel()">×</button></div>
+    <div class="p-title" id="ptitle"></div>
+    <div class="p-meta" id="pmeta"></div>
+  </div>
+  <div class="p-body" id="pbody"></div>
+  <div class="p-foot"><a class="open-page" id="popen" href="#">open full page ↗ <small id="pslug"></small></a></div>
+</aside>
+
+<div class="hud">drag canvas to pan · scroll to zoom · drag a node by its header · click to expand</div>
+<div class="zoomctl">
+  <button onclick="zoomBy(-1)">−</button><button onclick="zoomBy(1)">+</button>
+  <button onclick="resetView()" style="width:auto;padding:0 9px;font-size:11px">fit</button>
+</div>
+
+<script>
+  const projects = {
+    spoolcast:   { name:'spoolcast', desc:'The AI-to-video pipeline behind every show and devlog. Turns a chat session into a finished video.', meta:'main project · launched', slug:'spoolcast' },
+    pipelinecpc: { name:'PipelineCPC', desc:'Paid-search keyword research SaaS for Google Ads.', meta:'main project · launched', slug:'pipelinecpc' },
+    adsmetri:    { name:'AdsMetri', desc:'Meta Ads performance intelligence dashboard.', meta:'main project · launched', slug:'adsmetri' },
+  };
+  const subgroups = {
+    aninews: { name:'Aninews', project:'spoolcast', desc:'Daily AI-news anime satire — the FAUX7 NEWS show. Each episode ships as its own entry.', meta:'series · 11 episodes', slug:'series/aninews' },
+    devlog:  { name:'spoolcast dev-log', project:'spoolcast', desc:'Behind-the-scenes YouTube series on building with AI.', meta:'series · 6 episodes', slug:'series/spoolcast-dev-log' },
+  };
+  const journals = {
+    p1:{by:'ai',day:60,date:'may 16',title:'pipelinecpc got an agent planning bridge',body:"pipelinecpc can talk to agents now.\n\nnot as an ad launcher. the useful version is safer: codex, claude, or hermes can read saved keyword research, group it into ad groups, suggest negatives, and export a draft google ads structure.\n\nthe first test exposed the real problem: saved keyword lists can be noisy. so the planning layer now infers the likely campaign goal first, then splits keywords into included, needs review, and excluded."},
+    ep10:{by:'ai',day:60,date:'may 16',title:"shipped news-anime-bot ep 10 — cisco's 4,000 layoffs",body:"shipped another news-anime-bot short. cisco posted a record quarter and cut nearly 4,000 jobs the same day. stock rose 15%.\n\nthe useful part this run was the stitch fix, not the script. first cut had nine seconds of dead silence — i'd oversized the clips and locked the final beat's narration to its visual cut.\n\nupdated rules.md §7: the sync-drift hard-fail is now symmetric. re-stitched in 30 seconds."},
+    d7:{by:'ai',day:57,date:'may 13',title:'shipped spoolcast dev-log 7 — the AdsMetri three-agent build',body:"shipped the AdsMetri devlog about building one product across Codex, Manus, and Claude.\n\nthe useful lesson was not \"use three AIs.\" the product only made sense when the roles separated: Claude for design, Manus for foundation, Codex for repo-level implementation.\n\nthe video also exposed pipeline problems — thumbnails needed deterministic text overlays."},
+    a2:{by:'ai',day:56,date:'may 12',title:'adsmetri analyzer pass',body:"turned adsmetri into a real meta ads analysis surface instead of just a budget tool. shipped lifecycle views, fulfillment break-even math, and daily meta p&l.\n\nthe hard part was getting the account scoping and snapshot behavior to stop lying. the analyzer is still the part that needs the most discipline."},
+    d6:{by:'ai',day:52,date:'may 8',title:'shipped spoolcast dev log 6 — why ai makes things up',body:"today's spoolcast video is about a quieter agent failure: the agent invents answers about its own work because there's nothing real for it to look at.\n\nmost of the session was about audio — switched the tts pipeline to chunk-level ssml synthesis. caught a cumulative 1.21x speedup bug that was the inhuman feel."},
+    ep7:{by:'ai',day:52,date:'may 8',title:"shipped news-anime-bot ep 7 — google's ai health coach",body:"shipped another news-anime-bot short, about Google launching a Gemini-powered health coach.\n\nthe useful part was the workflow test. the new Spoolcast stage machine kept the episode on rails: source facts first, then script, then TTS, then clips, then stitch.\n\nit is FAUX7 NEWS: satire on real events."},
+    d5:{by:'ai',day:51,date:'may 7',title:'shipped spoolcast dev log 5 — repo gps for ai agents',body:"Today's Spoolcast video is about AI agents hallucinating workflows, not just facts.\n\nThe rules had grown out of trial and error and the docs became a patchwork. The repo needed a routing step.\n\nThat became the video: my AI was not ignoring instructions. It was lost, so I gave the repo GPS."},
+  };
+
+  // mt: 'v'=vertical video, 'h'=horizontal video, 'd'=demo, null=text only
+  const features = [
+    { id:'ep11', sub:'aninews', type:'video', mt:'v', new:true, date:'may 18', slug:'project/aninews-ep-11',
+      name:'Google Closes In On Nvidia — Aninews ep 11',
+      desc:'Satire on Google, written off in the AI race, closing in on Nvidia as the most valuable company.',
+      embed:{v:'uBfr45P2aOM'}, stack:['spoolcast','Seedance 2.0 Fast','Google Cloud TTS','ffmpeg'] },
+    { id:'cg', proj:'spoolcast', type:'research', mt:'d', new:true, date:'may 18', slug:'research/context-gate',
+      name:'AI hallucination experiment — Context Gate',
+      desc:"Built after spoolcast kept breaking its own rules — tests whether forcing the source of truth into context cuts hallucination.",
+      embed:{d:'https://artluai.github.io/context-gate-ai-hallucination/'}, stack:['Python','vanilla HTML/CSS/JS'] },
+    { id:'p1', proj:'pipelinecpc', type:'project', date:'may 16', status:'launched', slug:'project/agent-campaign-planning-bridge',
+      name:'agent campaign planning bridge — PipelineCPC',
+      desc:'MCP + agent API bridge letting AI agents plan Google Ads without launching them.',
+      stack:['Node.js','MCP','Firebase Auth','Firestore','Railway'], journal:'p1' },
+    { id:'ep10', sub:'aninews', type:'video', mt:'v', date:'may 16', slug:'project/aninews-ep-10',
+      name:'Cisco Pops 15% On 4,000 Layoffs — Aninews ep 10',
+      desc:'Satire on Cisco firing the engineers who built the networks its AI customers are buying.',
+      embed:{v:'_umRCKLUG8k'}, stack:['spoolcast','Seedance 2.0 Fast','Google Cloud TTS','ffmpeg'], journal:'ep10' },
+    { id:'a1', proj:'adsmetri', type:'project', date:'may 16', status:'launched', slug:'project/creative-intelligence-tagging-workbench',
+      name:'creative intelligence tagging workbench — AdsMetri',
+      desc:'Tag Meta ad creatives by hand and compare performance across 7 tag dimensions.',
+      stack:['React 19','tRPC 11','shadcn/ui','Tailwind','Drizzle','MySQL'] },
+    { id:'ep9', sub:'aninews', type:'video', mt:'v', date:'may 15', slug:'project/aninews-ep-9',
+      name:'Anthropic Vs OpenAI: 271 Bugs Found — Aninews ep 9',
+      desc:'Satire on rival AI labs racing to fix bugs their own bigger coding models will eventually write.',
+      embed:{v:'uBfr45P2aOM'}, stack:['spoolcast','Seedance 2.0 Fast','Google Cloud TTS','ffmpeg'] },
+    { id:'d7', sub:'devlog', type:'video', mt:'h', date:'may 13', slug:'project/spoolcast-dev-log-7',
+      name:'three-ai AdsMetri build story — dev-log #7',
+      desc:'Devlog on building AdsMetri across Codex, Manus and Claude — why role clarity beat raw output.',
+      embed:{h:'21zjy7BDEI0'}, stack:['Spoolcast','Remotion','Google TTS','AI image generation','YouTube'], journal:'d7' },
+    { id:'a2', proj:'adsmetri', type:'project', date:'may 12', status:'launched', slug:'project/meta-ads-performance-dashboard',
+      name:'meta ads performance dashboard — AdsMetri',
+      desc:'Visualize and analyze Meta Ads performance across campaigns, ad sets and ads from one dashboard.',
+      stack:['React','Tailwind','tRPC','Express','Drizzle','MySQL','Recharts'], journal:'a2' },
+    { id:'d6', sub:'devlog', type:'video', mt:'h', date:'may 8', slug:'project/spoolcast-dev-log-6',
+      name:'why ai makes things up — dev-log #6',
+      desc:'Why AI agents invent answers about their own work — and the small tracker that fixes it.',
+      embed:{h:'c1tWTNh2D1Y'}, stack:['Spoolcast','Remotion','Google TTS','AI image generation','YouTube'], journal:'d6' },
+    { id:'ep7', sub:'aninews', type:'video', mt:'v', date:'may 8', slug:'project/aninews-ep-7',
+      name:"Google's AI Health Coach — Aninews ep 7",
+      desc:'Satire on Google bundling a subscription into an AI health coach that wants your sleep data.',
+      embed:{v:'_umRCKLUG8k'}, stack:['spoolcast','Seedance 2.0 Fast','Google Cloud TTS','ffmpeg'], journal:'ep7' },
+    { id:'d5', sub:'devlog', type:'video', mt:'h', date:'may 7', slug:'project/spoolcast-dev-log-5',
+      name:'repo gps for ai agents — dev-log #5',
+      desc:'Giving AI agents a map of the repo so they stop hallucinating workflows.',
+      embed:{h:'nOfkukxHjm4'}, stack:['Spoolcast','Remotion','Google TTS','AI image generation','YouTube'], journal:'d5' },
+    { id:'ep6', sub:'aninews', type:'video', mt:'v', date:'may 7', slug:'project/aninews-ep-6',
+      name:'Elon Leases An Entire Data Center — Aninews ep 6',
+      desc:'Satire on a data-center lease deal between former rivals.',
+      embed:{v:'uBfr45P2aOM'}, stack:['spoolcast','Seedance 2.0 Fast','Google Cloud TTS','ffmpeg'] },
+  ];
+
+  const FEAT_X=180, JRNL_X=560, SUB_X=870, PROJ_X=1190;
+  const nodes={}, world=document.getElementById('world');
+
+  function embedFrame(e){
+    if(e.embed.v) return `<iframe src="https://www.youtube.com/embed/${e.embed.v}" allowfullscreen loading="lazy"></iframe>`;
+    if(e.embed.h) return `<iframe src="https://www.youtube.com/embed/${e.embed.h}" allowfullscreen loading="lazy"></iframe>`;
+    if(e.embed.d) return `<iframe src="${e.embed.d}" loading="lazy"></iframe>`;
+    return '';
+  }
+  function stackHTML(a){
+    if(!a) return '';
+    return `<div class="stack">${a.slice(0,3).map(s=>`<span class="chip">${s}</span>`).join('')}${a.length>3?`<span class="chip">+${a.length-3}</span>`:''}</div>`;
+  }
+  function featureHTML(e){
+    const head=`<div class="nhead" data-handle><span class="sdot ${e.type}"></span>
+      <span class="nname">${e.name}</span><span class="ntag">feature</span></div>`;
+    const foot=`<div class="nfoot">${e.status?`<span class="status status-${e.status}">${e.status}</span>`:''}
+      <span>${e.date}</span>${e.new?'<span class="new-tag">new</span>':''}</div>`;
+    const body=`<div class="nbody"><div class="ndesc">${e.desc}</div>${stackHTML(e.stack)}${foot}</div>`;
+    if(e.mt==='v'){
+      return `<div class="fmedia v">${embedFrame(e)}</div>
+        <div class="fcol">${head}${body}</div><span class="port pout"></span>`;
+    }
+    const media = e.embed ? `<div class="fmedia ${e.mt}">${embedFrame(e)}</div>` : '';
+    return `${head}${media}${body}<span class="port pout"></span>`;
+  }
+  function journalHTML(j){
+    return `<div class="nhead" data-handle><span class="sdot journal"></span>
+        <span class="nname">${j.title}</span><span class="ntag">journal</span></div>
+      <div class="nbody"><div class="ndesc">"${j.body.split('\\n')[0]}"</div>
+        <div class="nfoot">by the ${j.by} · day ${j.day}</div></div>
+      <span class="port pin"></span><span class="port pout"></span>`;
+  }
+  function groupHTML(g,k){
+    return `<div class="nhead"><span class="glyph ${k}">◆</span>
+        <span class="nname">${g.name}</span><span class="ntag">${k==='proj'?'main project':'subgroup'}</span></div>
+      <div class="nbody"><div class="ndesc">${g.desc}</div><div class="nfoot">${g.meta}</div></div>
+      <span class="port pin"></span>${k==='sub'?'<span class="port pout"></span>':''}`;
+  }
+  function mk(id,cls,html){
+    const el=document.createElement('div'); el.className='node '+cls;
+    el.innerHTML=html; el.dataset.id=id; world.appendChild(el);
+    const n={id,el,kind:cls.split(' ')[0]}; nodes[id]=n; return n;
+  }
+  features.forEach(e=>{
+    mk(e.id,'feature '+(e.mt==='v'?'lh':'lv')+(e.new?' new':''),featureHTML(e));
+    if(e.journal) mk('j_'+e.id,'journal',journalHTML(journals[e.journal]));
+  });
+  for(const id in subgroups) mk('s_'+id,'sub follower',groupHTML(subgroups[id],'sub'));
+  for(const id in projects)  mk('p_'+id,'proj follower',groupHTML(projects[id],'proj'));
+
+  [['feature — newest first',FEAT_X],['journal',JRNL_X],['subgroup / series',SUB_X],['main project',PROJ_X]]
+    .forEach(([t,x])=>{ const d=document.createElement('div'); d.className='col-head'; d.style.left=x+'px'; d.textContent=t; world.appendChild(d); });
+
+  function buildRuler(){
+    world.querySelectorAll('.tick,.timeline').forEach(e=>e.remove());
+    const tl=document.createElement('div'); tl.className='timeline'; world.appendChild(tl);
+    const seen={};
+    features.forEach(e=>{
+      if(seen[e.date]) return; seen[e.date]=1;
+      const fn=nodes[e.id];
+      const t=document.createElement('div'); t.className='tick'; t.style.top=(fn.y+36)+'px';
+      t.innerHTML=`<span class="lbl">${e.date}</span>`;
+      world.appendChild(t);
+    });
+    const last=nodes[features[features.length-1].id];
+    tl.style.height=(last.y+last.h+20-176)+'px';
+  }
+  function layout(){
+    let y=192;
+    features.forEach(e=>{
+      const fn=nodes[e.id];
+      fn.x=FEAT_X; fn.y=y; fn.el.style.left=FEAT_X+'px'; fn.el.style.top=y+'px';
+      fn.w=fn.el.offsetWidth; fn.h=fn.el.offsetHeight;
+      if(e.journal){
+        const jn=nodes['j_'+e.id];
+        jn.w=jn.el.offsetWidth; jn.h=jn.el.offsetHeight;
+        jn.x=JRNL_X; jn.y=fn.y+fn.h/2-jn.h/2;
+        jn.el.style.left=JRNL_X+'px'; jn.el.style.top=jn.y+'px';
+      }
+      y+=fn.h+40;
+    });
+    for(const id in subgroups){ const n=nodes['s_'+id]; n.x=SUB_X; n.w=n.el.offsetWidth; n.h=n.el.offsetHeight; }
+    for(const id in projects){ const n=nodes['p_'+id]; n.x=PROJ_X; n.w=n.el.offsetWidth; n.h=n.el.offsetHeight; }
+  }
+
+  const followers=[];
+  for(const id in subgroups) followers.push({n:nodes['s_'+id],members:features.filter(f=>f.sub===id).map(f=>nodes[f.id])});
+  for(const id in projects){
+    const mem=features.filter(f=>f.proj===id||(f.sub&&subgroups[f.sub].project===id));
+    followers.push({n:nodes['p_'+id],members:mem.map(f=>nodes[f.id])});
+  }
+  function positionFollowers(){
+    const vpH=vp.clientHeight, wTop=-pan.y/scale, wBot=(vpH-pan.y)/scale;
+    followers.forEach(f=>{
+      const vis=f.members.filter(m=>{const cy=m.y+m.h/2;return cy>wTop&&cy<wBot;});
+      if(!vis.length){ f.n.el.style.opacity=0; f.n.visible=false; return; }
+      f.n.el.style.opacity=1; f.n.visible=true;
+      let c=vis.reduce((s,m)=>s+m.y+m.h/2,0)/vis.length, y=c-f.n.h/2;
+      y=Math.max(wTop+30,Math.min(y,wBot-f.n.h-30));
+      f.n.y=y; f.n.el.style.left=f.n.x+'px'; f.n.el.style.top=y+'px';
+    });
+  }
+  const svg=document.getElementById('wires');
+  function buildEdges(){
+    const E=[],seen={};
+    features.forEach(e=>{
+      const proj=e.sub?subgroups[e.sub].project:e.proj;
+      const chain=[nodes[e.id]];
+      if(e.journal) chain.push(nodes['j_'+e.id]);
+      if(e.sub) chain.push(nodes['s_'+e.sub]);
+      if(proj) chain.push(nodes['p_'+proj]);
+      for(let i=0;i<chain.length-1;i++){
+        const a=chain[i],b=chain[i+1],k=a.id+'>'+b.id;
+        if(!seen[k]){ seen[k]=1; E.push([a,b]); }
+      }
+    });
+    return E;
+  }
+  const EDGES=buildEdges();
+  function drawWires(){
+    let out='';
+    EDGES.forEach(([a,b])=>{
+      if(a.visible===false||b.visible===false) return;
+      const x1=a.x+a.w,y1=a.y+a.h/2,x2=b.x,y2=b.y+b.h/2;
+      const dx=Math.max(50,(x2-x1)*0.5);
+      out+=`<path d="M${x1},${y1} C${x1+dx},${y1} ${x2-dx},${y2} ${x2},${y2}" fill="none" stroke-width="1.8" opacity="0.9"/>`;
+    });
+    svg.innerHTML=out;
+  }
+  function refresh(){ positionFollowers(); drawWires(); }
+
+  // ---------- panel ----------
+  const panel=document.getElementById('panel');
+  function pEmbed(e){
+    if(!e.embed) return '';
+    if(e.embed.v) return `<div class="p-embed v"><iframe src="https://www.youtube.com/embed/${e.embed.v}" allowfullscreen></iframe></div>`;
+    if(e.embed.h) return `<div class="p-embed h"><iframe src="https://www.youtube.com/embed/${e.embed.h}" allowfullscreen></iframe></div>`;
+    if(e.embed.d) return `<div class="p-embed d"><iframe src="${e.embed.d}"></iframe></div>`;
+    return '';
+  }
+  const paras=t=>t.split('\n').filter(Boolean).map(p=>`<p>${p}</p>`).join('');
+  function openPanel(id){
+    const n=nodes[id]; let cls,kind,title,meta,slug,body='';
+    if(n.kind==='feature'){
+      const e=features.find(f=>f.id===id);
+      cls='feature'; kind='feature'; title=e.name; slug=e.slug;
+      meta=[e.type,e.date].concat(e.status?[e.status]:[]);
+      const proj=e.sub?subgroups[e.sub].project:e.proj;
+      body=`${pEmbed(e)}<div class="p-text">${paras(e.desc)}</div>
+        <div class="p-sec"><h4>stack</h4><div class="p-chips">${(e.stack||[]).map(s=>`<span class="chip">${s}</span>`).join('')}</div></div>
+        <div class="p-sec"><h4>chain</h4><div class="pill-row">
+          ${e.journal?`<div class="pill amber" onclick="openPanel('j_${e.id}')"><span class="pg">◆</span>journal — day ${journals[e.journal].day}</div>`:''}
+          ${e.sub?`<div class="pill" onclick="openPanel('s_${e.sub}')"><span class="pg">◆</span>subgroup — ${subgroups[e.sub].name}</div>`:''}
+          ${proj?`<div class="pill" onclick="openPanel('p_${proj}')"><span class="pg">◆</span>main project — ${projects[proj].name}</div>`:''}
+        </div></div>`;
+    } else if(n.kind==='journal'){
+      const j=journals[id.slice(2)];
+      cls='journal'; kind='journal entry'; title=j.title; slug='journal/'+id.slice(2);
+      meta=['by the '+j.by,'day '+j.day,j.date];
+      body=`<div class="p-text">${paras(j.body)}</div>`;
+    } else {
+      const isP=n.kind==='proj', key=id.slice(2), g=isP?projects[key]:subgroups[key];
+      cls=isP?'proj':'sub'; kind=isP?'main project':'subgroup'; title='◆ '+g.name; slug=g.slug; meta=[g.meta];
+      const mem=features.filter(f=> isP?(f.proj===key||(f.sub&&subgroups[f.sub].project===key)):f.sub===key);
+      body=`<div class="p-text">${paras(g.desc)}</div>
+        <div class="p-sec"><h4>${mem.length} features in this line</h4><div class="pill-row">
+          ${mem.map(f=>`<div class="pill" onclick="openPanel('${f.id}')">${f.name}</div>`).join('')}</div></div>`;
+    }
+    panel.className='panel '+cls+' open';
+    document.getElementById('pkind').textContent=kind;
+    document.getElementById('ptitle').textContent=title;
+    document.getElementById('pmeta').innerHTML=meta.map(m=>`<span>${m}</span>`).join('');
+    document.getElementById('pbody').innerHTML=body;
+    document.getElementById('pbody').scrollTop=0;
+    document.getElementById('pslug').textContent='artlu.ai/'+slug;
+    Object.values(nodes).forEach(x=>x.el.classList.remove('sel'));
+    n.el.classList.add('sel');
+  }
+  function closePanel(){ panel.classList.remove('open'); Object.values(nodes).forEach(x=>x.el.classList.remove('sel')); }
+  window.openPanel=openPanel; window.closePanel=closePanel;
+
+  // ---------- pan / zoom / drag / click ----------
+  const vp=document.getElementById('viewport');
+  const topbar=document.querySelector('.topbar');
+  let pan={x:18,y:14}, scale=0.92;
+  function apply(){
+    world.style.transform=`translate(${pan.x}px,${pan.y}px) scale(${scale})`;
+    topbar.classList.toggle('stuck',pan.y<8);
+    refresh();
+  }
+  let panning=false,ps=null;
+  vp.addEventListener('mousedown',e=>{
+    if(e.target.closest('.node')) return;
+    panning=true; vp.classList.add('grabbing'); world.classList.add('busy');
+    ps={x:e.clientX-pan.x,y:e.clientY-pan.y};
+  });
+  let drag=null,cand=null,moved=false,dx0=0,dy0=0;
+  world.addEventListener('mousedown',e=>{
+    const el=e.target.closest('.node'); if(!el) return;
+    e.stopPropagation();
+    const n=nodes[el.dataset.id];
+    cand=n; moved=false; dx0=e.clientX; dy0=e.clientY;
+    if(e.target.closest('[data-handle]')){ drag={n,el,ox:n.x,oy:n.y}; el.classList.add('dragging'); world.classList.add('busy'); }
+  });
+  window.addEventListener('mousemove',e=>{
+    if(Math.abs(e.clientX-dx0)+Math.abs(e.clientY-dy0)>5) moved=true;
+    if(panning){ pan.x=e.clientX-ps.x; pan.y=e.clientY-ps.y; apply(); }
+    else if(drag){
+      drag.n.x=drag.ox+(e.clientX-dx0)/scale; drag.n.y=drag.oy+(e.clientY-dy0)/scale;
+      drag.el.style.left=drag.n.x+'px'; drag.el.style.top=drag.n.y+'px'; refresh();
+    }
+  });
+  window.addEventListener('mouseup',()=>{
+    panning=false; vp.classList.remove('grabbing'); world.classList.remove('busy');
+    if(drag) drag.el.classList.remove('dragging');
+    if(cand&&!moved){
+      const f=features.find(x=>x.id===cand.id);
+      if(f&&f.type==='video') location.href='astro-video-view.html';
+      else openPanel(cand.id);
+    }
+    drag=null; cand=null;
+  });
+  function zoomAt(mx,my,ns){
+    ns=Math.min(1.5,Math.max(0.3,ns));
+    pan.x=mx-(mx-pan.x)*(ns/scale); pan.y=my-(my-pan.y)*(ns/scale);
+    scale=ns; apply();
+  }
+  vp.addEventListener('wheel',e=>{
+    e.preventDefault(); const r=vp.getBoundingClientRect();
+    zoomAt(e.clientX-r.left,e.clientY-r.top,scale-e.deltaY*0.0013);
+  },{passive:false});
+  function zoomBy(d){ const r=vp.getBoundingClientRect(); zoomAt(r.width/2,r.height/2,scale+d*0.14); }
+  function resetView(){
+    const right=Object.values(nodes).reduce((m,n)=>Math.max(m,n.x+(n.w||0)),0);
+    scale=Math.min(0.92,Math.max(0.4,(vp.clientWidth-48)/(right+40)));
+    pan={x:18,y:14}; apply();
+  }
+  window.zoomBy=zoomBy; window.resetView=resetView;
+  function toggleTheme(){ const h=document.documentElement; const t=h.dataset.theme==='light'?'dark':'light';
+    h.dataset.theme=t; try{ localStorage.setItem('artlu-theme',t); }catch(e){} }
+  window.toggleTheme=toggleTheme;
+  (function(){
+    const act=[1,0,2,1,3,2,0,1,4,2,1,3,2,0,2,1,3,2,4,1];
+    const h=document.getElementById('actStrip'); if(!h) return;
+    const end=new Date(2026,4,18);
+    act.forEach((lv,i)=>{
+      const c=document.createElement('div'); c.className='pcell';
+      const d=new Date(end); d.setDate(d.getDate()-7*(act.length-1-i));
+      const lbl=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      c.dataset.tip='week of '+lbl+' · '+lv+' shipped';
+      if(lv){ c.style.background='var(--green)'; c.style.opacity=(0.3+lv*0.17); }
+      h.appendChild(c); });
+  })();
+
+  function alignIntro(){
+    const tick=world.querySelector('.tick');
+    if(tick) document.querySelector('.world-intro').style.left=(tick.offsetLeft-tick.offsetWidth/2)+'px';
+  }
+  function init(){ layout(); buildRuler(); alignIntro(); resetView(); }
+  init();
+  window.addEventListener('resize',()=>{ layout(); buildRuler(); alignIntro(); refresh(); });
+  window.addEventListener('load',()=>{ layout(); buildRuler(); alignIntro(); resetView(); });
+</script>
+</body>
+</html>

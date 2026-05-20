@@ -1,0 +1,59 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+---
+<BaseLayout title="artlu.ai — admin · settings" description="artlu.ai admin settings." noindex>
+  <Header active="settings" variant="admin" sticky="none" />
+  <main class="admin-page">
+    <div class="admin-card" id="adminGate">
+      <div class="admin-card-h">
+        <h2>$ admin access</h2>
+        <button class="mini-btn primary" type="button" id="adminSignIn">sign in with google</button>
+      </div>
+      <div class="admin-card-b">
+        <p class="meta" id="adminStatus">checking auth...</p>
+        <p class="meta">If nothing opens, use Chrome or Safari directly and allow popups for this local site.</p>
+      </div>
+    </div>
+  </main>
+  <main class="settings-grid" id="settingsApp" hidden>
+    <nav class="s-nav">
+      <a class="on" href="#connections">connections</a>
+      <a href="#processes">processes</a>
+      <a href="#general">general</a>
+    </nav>
+    <section>
+      <div class="admin-card s-section on" id="connections">
+        <div class="admin-card-h"><h2>connections</h2><button class="mini-btn disabled" type="button" disabled>+ connect server · coming soon</button></div>
+        <div>
+          <div class="crow"><span class="cstat on"></span><div><div class="admin-row-title">Firebase Firestore</div><div class="admin-row-meta">artluai-tracker · connected</div></div><button class="mini-btn disabled" type="button" disabled style="margin-left:auto">config · coming soon</button></div>
+          <div class="crow"><span class="cstat on"></span><div><div class="admin-row-title">GitHub</div><div class="admin-row-meta">github.com/artluai · connected</div></div><button class="mini-btn disabled" type="button" disabled style="margin-left:auto">config · coming soon</button></div>
+          <div class="crow"><span class="cstat idle"></span><div><div class="admin-row-title">Netlify build hook</div><div class="admin-row-meta">manual setup pending</div></div><button class="mini-btn disabled" type="button" disabled style="margin-left:auto">config · coming soon</button></div>
+          <div class="crow"><span class="cstat on"></span><div><div class="admin-row-title">MCP server</div><div class="admin-row-meta">artlu-tracker-mcp · local</div></div><button class="mini-btn disabled" type="button" disabled style="margin-left:auto">logs · coming soon</button></div>
+        </div>
+      </div>
+      <div class="admin-card s-section on" id="processes">
+        <div class="admin-card-h"><h2>automated processes</h2><button class="mini-btn disabled" type="button" disabled>+ new job · coming soon</button></div>
+        <div class="admin-card-b">
+          <div class="sum-row"><div class="sum-label">rebuild</div><div class="sum-value">Firestore write → Netlify build hook</div></div>
+          <div class="sum-row"><div class="sum-label">videos</div><div class="sum-value">scripts/sync-video.mjs → public video bundles</div></div>
+          <div class="sum-row"><div class="sum-label">research</div><div class="sum-value">Astro content collections → RSS</div></div>
+        </div>
+      </div>
+      <div class="admin-card s-section on" id="general">
+        <div class="admin-card-h"><h2>general</h2></div>
+        <div class="admin-card-b form-grid">
+          <div class="admin-row"><div style="flex:1"><div class="admin-row-title">default public visibility</div><div class="admin-row-meta">new entries still default private in the MCP until explicitly shipped</div></div><button class="switch off" type="button"><i></i></button></div>
+          <label class="field"><span>day 1 start</span><input type="date" value="2026-03-18" /></label>
+          <label class="field"><span>default theme</span><select><option>dark</option><option>light</option></select></label>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script>
+    document.querySelectorAll(".switch").forEach((button) => button.addEventListener("click", () => button.classList.toggle("off")));
+  </script>
+  <script>
+    import "../../scripts/admin.ts";
+  </script>
+</BaseLayout>

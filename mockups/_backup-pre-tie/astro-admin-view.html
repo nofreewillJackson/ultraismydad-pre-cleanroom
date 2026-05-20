@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>artlu.ai — admin</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  html[data-theme="dark"] {
+    --bg:#08090a; --surface:#0e0f11; --surface-2:#16191d;
+    --border:#1a1d22; --border-strong:#2b3038; --border-hover:#4a525e;
+    --text:#c0c4cc; --text-bright:#f0f1f3; --text-sub:#9aa0aa;
+    --dim:#6b7280; --dimmer:#3a3f48;
+    --green:#4ade80; --green-bg:#062b12; --green-border:#1d4d31;
+    --blue:#60a5fa; --amber:#d8a657; --amber-bg:#1c1a12; --amber-border:#3a3320;
+    --node-shadow:0 8px 26px rgba(0,0,0,0.6);
+    --font:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  html[data-theme="light"] {
+    --bg:#e9eaec; --surface:#ffffff; --surface-2:#f2f3f5;
+    --border:#dcdfe2; --border-strong:#ccd0d4; --border-hover:#9ba0a8;
+    --text:#34373c; --text-bright:#15171a; --text-sub:#50545a;
+    --dim:#7c8087; --dimmer:#aeb2b8;
+    --green:#0a7d5e; --green-bg:#e6f4ee; --green-border:#a9ddc9;
+    --blue:#2563eb; --amber:#8a6300; --amber-bg:#f3e9d2; --amber-border:#e1d5aa;
+    --node-shadow:0 1px 2px rgba(22,24,27,0.07), 0 4px 14px rgba(22,24,27,0.06);
+    --font:'Inter',system-ui,sans-serif;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { height:100%; }
+  body { background:var(--bg); color:var(--text); font-family:var(--font); font-size:14px;
+    -webkit-font-smoothing:antialiased; min-height:100%; }
+
+  /* ---------- header ---------- */
+  .topbar { height:72px; border-bottom:1px solid transparent; background:var(--bg);
+    display:flex; align-items:center; gap:24px; padding:0 18px; position:sticky; top:0; z-index:40;
+    transition:background .16s, border-color .16s, box-shadow .16s; }
+  .topbar.stuck { background:var(--surface); border-bottom-color:var(--border); box-shadow:var(--node-shadow); }
+  .brandwrap { display:flex; align-items:center; gap:18px; }
+  .identity { display:flex; flex-direction:column; gap:3px; }
+  .htitle { font-size:13px; font-weight:600; color:var(--text-bright); white-space:nowrap; }
+  .hbio { font-size:11.5px; color:var(--text-sub); white-space:nowrap; }
+  .hright { margin-left:auto; display:flex; align-items:center; gap:12px; }
+  .brand { font-weight:600; font-size:29px; letter-spacing:-0.02em; color:var(--text-bright); display:flex; align-items:center; gap:3px; }
+  .cursor-bl { width:10px; height:26px; background:var(--green); display:inline-block; animation:blink 1s step-end infinite; }
+  @keyframes blink { 50% { opacity:0; } }
+  .admin-badge { font-family:var(--mono); font-size:11px; color:var(--amber); border:1px solid var(--amber);
+    border-radius:5px; padding:4px 10px; display:flex; align-items:center; gap:6px; }
+  .admin-badge .d { width:6px; height:6px; border-radius:50%; background:var(--amber); }
+  .who { font-family:var(--mono); font-size:11px; color:var(--text-sub); }
+  .theme-tog { width:30px; height:28px; border:1px solid var(--border); background:transparent; color:var(--text-sub); border-radius:5px; cursor:pointer; font-size:13px; }
+  .signout { font-family:var(--mono); font-size:11px; color:var(--dim); background:transparent;
+    border:1px solid var(--border); border-radius:5px; padding:6px 11px; cursor:pointer; }
+  .signout:hover { color:var(--text-bright); }
+
+  /* ---------- page ---------- */
+  .page { padding:22px 30px 100px; }
+  .col { max-width:1240px; margin:0 auto; }
+  .toolbar { display:flex; align-items:center; justify-content:space-between;
+    border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:9px 2px; }
+  .tl-left { display:flex; align-items:baseline; gap:14px; }
+  .tl-left .dash { font-family:var(--mono); font-size:12px; color:var(--green); font-weight:600; }
+  .tl-left .stats { font-family:var(--mono); font-size:11px; color:var(--text-sub); }
+  .tl-left .stats b { color:var(--text-bright); }
+  .tl-btns { display:flex; gap:8px; }
+  .add-btn { background:var(--green-bg); border:1px solid var(--green-border); color:var(--green);
+    font-family:var(--mono); font-size:11.5px; padding:6px 13px; border-radius:5px; cursor:pointer; }
+  .add-btn.alt { background:var(--surface-2); border-color:var(--border-strong); color:var(--text); }
+  .add-btn:hover { filter:brightness(1.15); }
+
+  .sec-h { font-family:var(--mono); font-size:10px; letter-spacing:1.6px; text-transform:uppercase;
+    color:var(--dim); margin:22px 0 11px; display:flex; align-items:center; gap:9px; }
+  .sec-h::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  /* ---------- main projects & series tree ---------- */
+  .proj-panel { border:1px solid var(--border-strong); border-radius:9px; overflow:hidden;
+    background:var(--surface); box-shadow:var(--node-shadow); }
+  .proj-item { border-bottom:1px solid var(--border); }
+  .proj-item:last-child { border-bottom:none; }
+  .proj-row { display:flex; align-items:center; gap:10px; padding:10px 14px; cursor:pointer; transition:background .1s; }
+  .proj-row:hover { background:var(--surface-2); }
+  .pr-caret { font-size:8px; color:var(--dimmer); transition:transform .14s; width:8px; }
+  .proj-item.open .pr-caret { transform:rotate(90deg); }
+  .pr-glyph { color:var(--green); font-size:11px; }
+  .pr-name { color:var(--text-bright); font-weight:600; font-size:13px; }
+  .pr-count { font-family:var(--mono); font-size:10.5px; color:var(--dim); }
+  .pr-spacer { flex:1; }
+  .pr-act { font-family:var(--mono); font-size:10.5px; color:var(--dim); background:none; border:none; cursor:pointer; padding:2px 5px; }
+  .pr-act:hover { color:var(--text-bright); }
+  .proj-children { display:none; background:var(--bg); border-top:1px solid var(--border); padding:5px 0; }
+  .proj-item.open .proj-children { display:block; }
+  .ser-row { display:flex; align-items:center; gap:9px; padding:7px 14px 7px 44px; }
+  .ser-row:hover { background:var(--surface-2); }
+  .ser-glyph { color:var(--amber); font-size:10px; }
+  .ser-name { color:var(--text); font-size:12px; }
+  .ser-kind { font-family:var(--mono); font-size:9.5px; color:var(--dim); border:1px solid var(--border);
+    border-radius:3px; padding:1px 6px; }
+  .ser-count { font-family:var(--mono); font-size:10px; color:var(--dim); }
+  .add-ser { display:flex; align-items:center; gap:7px; padding:7px 14px 7px 44px; cursor:pointer;
+    font-family:var(--mono); font-size:11px; color:var(--amber); }
+  .add-ser:hover { color:var(--text-bright); }
+
+  /* ---------- timeline — mirrors the public list view ---------- */
+  .tl { position:relative; }
+  .tl::before { content:''; position:absolute; left:66px; top:6px; bottom:6px; width:1px; background:var(--border-strong); }
+  .day-pill-row { height:40px; position:relative; }
+  .day-pill { position:absolute; left:66px; top:50%; transform:translate(-50%,-50%);
+    font-family:var(--mono); font-size:11px; font-weight:500; color:var(--text-sub);
+    background:var(--bg); border:1px solid var(--border-strong); border-radius:5px; padding:3px 9px; white-space:nowrap; z-index:2; }
+  .day-rows { margin-left:106px; }
+  .item { border-bottom:1px solid var(--border); }
+  .r { display:flex; align-items:flex-start; gap:10px; padding:8px 12px 9px; cursor:pointer; transition:background .1s; }
+  .r:hover { background:var(--surface-2); }
+  .item.open .r { background:var(--surface-2); }
+  .grip { font-size:12px; color:var(--dimmer); cursor:grab; flex-shrink:0; padding-top:3px; }
+  .caret { font-size:8px; color:var(--dimmer); transition:transform .14s; flex-shrink:0; width:8px; padding-top:4px; }
+  .item.open .caret { transform:rotate(90deg); }
+  .dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+  .dot.video { background:var(--blue); } .dot.build { background:var(--green); }
+  .r-col { flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
+  .r-title { color:var(--text-bright); font-weight:500; font-size:12.5px; line-height:1.4;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .r-sub { font-size:11px; color:var(--text-sub); line-height:1.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .r-path { width:208px; flex-shrink:0; font-family:var(--mono); font-size:10px; color:var(--dim); padding-top:3px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .r-path b { color:var(--green); font-weight:500; }
+  .r-path .sx { color:var(--amber); }
+  .r-status { width:74px; flex-shrink:0; padding-top:2px; }
+  .status { font-family:var(--mono); font-size:10px; padding:1px 6px; border-radius:3px; }
+  .status.launched { background:var(--green-bg); color:var(--green); }
+  .status.building { background:var(--amber-bg); color:var(--amber); }
+  .r-vis { width:28px; flex-shrink:0; text-align:center; padding-top:2px; }
+  .vis-btn { background:none; border:none; cursor:pointer; font-size:13px; padding:0; line-height:1; }
+  .vis-public { color:var(--green); } .vis-private { color:var(--dimmer); }
+  .r-edit { width:42px; flex-shrink:0; text-align:right; padding-top:2px; }
+  .edit-btn { background:none; border:none; color:var(--dim); font-family:var(--mono); font-size:10.5px; cursor:pointer; }
+  .edit-btn:hover { color:var(--text-bright); }
+  .detail { display:none; padding:6px 16px 16px 40px; background:var(--surface-2); border-top:1px solid var(--border); }
+  .item.open .detail { display:block; }
+  .d-long { font-size:12.5px; color:var(--text-sub); line-height:1.66; max-width:760px; padding-top:8px; }
+  .d-meta { margin-top:11px; font-family:var(--mono); font-size:10.5px; color:var(--dim); display:flex; gap:14px; flex-wrap:wrap; }
+  .d-meta a { color:var(--green); text-decoration:none; }
+
+  /* ---------- modals ---------- */
+  .overlay { position:fixed; inset:0; background:rgba(0,0,0,0.62); display:none;
+    align-items:center; justify-content:center; z-index:100; padding:18px; }
+  .overlay.open { display:flex; }
+  .modal { background:var(--surface); border:1px solid var(--border-strong); border-radius:11px;
+    box-shadow:var(--node-shadow); padding:20px 22px; width:100%; display:flex; flex-direction:column; }
+  .modal.wide { max-width:540px; max-height:90vh; }
+  .modal.narrow { max-width:412px; }
+  .modal-title { font-family:var(--mono); font-size:13px; color:var(--green); font-weight:600; margin-bottom:16px; }
+  .modal.narrow .modal-title { color:var(--amber); }
+  .modal-scroll { flex:1; overflow-y:auto; padding-right:4px; }
+  .fld { margin-bottom:13px; }
+  .fld label { display:block; font-family:var(--mono); font-size:9.5px; letter-spacing:0.5px;
+    text-transform:uppercase; color:var(--dim); margin-bottom:5px; }
+  .fld label .lh { text-transform:none; letter-spacing:0; color:var(--dimmer); }
+  .fld-row { display:flex; gap:12px; } .fld-row .fld { flex:1; }
+  input, select, textarea { width:100%; background:var(--bg); border:1px solid var(--border-strong);
+    border-radius:5px; color:var(--text-bright); font-family:var(--mono); font-size:12px; padding:7px 9px; outline:none; }
+  input:focus, select:focus, textarea:focus { border-color:var(--green-border); }
+  textarea { min-height:62px; resize:vertical; line-height:1.5; }
+  select:disabled { opacity:0.45; cursor:not-allowed; }
+  .ser-field { display:flex; gap:8px; }
+  .ser-field select { flex:1; }
+  .ser-new-btn { background:var(--amber-bg); border:1px solid var(--amber-border); color:var(--amber);
+    font-family:var(--mono); font-size:10.5px; padding:0 11px; border-radius:5px; cursor:pointer; white-space:nowrap; }
+  .ser-new-btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .step { font-family:var(--mono); font-size:9px; color:var(--green); border:1px solid var(--green-border);
+    background:var(--green-bg); border-radius:3px; padding:1px 5px; margin-right:6px; }
+  .toggle { display:flex; gap:8px; }
+  .toggle button { flex:1; background:none; border:1px solid var(--border-strong); border-radius:5px;
+    color:var(--dim); font-family:var(--mono); font-size:11px; padding:6px 10px; cursor:pointer; }
+  .toggle button.on { background:var(--green-bg); border-color:var(--green-border); color:var(--green); }
+  .toggle button.on.neutral { background:var(--surface-2); border-color:var(--border-hover); color:var(--text); }
+  .slug-preview { font-family:var(--mono); font-size:10.5px; color:var(--dim); margin-top:6px; }
+  .slug-preview b { color:var(--green); }
+  .modal-btns { display:flex; justify-content:flex-end; gap:8px; margin-top:16px; }
+  .m-cancel { background:none; border:1px solid var(--border-strong); border-radius:5px; color:var(--dim);
+    font-family:var(--mono); font-size:11px; padding:7px 15px; cursor:pointer; }
+  .m-save { background:var(--green-bg); border:1px solid var(--green-border); border-radius:5px; color:var(--green);
+    font-family:var(--mono); font-size:11px; font-weight:600; padding:7px 18px; cursor:pointer; }
+  .modal.narrow .m-save { background:var(--amber-bg); border-color:var(--amber-border); color:var(--amber); }
+</style>
+</head>
+<body>
+
+<div class="topbar" id="topbar">
+  <div class="brandwrap">
+    <div class="brand">artlu.ai<span class="cursor-bl"></span></div>
+    <div class="identity">
+      <div class="htitle">100 days. 100 features.</div>
+      <div class="hbio">one person. no coding experience. just AI and an internet connection.</div>
+    </div>
+  </div>
+  <div class="hright">
+    <span class="admin-badge"><span class="d"></span>ADMIN</span>
+    <span class="who">signed in · artlu</span>
+    <button class="theme-tog" onclick="toggleTheme()" title="toggle theme">◐</button>
+    <button class="signout" onclick="location.href='astro-admin-settings.html'">⚙ settings</button>
+    <button class="signout">sign out</button>
+  </div>
+</div>
+
+<div class="page">
+  <div class="col">
+    <div class="toolbar">
+      <div class="tl-left">
+        <span class="dash">◆ dashboard</span>
+        <span class="stats"><b>6</b> main projects · <b id="serCount">2</b> series · <b>79</b> entries</span>
+      </div>
+      <div class="tl-btns">
+        <button class="add-btn alt" onclick="openProject()">+ new project</button>
+        <button class="add-btn" onclick="openForm()">+ add entry</button>
+      </div>
+    </div>
+
+    <div class="sec-h">main projects &amp; series</div>
+    <div class="proj-panel" id="projPanel"></div>
+
+    <div class="sec-h">the timeline</div>
+    <div id="feed"></div>
+  </div>
+</div>
+
+<!-- entry form -->
+<div class="overlay" id="overlay">
+  <div class="modal wide">
+    <div class="modal-title" id="modalTitle">$ add entry</div>
+    <div class="modal-scroll">
+      <div class="fld"><label><span class="step">1</span>main project <span class="lh">(every entry rolls up to one)</span></label>
+        <select id="f-project"></select></div>
+      <div class="fld"><label><span class="step">2</span>series / subgroup <span class="lh">(optional — scoped to the project above)</span></label>
+        <div class="ser-field">
+          <select id="f-series"></select>
+          <button class="ser-new-btn" id="serNewBtn" onclick="openSeries()">+ new</button>
+        </div></div>
+      <div class="fld"><label>name</label><input id="f-name" placeholder="entry name" /></div>
+      <div class="fld"><label>short description <span class="lh">(the timeline row)</span></label><input id="f-desc" placeholder="one-liner" /></div>
+      <div class="fld"><label>long description <span class="lh">(expanded view)</span></label><textarea id="f-long" placeholder="what it does, why you built it..."></textarea></div>
+      <div class="fld-row">
+        <div class="fld"><label>status</label><select id="f-status"><option>idea</option><option>building</option><option selected>launched</option><option>abandoned</option></select></div>
+        <div class="fld"><label>date</label><input id="f-date" type="date" value="2026-05-19" /></div>
+      </div>
+      <div class="fld"><label>stack <span class="lh">(comma separated)</span></label><input id="f-stack" placeholder="firebase, netlify, claude" /></div>
+      <div class="fld"><label>tags <span class="lh">(comma separated)</span></label><input id="f-tags" placeholder="ecom, research, ai" /></div>
+      <div class="fld"><label>live link</label><input id="f-link" placeholder="https://mysite.com" /></div>
+      <div class="fld"><label>github repo</label><input id="f-repo" placeholder="https://github.com/artluai/project" /></div>
+      <div class="fld"><label>media <span class="lh">(youtube / tiktok / loom url)</span></label><input id="f-media" placeholder="https://youtu.be/..." /></div>
+      <div class="fld"><label>artifact html <span class="lh">(paste raw html from a claude artifact)</span></label><textarea id="f-artifact" placeholder="<!DOCTYPE html>..."></textarea></div>
+      <div class="fld"><label>visibility</label>
+        <div class="toggle" data-toggle="vis"><button data-v="private" class="on neutral">○ private</button><button data-v="public">● public</button></div></div>
+    </div>
+    <div class="modal-btns">
+      <button class="m-cancel" onclick="closeForm()">cancel</button>
+      <button class="m-save" onclick="closeForm()">save</button>
+    </div>
+  </div>
+</div>
+
+<!-- new series -->
+<div class="overlay" id="serOverlay">
+  <div class="modal narrow">
+    <div class="modal-title">◆ new series / subgroup</div>
+    <div class="fld"><label>parent project <span class="lh">(the series belongs to this)</span></label><select id="s-parent" onchange="updateSlug()"></select></div>
+    <div class="fld"><label>series name</label><input id="s-name" placeholder="e.g. Aninews" oninput="updateSlug()" /></div>
+    <div class="fld"><label>kind</label>
+      <div class="toggle" data-toggle="kind"><button data-v="series" class="on">series</button><button data-v="subgroup" class="on neutral">subgroup</button></div></div>
+    <div class="slug-preview">url · artlu.ai/series/<b id="s-slug">…</b></div>
+    <div class="modal-btns">
+      <button class="m-cancel" onclick="closeSeries()">cancel</button>
+      <button class="m-save" onclick="closeSeries()">create series</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ===== data — artlu.ai tracker ===== */
+  const projects = ['spoolcast','PipelineCPC','AdsMetri','VibeSkill','CostIntel','artlu.ai'];
+  const series = [
+    { id:'aninews', name:'Aninews', parent:'spoolcast', kind:'series' },
+    { id:'devlog',  name:'spoolcast dev-log', parent:'spoolcast', kind:'series' },
+  ];
+  const entries = [
+    { date:'may 18', name:'Google Closes In On Nvidia — Aninews ep 11', kind:'video', project:'spoolcast', series:'aninews',
+      desc:"anime news satire on google closing in on nvidia.", status:'launched', vis:'public',
+      stack:['spoolcast','Seedance 2.0 Fast','Google Cloud TTS','ffmpeg'], link:'tiktok.com',
+      long:'Episode 11 of FAUX7 NEWS — built on the spoolcast pipeline, 12 anime-cel-shaded beats.' },
+    { date:'may 18', name:'AI hallucination experiment — Context Gate', kind:'build', project:'spoolcast', series:'',
+      desc:'tests whether forcing the source of truth into context reduces hallucination.', status:'launched', vis:'public',
+      stack:['Python','vanilla HTML/CSS/JS'], link:'artluai.github.io',
+      long:'A Context Gate forces the source-of-truth file into context before the model acts — cutting hallucination from ~90% of scenes to near-zero.' },
+    { date:'may 16', name:'agent campaign planning bridge — PipelineCPC', kind:'build', project:'PipelineCPC', series:'',
+      desc:'MCP and agent API bridge for Google Ads planning.', status:'launched', vis:'public',
+      stack:['Node.js','MCP','Firebase Auth','Firestore','Railway'], link:'pipelinecpc.com',
+      long:'A separate MCP bridge and agent-facing API — agents read saved keyword lists and export draft Google Ads structures.' },
+    { date:'may 16', name:'Cisco Pops 15% On 4,000 Layoffs — Aninews ep 10', kind:'video', project:'spoolcast', series:'aninews',
+      desc:'anime news satire on cisco firing the engineers who built the AI networks.', status:'launched', vis:'public',
+      stack:['spoolcast','Seedance 2.0 Fast','Google Cloud TTS','ffmpeg'], link:'tiktok.com',
+      long:'Episode 10 of FAUX7 NEWS — the empty-cathedral trope, 12 beats, $5.25 to produce.' },
+    { date:'may 16', name:'creative intelligence tagging workbench — AdsMetri', kind:'build', project:'AdsMetri', series:'',
+      desc:'tag Meta ad creatives by hand across 7 tag dimensions.', status:'launched', vis:'public',
+      stack:['React 19','tRPC 11','shadcn/ui','Tailwind','Drizzle','MySQL'], link:'adsmetri.com',
+      long:'A workbench for tagging Meta ad creatives so you can compare performance across creative types and hooks.' },
+    { date:'may 12', name:'meta ads performance dashboard — AdsMetri', kind:'build', project:'AdsMetri', series:'',
+      desc:'visualize Meta Ads performance across campaigns, ad sets, and ads.', status:'launched', vis:'public',
+      stack:['React','Tailwind','tRPC','Express','Drizzle','MySQL','Recharts'], link:'adsmetri.com',
+      long:'A Meta ads intelligence dashboard for operators managing multiple ad accounts.' },
+    { date:'may 8', name:'why ai makes things up — spoolcast dev-log #6', kind:'video', project:'spoolcast', series:'devlog',
+      desc:'a devlog about why AI agents invent answers about their own work.', status:'launched', vis:'public',
+      stack:['Spoolcast','Remotion','Google TTS','YouTube'], link:'youtu.be',
+      long:'AI agents make things up about their own work — not because they are lying, but because they have nothing real to check.' },
+    { date:'may 1', name:'shorts + tiktok embed — artlu.ai', kind:'build', project:'artlu.ai', series:'',
+      desc:'vertical 9:16 shorts now sit alongside longform videos in the showcase.', status:'launched', vis:'public',
+      stack:['React','Vite','Node 22','ffmpeg','cwebp'], link:'artlu.ai',
+      long:'Extends the artlu.ai showcase to support vertical short-form videos with their own 2-col guidebook pages.' },
+    { date:'apr 22', name:'live-updating activity heatmap — artlu.ai', kind:'build', project:'artlu.ai', series:'',
+      desc:'real-time activity card — 14-week shipping heatmap.', status:'launched', vis:'public',
+      stack:['React','Firestore onSnapshot','CSS Grid'], link:'',
+      long:'The live stats + heatmap panel on the homepage — re-paints on every new write, rolls over at local midnight.' },
+    { date:'apr 10', name:'AI brain-response video comparison with TRIBE v2', kind:'build', project:'AdsMetri', series:'',
+      desc:"compared two ad videos with Meta's TRIBE v2 brain-response model.", status:'launched', vis:'public',
+      stack:['Python','TRIBE v2','PyTorch','WhisperX'], link:'',
+      long:'A research experiment — the model favored Video A, real ROAS favored Video B. The mismatch was the result.' },
+  ];
+
+  const seriesName = id => (series.find(s=>s.id===id)||{}).name || '';
+  const slugify = s => s.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+
+  /* ---- main projects & series tree ---- */
+  const projPanel=document.getElementById('projPanel');
+  function renderPanel(){
+    projPanel.innerHTML=projects.map(p=>{
+      const subs=series.filter(s=>s.parent===p);
+      const ec=entries.filter(e=>e.project===p).length;
+      return `<div class="proj-item">
+        <div class="proj-row">
+          <span class="pr-caret">▶</span>
+          <span class="pr-glyph">◆</span>
+          <span class="pr-name">${p}</span>
+          <span class="pr-count">${ec} entr${ec===1?'y':'ies'} · ${subs.length} series</span>
+          <span class="pr-spacer"></span>
+          <button class="pr-act" onclick="event.stopPropagation();openProject('${p}')">edit</button>
+        </div>
+        <div class="proj-children">
+          ${subs.map(s=>`<div class="ser-row">
+            <span class="ser-glyph">◆</span><span class="ser-name">${s.name}</span>
+            <span class="ser-kind">${s.kind}</span>
+            <span class="ser-count">${entries.filter(e=>e.series===s.id).length} entries</span>
+            <span class="pr-spacer"></span><button class="pr-act" onclick="event.stopPropagation()">edit</button>
+          </div>`).join('')}
+          <div class="add-ser" onclick="event.stopPropagation();openSeries('${p}')">+ new series under ${p}</div>
+        </div>
+      </div>`;
+    }).join('');
+    document.getElementById('serCount').textContent=series.length;
+  }
+  renderPanel();
+  projPanel.addEventListener('click',e=>{
+    const row=e.target.closest('.proj-row'); if(!row) return;
+    row.closest('.proj-item').classList.toggle('open');
+  });
+
+  /* ---- timeline ---- */
+  const feed=document.getElementById('feed');
+  function pathHTML(e){
+    return `<b>${e.project}</b>${e.series?` <span class="sx">› ${seriesName(e.series)}</span>`:''}`;
+  }
+  function render(){
+    const groups=[]; let cur=null;
+    entries.forEach((e,idx)=>{ if(e.date!==cur){ cur=e.date; groups.push({date:cur,items:[]}); }
+      groups[groups.length-1].items.push({e,idx}); });
+    feed.innerHTML='<div class="tl">'+groups.map(g=>`<div class="day-group">
+      <div class="day-pill-row"><span class="day-pill">${g.date}</span></div>
+      <div class="day-rows">${g.items.map(({e,idx})=>`
+        <div class="item" data-idx="${idx}">
+          <div class="r">
+            <span class="grip">⠿</span><span class="caret">▶</span><span class="dot ${e.kind}"></span>
+            <div class="r-col"><span class="r-title">${e.name}</span><span class="r-sub">${e.desc}</span></div>
+            <div class="r-path">${pathHTML(e)}</div>
+            <div class="r-status"><span class="status ${e.status}">${e.status}</span></div>
+            <div class="r-vis"><button class="vis-btn ${e.vis==='public'?'vis-public':'vis-private'}">${e.vis==='public'?'●':'○'}</button></div>
+            <div class="r-edit"><button class="edit-btn">edit</button></div>
+          </div>
+          <div class="detail">
+            <div class="d-long">${e.long}</div>
+            <div class="d-meta">
+              <span>project: ${e.project}${e.series?' › '+seriesName(e.series):''}</span>
+              <span>stack: ${e.stack.join(', ')}</span>
+              ${e.link?`<a href="#">↗ ${e.link}</a>`:''}
+              <span>visibility: ${e.vis}</span>
+            </div>
+          </div>
+        </div>`).join('')}</div>
+    </div>`).join('')+'</div>';
+  }
+  render();
+  feed.addEventListener('click',e=>{
+    const vis=e.target.closest('.vis-btn');
+    if(vis){ e.stopPropagation();
+      const en=entries[+vis.closest('.item').dataset.idx];
+      en.vis=en.vis==='public'?'private':'public';
+      const pub=en.vis==='public';
+      vis.textContent=pub?'●':'○'; vis.className='vis-btn '+(pub?'vis-public':'vis-private'); return; }
+    if(e.target.closest('.edit-btn')){ e.stopPropagation();
+      openForm(entries[+e.target.closest('.item').dataset.idx]); return; }
+    const item=e.target.closest('.item'); if(!item) return;
+    item.classList.toggle('open');
+  });
+
+  /* ---- entry form — project first, then scoped series ---- */
+  document.getElementById('f-project').innerHTML='<option value="">— pick a project —</option>'
+    + projects.map(p=>`<option>${p}</option>`).join('');
+  function refreshSeriesField(){
+    const proj=document.getElementById('f-project').value;
+    const sel=document.getElementById('f-series'), btn=document.getElementById('serNewBtn');
+    if(!proj){
+      sel.innerHTML='<option value="">— pick a project first —</option>';
+      sel.disabled=true; btn.disabled=true; return;
+    }
+    sel.disabled=false; btn.disabled=false;
+    const subs=series.filter(s=>s.parent===proj);
+    sel.innerHTML='<option value="">— none (directly under '+proj+') —</option>'
+      + subs.map(s=>`<option value="${s.id}">${s.name} (${s.kind})</option>`).join('');
+  }
+  document.getElementById('f-project').addEventListener('change',refreshSeriesField);
+  document.querySelectorAll('.toggle').forEach(tg=>tg.addEventListener('click',e=>{
+    const b=e.target.closest('button'); if(!b) return;
+    tg.querySelectorAll('button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    if(b.dataset.v==='private'||b.dataset.v==='subgroup') b.classList.add('neutral'); else b.classList.remove('neutral');
+  }));
+  function openForm(en){
+    const editing=!!en;
+    document.getElementById('modalTitle').textContent=editing?'$ edit entry':'$ add entry';
+    document.getElementById('f-project').value=editing?en.project:'';
+    refreshSeriesField();
+    document.getElementById('f-series').value=editing?(en.series||''):'';
+    document.getElementById('f-name').value=editing?en.name:'';
+    document.getElementById('f-desc').value=editing?en.desc:'';
+    document.getElementById('f-long').value=editing?en.long:'';
+    document.getElementById('f-stack').value=editing?en.stack.join(', '):'';
+    document.getElementById('f-link').value=editing&&en.link?('https://'+en.link):'';
+    document.getElementById('f-tags').value=''; document.getElementById('f-repo').value='';
+    document.getElementById('f-media').value=''; document.getElementById('f-artifact').value='';
+    document.getElementById('overlay').classList.add('open');
+  }
+  function closeForm(){ document.getElementById('overlay').classList.remove('open'); }
+  window.openForm=openForm; window.closeForm=closeForm;
+  document.getElementById('overlay').addEventListener('click',e=>{ if(e.target.id==='overlay') closeForm(); });
+
+  /* ---- new series — parent prefilled when launched from a project ---- */
+  document.getElementById('s-parent').innerHTML=projects.map(p=>`<option>${p}</option>`).join('');
+  function updateSlug(){
+    document.getElementById('s-slug').textContent=slugify(document.getElementById('s-name').value)||'…';
+  }
+  window.updateSlug=updateSlug;
+  function openSeries(parent){
+    if(parent) document.getElementById('s-parent').value=parent;
+    document.getElementById('s-name').value=''; updateSlug();
+    document.getElementById('serOverlay').classList.add('open');
+  }
+  function closeSeries(){ document.getElementById('serOverlay').classList.remove('open'); }
+  window.openSeries=openSeries; window.closeSeries=closeSeries;
+  document.getElementById('serOverlay').addEventListener('click',e=>{ if(e.target.id==='serOverlay') closeSeries(); });
+
+  function openProject(){ /* project form — same modal pattern */ openForm(); }
+  window.openProject=openProject;
+
+  /* ---- header ---- */
+  const topbar=document.getElementById('topbar');
+  function onScroll(){ topbar.classList.toggle('stuck',(window.scrollY||document.documentElement.scrollTop)>6); }
+  window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+  function toggleTheme(){ const h=document.documentElement; h.dataset.theme=h.dataset.theme==='light'?'dark':'light'; }
+  window.toggleTheme=toggleTheme;
+</script>
+</body>
+</html>

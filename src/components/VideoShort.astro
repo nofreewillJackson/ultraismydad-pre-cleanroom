@@ -1,0 +1,110 @@
+---
+import { fmtDateFull, fmtDuration } from "../lib/format";
+
+type Props = { bundle: any };
+const { bundle } = Astro.props;
+const beats = bundle.beats || [];
+const sources = bundle.sources || [];
+const summary = bundle.summary || {};
+const rows = [
+  ["writing", summary.writing && `${summary.writing.author || ""} ${summary.writing.role ? `· ${summary.writing.role}` : ""}`],
+  ["video clips", summary.videoClips && `${summary.videoClips.count || beats.length} clips ${summary.videoClips.model ? `· ${summary.videoClips.model}` : ""}`],
+  ["audio", summary.audio && `${summary.audio.voice || ""} ${summary.audio.durationSec ? `· ${summary.audio.durationSec}s` : ""}`],
+  ["render", summary.render && `${summary.render.engine || ""}`],
+  ["cost", summary.cost && `${summary.cost.total || summary.cost}`],
+].filter((row) => row[1]);
+---
+<div class="video-shell">
+  <a class="back" href="/list" data-back-to-last-index>← all projects</a>
+  <div class="meta">$ short video · {bundle.id}</div>
+  <h1 class="v-title">{bundle.title}</h1>
+  <div class="meta">{fmtDateFull(bundle.shippedAt)} · {fmtDuration(bundle.durationSec)}</div>
+
+  <div class="vgrid" style="margin-top:16px">
+    <div class="vleft">
+      <div class="vframe">
+        {bundle.video?.youtubeId
+          ? <iframe src={`https://www.youtube.com/embed/${bundle.video.youtubeId}?rel=0&modestbranding=1`} title={bundle.title} allow="encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>
+          : bundle.video?.mp4Url
+            ? <video src={bundle.video.mp4Url} controls></video>
+            : <div class="empty">video pending</div>}
+      </div>
+      {bundle.video?.tiktokId && (
+        <div class="vframe">
+          <iframe src={`https://www.tiktok.com/embed/${bundle.video.tiktokId}`} title={`${bundle.title} on TikTok`} allow="encrypted-media; fullscreen" scrolling="no"></iframe>
+        </div>
+      )}
+    </div>
+    <div class="vright">
+      {rows.length > 0 && (
+        <section class="section" style="margin-top:0">
+          <div class="section-head"><h2 class="h2">summary</h2><div class="section-meta">episode build sheet</div></div>
+          <div class="summary-panel">
+            {rows.map(([label, value]) => <div class="sum-row"><div class="sum-label">{label}</div><div class="sum-value">{value}</div></div>)}
+          </div>
+        </section>
+      )}
+
+      {bundle.characters?.length > 0 && (
+        <section class="section">
+          <div class="section-head"><h2 class="h2">characters</h2><div class="section-meta">{bundle.characters.length}</div></div>
+          <div class="ref-grid">
+            {bundle.characters.map((char: any) => (
+              <div class="ref-card">
+                {char.imageUrl && <img src={char.imageUrl} alt="" loading="lazy" />}
+                <div class="ref-card-body"><div class="ref-name">{char.name}</div><div class="ref-desc">{char.description}</div></div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {beats.length > 0 && (
+        <section class="section">
+          <div class="section-head"><h2 class="h2">beats</h2><div class="section-meta">{beats.length} scenes</div></div>
+          <div class="beat-grid">
+            {beats.map((beat: any) => (
+              <article class="beat-card">
+                {beat.imageUrl && <img src={beat.imageUrl} alt="" loading="lazy" />}
+                <div class="beat-body">
+                  <div class="beat-n">beat {beat.n || beat.id}</div>
+                  <div class="beat-text">{beat.narration || beat.text}</div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {sources.length > 0 && (
+        <section class="section">
+          <div class="section-head"><h2 class="h2">sources</h2><div class="section-meta">{sources.length}</div></div>
+          <div class="source-grid">
+            {sources.map((source: any) => (
+              <a class="source-card" href={source.url} target="_blank" rel="noreferrer">
+                <div class="source-title">{source.title || source.publisher || source.url}</div>
+                <div class="source-url">{source.url}</div>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {bundle.transcript && (
+        <section class="section">
+          <div class="section-head"><h2 class="h2">transcript</h2></div>
+          <div class="summary-panel"><div class="md"><p>{Array.isArray(bundle.transcript) ? bundle.transcript.join(" ") : bundle.transcript}</p></div></div>
+        </section>
+      )}
+
+      {bundle.preRoll && (
+        <section class="section">
+          <div class="quote">
+            <div class="quote-label">pre-roll disclosure</div>
+            <div class="quote-text">{bundle.preRoll.burnedText || bundle.preRoll.voiceTag}</div>
+          </div>
+        </section>
+      )}
+    </div>
+  </div>
+</div>

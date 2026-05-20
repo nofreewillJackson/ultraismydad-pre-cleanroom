@@ -1,0 +1,1987 @@
+{
+  "source": "firestore",
+  "projectCount": 82,
+  "rawStackCount": 95,
+  "unmatchedRaw": {},
+  "technologyCounts": {
+    "react": 30,
+    "spoolcast": 29,
+    "google-cloud-tts": 23,
+    "firestore": 22,
+    "javascript": 21,
+    "ffmpeg": 19,
+    "node-js": 18,
+    "vite": 17,
+    "netlify": 16,
+    "claude": 13,
+    "css": 12,
+    "python": 12,
+    "remotion": 12,
+    "html": 11,
+    "codex": 10,
+    "firebase": 10,
+    "kie-ai": 10,
+    "seedance": 10,
+    "youtube": 9,
+    "firebase-auth": 8,
+    "other": 8,
+    "gpt-image-2": 7,
+    "typescript": 7,
+    "google-ads": 6,
+    "mcp": 6,
+    "tailwind": 6,
+    "stripe": 5,
+    "ai-image-generation": 4,
+    "anthropic-api": 4,
+    "cloudflare-pages": 4,
+    "firebase-admin": 4,
+    "oauth": 4,
+    "railway": 4,
+    "chatgpt": 3,
+    "chrome-extension": 3,
+    "cron": 3,
+    "drizzle": 3,
+    "express": 3,
+    "github-actions": 3,
+    "lucide-react": 3,
+    "matrix-js-sdk": 3,
+    "motion-react": 3,
+    "mysql": 3,
+    "netlify-functions": 3,
+    "openrouter": 3,
+    "postgres": 3,
+    "shadcn-ui": 3,
+    "trpc": 3,
+    "babel-standalone": 2,
+    "css-variables": 2,
+    "cwebp": 2,
+    "dataforseo": 2,
+    "dom-automation": 2,
+    "ethers-js": 2,
+    "firebase-cloud-functions": 2,
+    "firebase-realtime-db": 2,
+    "gemini": 2,
+    "github-api": 2,
+    "kling": 2,
+    "manus": 2,
+    "meta-graph-api": 2,
+    "opencv": 2,
+    "pm2": 2,
+    "puppeteer": 2,
+    "x-api": 2,
+    "aes-256-gcm": 1,
+    "astro": 1,
+    "browserless": 1,
+    "chart-js": 1,
+    "chrome-storage-api": 1,
+    "cloud-run": 1,
+    "cloud-tasks": 1,
+    "cloudflare-dns": 1,
+    "cloudflare-email-routing": 1,
+    "csv-parsing": 1,
+    "firebase-storage": 1,
+    "google-colab": 1,
+    "hetzner": 1,
+    "hugging-face": 1,
+    "libass": 1,
+    "moonshot-api": 1,
+    "numpy": 1,
+    "openai-api": 1,
+    "openpyxl": 1,
+    "prompt-design": 1,
+    "pullpush-api": 1,
+    "pytorch": 1,
+    "react-router": 1,
+    "recharts": 1,
+    "rsvg-convert": 1,
+    "sheetjs": 1,
+    "tiktok": 1,
+    "tribe-v2": 1,
+    "web-workers": 1,
+    "whisperx": 1
+  },
+  "projects": [
+    {
+      "id": "0mtRzJ6W000gYWBhQ04d",
+      "name": "daily ai news satire pilot",
+      "date": "2026-04-29",
+      "directIds": [
+        "python",
+        "spoolcast",
+        "ffmpeg",
+        "google-cloud-tts",
+        "gpt-image-2",
+        "kie-ai",
+        "kling"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "python",
+        "spoolcast",
+        "ffmpeg",
+        "google-cloud-tts",
+        "gpt-image-2",
+        "kie-ai",
+        "kling"
+      ]
+    },
+    {
+      "id": "1YljUtbzOkTybi4GAUbk",
+      "name": "chat to video workflow - session to video",
+      "date": "2026-04-19",
+      "directIds": [
+        "react",
+        "typescript",
+        "node-js",
+        "python",
+        "openpyxl",
+        "remotion",
+        "other"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "typescript",
+        "node-js",
+        "python",
+        "openpyxl",
+        "remotion",
+        "other"
+      ]
+    },
+    {
+      "id": "29teGWMf1ehv7YGSvORj",
+      "name": "Google Ads keyword finder, interactive mockup",
+      "date": "2026-04-03",
+      "directIds": [
+        "javascript",
+        "dataforseo",
+        "google-ads"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "javascript",
+        "dataforseo",
+        "google-ads"
+      ]
+    },
+    {
+      "id": "2THXLug2RU7xQ3H10huW",
+      "name": "AI agent control panel mockup - Animabot",
+      "date": "2026-04-07",
+      "directIds": [
+        "html",
+        "css",
+        "javascript",
+        "node-js",
+        "ethers-js",
+        "matrix-js-sdk",
+        "postgres"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "html",
+        "css",
+        "javascript",
+        "node-js",
+        "ethers-js",
+        "matrix-js-sdk",
+        "postgres"
+      ]
+    },
+    {
+      "id": "2bgL1Z0Qa7BFGkqyOZ3E",
+      "name": "skill tracker mockup — Gemini 3 Flash",
+      "date": "2026-03-28",
+      "directIds": [
+        "react",
+        "vite",
+        "tailwind",
+        "motion-react",
+        "lucide-react",
+        "node-js"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "vite",
+        "tailwind",
+        "motion-react",
+        "lucide-react",
+        "node-js"
+      ]
+    },
+    {
+      "id": "3WLunQa9JNnHsRkNBkDf",
+      "name": "Tesla Targets 10 Million Optimus Robots A Year, First Few Currently Folding Laundry — Aninews ep 4",
+      "date": "2026-05-03",
+      "directIds": [
+        "spoolcast",
+        "ffmpeg",
+        "seedance",
+        "google-cloud-tts",
+        "gpt-image-2",
+        "chatgpt",
+        "other"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "spoolcast",
+        "ffmpeg",
+        "seedance",
+        "google-cloud-tts",
+        "gpt-image-2",
+        "chatgpt",
+        "other"
+      ]
+    },
+    {
+      "id": "4EdEwKBbJWejkxwv8WVw",
+      "name": "homepage showcase demos grid + top/showcase flag split — artlu.ai",
+      "date": "2026-04-18",
+      "directIds": [
+        "react",
+        "javascript",
+        "firestore",
+        "netlify",
+        "railway"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "javascript",
+        "firestore",
+        "netlify",
+        "railway"
+      ]
+    },
+    {
+      "id": "4hTyqZfXrdytXIkkcStm",
+      "name": "Elon Leases Entire Data Center To AI Company He Once Criticized — Aninews ep 6",
+      "date": "2026-05-07",
+      "directIds": [
+        "spoolcast",
+        "ffmpeg",
+        "seedance",
+        "google-cloud-tts",
+        "claude"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "spoolcast",
+        "ffmpeg",
+        "seedance",
+        "google-cloud-tts",
+        "claude"
+      ]
+    },
+    {
+      "id": "5RYbyV2uCRm7OtwFElHA",
+      "name": "google ads launch setup + conversion tracking — sitesnapshot",
+      "date": "2026-03-30",
+      "directIds": [
+        "vite",
+        "stripe",
+        "firebase",
+        "google-ads",
+        "netlify"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "vite",
+        "stripe",
+        "firebase",
+        "google-ads",
+        "netlify"
+      ]
+    },
+    {
+      "id": "5wKVNWOCn7B5DvXNs5ID",
+      "name": "three-ai AdsMetri build story — spoolcast dev-log #7",
+      "date": "2026-05-13",
+      "directIds": [
+        "oauth",
+        "spoolcast",
+        "remotion",
+        "google-cloud-tts",
+        "youtube",
+        "ai-image-generation",
+        "codex",
+        "claude",
+        "manus"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "oauth",
+        "spoolcast",
+        "remotion",
+        "google-cloud-tts",
+        "youtube",
+        "ai-image-generation",
+        "codex",
+        "claude",
+        "manus"
+      ]
+    },
+    {
+      "id": "81pmDDf9irFq05ovHmut",
+      "name": "creative intelligence tagging workbench - AdsMetri",
+      "date": "2026-05-16",
+      "directIds": [
+        "react",
+        "tailwind",
+        "shadcn-ui",
+        "trpc",
+        "mysql",
+        "drizzle",
+        "meta-graph-api"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "tailwind",
+        "shadcn-ui",
+        "trpc",
+        "mysql",
+        "drizzle",
+        "meta-graph-api"
+      ]
+    },
+    {
+      "id": "8e8bIucfp9Btpfy2eqRg",
+      "name": "AI Vacation Search Template",
+      "date": "2026-04-23",
+      "directIds": [
+        "html",
+        "css",
+        "javascript",
+        "prompt-design"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "html",
+        "css",
+        "javascript",
+        "prompt-design"
+      ]
+    },
+    {
+      "id": "9FMCMrsfHjS8T6cBekFL",
+      "name": "video showcase + per-video guidebook pages — artlu.ai",
+      "date": "2026-04-22",
+      "directIds": [
+        "react",
+        "vite",
+        "node-js",
+        "spoolcast",
+        "cwebp",
+        "youtube"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "vite",
+        "node-js",
+        "spoolcast",
+        "cwebp",
+        "youtube"
+      ]
+    },
+    {
+      "id": "9cg27OiPifGTXeVKYBQo",
+      "name": "payment engine rewrite + calendar UI + light theme — TRACK v2",
+      "date": "2026-05-03",
+      "directIds": [
+        "react",
+        "html",
+        "css",
+        "javascript",
+        "babel-standalone",
+        "firebase-realtime-db",
+        "netlify"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "html",
+        "css",
+        "javascript",
+        "babel-standalone",
+        "firebase-realtime-db",
+        "netlify"
+      ]
+    },
+    {
+      "id": "9wZvCWpTIPFhagJxqxpu",
+      "name": "live-updating activity heatmap — artlu.ai",
+      "date": "2026-04-22",
+      "directIds": [
+        "react",
+        "css",
+        "css-variables",
+        "firestore"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "css",
+        "css-variables",
+        "firestore"
+      ]
+    },
+    {
+      "id": "ASJWFamxvzLcWMqxPASz",
+      "name": "reddit brand monitor",
+      "date": "2026-04-02",
+      "directIds": [
+        "html",
+        "css",
+        "javascript",
+        "pullpush-api"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "html",
+        "css",
+        "javascript",
+        "pullpush-api"
+      ]
+    },
+    {
+      "id": "CkCZZqWvLjG2HBjYYsmL",
+      "name": "canonical skill-map prototype — Gemini + Codex",
+      "date": "2026-03-31",
+      "directIds": [
+        "react",
+        "vite",
+        "tailwind",
+        "motion-react",
+        "lucide-react",
+        "cloudflare-pages",
+        "codex",
+        "gemini"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "vite",
+        "tailwind",
+        "motion-react",
+        "lucide-react",
+        "cloudflare-pages",
+        "codex",
+        "gemini"
+      ]
+    },
+    {
+      "id": "DewESANQsTedut4PMgtA",
+      "name": "google ads search launch experiment — sitesnapshot",
+      "date": "2026-04-05",
+      "directIds": [
+        "vite",
+        "stripe",
+        "firebase",
+        "google-ads",
+        "netlify"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "vite",
+        "stripe",
+        "firebase",
+        "google-ads",
+        "netlify"
+      ]
+    },
+    {
+      "id": "E9jVCD8dnAUWWhsaCQ6p",
+      "name": "url-to-snapshot pipeline + queued worker and artifact backend — snapshot",
+      "date": "2026-03-27",
+      "directIds": [
+        "react",
+        "vite",
+        "puppeteer",
+        "firestore",
+        "firebase-auth",
+        "firebase-storage",
+        "netlify",
+        "cloud-run",
+        "cloud-tasks",
+        "anthropic-api"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "vite",
+        "puppeteer",
+        "firestore",
+        "firebase-auth",
+        "firebase-storage",
+        "netlify",
+        "cloud-run",
+        "cloud-tasks",
+        "anthropic-api"
+      ]
+    },
+    {
+      "id": "GPTpg2qTBMTeKp9ZBoEe",
+      "name": "subnet-client adapter, broadcast detection, invite evaluation — Animabot",
+      "date": "2026-04-09",
+      "directIds": [
+        "node-js",
+        "pm2",
+        "matrix-js-sdk",
+        "postgres",
+        "openrouter"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "node-js",
+        "pm2",
+        "matrix-js-sdk",
+        "postgres",
+        "openrouter"
+      ]
+    },
+    {
+      "id": "HU7xleACQiPYxrlxa6f9",
+      "name": "TRACK — Contractor Status Tracker",
+      "date": "2026-03-18",
+      "directIds": [
+        "react",
+        "babel-standalone",
+        "firebase-realtime-db",
+        "netlify"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "babel-standalone",
+        "firebase-realtime-db",
+        "netlify"
+      ]
+    },
+    {
+      "id": "HpMsyREfVfjqc3DpJaiM",
+      "name": "recurring-show + character cloning support — spoolcast",
+      "date": "2026-04-29",
+      "directIds": [
+        "spoolcast",
+        "ffmpeg",
+        "google-cloud-tts",
+        "gpt-image-2",
+        "kie-ai",
+        "kling"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "spoolcast",
+        "ffmpeg",
+        "google-cloud-tts",
+        "gpt-image-2",
+        "kie-ai",
+        "kling"
+      ]
+    },
+    {
+      "id": "IA5WQfqMNtO5phN9U4yG",
+      "name": "Live Demo Iframe Embed",
+      "date": "2026-03-19",
+      "directIds": [
+        "react",
+        "firebase",
+        "netlify"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "firebase",
+        "netlify"
+      ]
+    },
+    {
+      "id": "IIHuQIFXdvz4nNrqciHk",
+      "name": "tracker-backed evidence bridge for skill progress tracking — VibeSkill MCP",
+      "date": "2026-04-01",
+      "directIds": [
+        "typescript",
+        "mcp",
+        "firestore",
+        "spoolcast",
+        "codex",
+        "other"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "typescript",
+        "mcp",
+        "firestore",
+        "spoolcast",
+        "codex",
+        "other"
+      ]
+    },
+    {
+      "id": "IdxBbFILh08jfHvi97wM",
+      "name": "tracker MCP migration from Claude to Codex — artlu.ai",
+      "date": "2026-03-27",
+      "directIds": [
+        "node-js",
+        "mcp",
+        "firebase-admin",
+        "firestore",
+        "codex",
+        "claude"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "node-js",
+        "mcp",
+        "firebase-admin",
+        "firestore",
+        "codex",
+        "claude"
+      ]
+    },
+    {
+      "id": "JZNwWRHeto6EuLtEc6w5",
+      "name": "Google's AI Health Coach Asks For Your Sleep Data And $9.99 — Aninews ep 7",
+      "date": "2026-05-08",
+      "directIds": [
+        "spoolcast",
+        "ffmpeg",
+        "seedance",
+        "google-cloud-tts"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "spoolcast",
+        "ffmpeg",
+        "seedance",
+        "google-cloud-tts"
+      ]
+    },
+    {
+      "id": "Jjo6SjKSLRVAah638AlY",
+      "name": "artlu.ai rebuild — mockup",
+      "date": "2026-05-19",
+      "directIds": [
+        "astro",
+        "html",
+        "css",
+        "javascript",
+        "spoolcast"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "astro",
+        "html",
+        "css",
+        "javascript",
+        "spoolcast"
+      ]
+    },
+    {
+      "id": "JopBLJT3ZfB5HpWICcOY",
+      "name": "daily ai news satire ep 2 — microsoft's $120b ai bet",
+      "date": "2026-04-30",
+      "directIds": [
+        "python",
+        "spoolcast",
+        "ffmpeg",
+        "seedance",
+        "google-cloud-tts",
+        "gpt-image-2",
+        "kie-ai"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "python",
+        "spoolcast",
+        "ffmpeg",
+        "seedance",
+        "google-cloud-tts",
+        "gpt-image-2",
+        "kie-ai"
+      ]
+    },
+    {
+      "id": "K9dN6j2a3xQHraL1QQKI",
+      "name": "remote panic button, exit trades from phone — tradovate auto-cancel",
+      "date": "2026-03-25",
+      "directIds": [
+        "javascript",
+        "chrome-extension",
+        "firestore",
+        "firebase",
+        "netlify"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "javascript",
+        "chrome-extension",
+        "firestore",
+        "firebase",
+        "netlify"
+      ]
+    },
+    {
+      "id": "LBbhUghCcqUW6AzyZpSy",
+      "name": "CostIntel — eCommerce Fulfillment Analytics Dashboard",
+      "date": "2026-03-20",
+      "directIds": [
+        "html",
+        "css",
+        "javascript",
+        "chart-js",
+        "csv-parsing"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "html",
+        "css",
+        "javascript",
+        "chart-js",
+        "csv-parsing"
+      ]
+    },
+    {
+      "id": "LfImFhyBxvzWeQc9uWGX",
+      "name": "Cisco Stock Pops 15% On 4,000 Layoffs And $5B AI Order Surge — Aninews ep 10",
+      "date": "2026-05-16",
+      "directIds": [
+        "spoolcast",
+        "ffmpeg",
+        "seedance",
+        "google-cloud-tts",
+        "other"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "spoolcast",
+        "ffmpeg",
+        "seedance",
+        "google-cloud-tts",
+        "other"
+      ]
+    },
+    {
+      "id": "LwqrGfJUIfgCNDaSuM96",
+      "name": "exact-match lookup + slug audit — artlu-tracker-mcp",
+      "date": "2026-04-30",
+      "directIds": [
+        "typescript",
+        "node-js",
+        "mcp",
+        "firebase-admin",
+        "firestore"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "typescript",
+        "node-js",
+        "mcp",
+        "firebase-admin",
+        "firestore"
+      ]
+    },
+    {
+      "id": "MTXIiF0X0SQqjiAYbsn4",
+      "name": "keyword filtering feature, stripe billing - Pipelinecpc",
+      "date": "2026-04-06",
+      "directIds": [
+        "javascript",
+        "node-js",
+        "stripe",
+        "firestore",
+        "firebase-auth",
+        "railway"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "javascript",
+        "node-js",
+        "stripe",
+        "firestore",
+        "firebase-auth",
+        "railway"
+      ]
+    },
+    {
+      "id": "NTsas3r7ecpiHzlgS9cu",
+      "name": "spoolcast SFX — meme/reaction audio per chunk",
+      "date": "2026-04-27",
+      "directIds": [
+        "spoolcast",
+        "remotion",
+        "ffmpeg",
+        "google-cloud-tts"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "spoolcast",
+        "remotion",
+        "ffmpeg",
+        "google-cloud-tts"
+      ]
+    },
+    {
+      "id": "NXXS5upp1p2l6ZXIIb1p",
+      "name": "why ai makes things up about its own work — spoolcast dev-log #6",
+      "date": "2026-05-08",
+      "directIds": [
+        "spoolcast",
+        "remotion",
+        "google-cloud-tts",
+        "youtube",
+        "ai-image-generation"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "spoolcast",
+        "remotion",
+        "google-cloud-tts",
+        "youtube",
+        "ai-image-generation"
+      ]
+    },
+    {
+      "id": "NqESTGJ2aIa5BTwod4Am",
+      "name": "Google Ads agent dashboard — AdAgent Operator mockup",
+      "date": "2026-04-07",
+      "directIds": [
+        "html",
+        "css",
+        "javascript",
+        "google-ads"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "html",
+        "css",
+        "javascript",
+        "google-ads"
+      ]
+    },
+    {
+      "id": "PhlkE0oVucXLWWAku5hK",
+      "name": "the bug an AI couldn't catch — spoolcast dev log 4",
+      "date": "2026-05-02",
+      "directIds": [
+        "python",
+        "spoolcast",
+        "remotion",
+        "google-cloud-tts",
+        "kie-ai"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "python",
+        "spoolcast",
+        "remotion",
+        "google-cloud-tts",
+        "kie-ai"
+      ]
+    },
+    {
+      "id": "PsdvGPA9lXBiNcgqUdld",
+      "name": "multi-model support, generate from UI — xqboost",
+      "date": "2026-03-25",
+      "directIds": [
+        "react",
+        "netlify-functions",
+        "cron",
+        "aes-256-gcm",
+        "moonshot-api",
+        "firestore",
+        "firebase-auth",
+        "github-actions",
+        "openai-api",
+        "anthropic-api"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "netlify-functions",
+        "cron",
+        "aes-256-gcm",
+        "moonshot-api",
+        "firestore",
+        "firebase-auth",
+        "github-actions",
+        "openai-api",
+        "anthropic-api"
+      ]
+    },
+    {
+      "id": "Q7nljTaLyaohOfGnTi91",
+      "name": "artifact embed",
+      "date": "2026-03-22",
+      "directIds": [
+        "react",
+        "firebase",
+        "netlify",
+        "claude"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "firebase",
+        "netlify",
+        "claude"
+      ]
+    },
+    {
+      "id": "RtRKaAeA4PV9hgBG7KuD",
+      "name": "snapshot — public web app for site freezing",
+      "date": "2026-03-26",
+      "directIds": [
+        "react",
+        "vite",
+        "javascript",
+        "netlify-functions",
+        "firebase-cloud-functions",
+        "firestore",
+        "firebase-auth",
+        "browserless",
+        "anthropic-api",
+        "claude"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "vite",
+        "javascript",
+        "netlify-functions",
+        "firebase-cloud-functions",
+        "firestore",
+        "firebase-auth",
+        "browserless",
+        "anthropic-api",
+        "claude"
+      ]
+    },
+    {
+      "id": "RxI2qzdUa8eAddNemvWV",
+      "name": "xqboost MCP Server",
+      "date": "2026-03-23",
+      "directIds": [
+        "node-js",
+        "mcp",
+        "firebase-admin",
+        "firestore"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "node-js",
+        "mcp",
+        "firebase-admin",
+        "firestore"
+      ]
+    },
+    {
+      "id": "VfKLMNyhDKjl0hHLuNBH",
+      "name": "Perp Position Size Calculator",
+      "date": "2026-03-18",
+      "directIds": [
+        "html",
+        "css",
+        "javascript",
+        "claude"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "html",
+        "css",
+        "javascript",
+        "claude"
+      ]
+    },
+    {
+      "id": "WZ8xT1ZbxRxNceMNTxFd",
+      "name": "giving an AI agent a key to your wallet — spoolcast dev-log #8",
+      "date": "2026-05-18",
+      "directIds": [
+        "spoolcast",
+        "remotion",
+        "google-cloud-tts",
+        "youtube",
+        "ai-image-generation",
+        "codex"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "spoolcast",
+        "remotion",
+        "google-cloud-tts",
+        "youtube",
+        "ai-image-generation",
+        "codex"
+      ]
+    },
+    {
+      "id": "X1slkZ1eA2EfZfdSHjo2",
+      "name": "how AI hides its own mistakes — spoolcast dev log 3",
+      "date": "2026-04-27",
+      "directIds": [
+        "python",
+        "spoolcast",
+        "remotion",
+        "google-cloud-tts",
+        "gpt-image-2",
+        "kie-ai",
+        "youtube",
+        "claude"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "python",
+        "spoolcast",
+        "remotion",
+        "google-cloud-tts",
+        "gpt-image-2",
+        "kie-ai",
+        "youtube",
+        "claude"
+      ]
+    },
+    {
+      "id": "XO1pGHOEYQxYHMlkCYzt",
+      "name": "Anthropic Vs OpenAI Cybersecurity AI Race: 271 Bugs Found, Three Of Them Real — Aninews ep 9",
+      "date": "2026-05-15",
+      "directIds": [
+        "spoolcast",
+        "ffmpeg",
+        "seedance",
+        "google-cloud-tts"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "spoolcast",
+        "ffmpeg",
+        "seedance",
+        "google-cloud-tts"
+      ]
+    },
+    {
+      "id": "YxGDUrWnCMd4m1zvuWJ9",
+      "name": "Drag & Drop, Tags, Permalinks — artlu.ai v2",
+      "date": "2026-03-22",
+      "directIds": [
+        "react",
+        "vite",
+        "javascript",
+        "firestore",
+        "firebase",
+        "netlify"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "vite",
+        "javascript",
+        "firestore",
+        "firebase",
+        "netlify"
+      ]
+    },
+    {
+      "id": "ZhVsweVaqTH7bGaiNG39",
+      "name": "AI hallucination experiment — Context Gate",
+      "date": "2026-05-18",
+      "directIds": [
+        "javascript",
+        "python"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "javascript",
+        "python"
+      ]
+    },
+    {
+      "id": "aXti9Wvt4bT1RqLpFuZn",
+      "name": "repo gps for ai agents — spoolcast dev-log #5",
+      "date": "2026-05-07",
+      "directIds": [
+        "spoolcast",
+        "remotion",
+        "google-cloud-tts",
+        "youtube",
+        "ai-image-generation"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "spoolcast",
+        "remotion",
+        "google-cloud-tts",
+        "youtube",
+        "ai-image-generation"
+      ]
+    },
+    {
+      "id": "c76Cyi3nVPhGdU4Q1f6q",
+      "name": "featured Projects + Tag Pool — artlu.ai",
+      "date": "2026-03-26",
+      "directIds": [
+        "react",
+        "vite",
+        "firestore",
+        "netlify"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "vite",
+        "firestore",
+        "netlify"
+      ]
+    },
+    {
+      "id": "d3ziyvhm4KAlmxFHtQgX",
+      "name": "demo links, UI layout update — artlu.ai",
+      "date": "2026-04-07",
+      "directIds": [
+        "react",
+        "vite",
+        "firestore"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "vite",
+        "firestore"
+      ]
+    },
+    {
+      "id": "dxofCMbggdfUlom1d6hD",
+      "name": "AI personality tweet generator — xqboost",
+      "date": "2026-03-23",
+      "directIds": [
+        "react",
+        "vite",
+        "cron",
+        "puppeteer",
+        "firebase",
+        "netlify",
+        "github-actions",
+        "anthropic-api"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "vite",
+        "cron",
+        "puppeteer",
+        "firebase",
+        "netlify",
+        "github-actions",
+        "anthropic-api"
+      ]
+    },
+    {
+      "id": "ecIt5YvNs46GNOxNCjCj",
+      "name": "Nvidia Invests $40 Billion In Companies That Make Money By Spending It On Nvidia — Aninews ep 8",
+      "date": "2026-05-12",
+      "directIds": [
+        "spoolcast",
+        "ffmpeg",
+        "seedance",
+        "google-cloud-tts"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "spoolcast",
+        "ffmpeg",
+        "seedance",
+        "google-cloud-tts"
+      ]
+    },
+    {
+      "id": "evjJBdK5KNIpalsMMalH",
+      "name": "Claude skill for website snapshots",
+      "date": "2026-03-24",
+      "directIds": [
+        "html",
+        "css",
+        "javascript",
+        "claude"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "html",
+        "css",
+        "javascript",
+        "claude"
+      ]
+    },
+    {
+      "id": "f4hKrgogV6m0tIPRXVXG",
+      "name": "agent campaign planning bridge — PipelineCPC",
+      "date": "2026-05-16",
+      "directIds": [
+        "node-js",
+        "mcp",
+        "firestore",
+        "firebase-auth",
+        "google-ads",
+        "railway",
+        "codex"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "node-js",
+        "mcp",
+        "firestore",
+        "firebase-auth",
+        "google-ads",
+        "railway",
+        "codex"
+      ]
+    },
+    {
+      "id": "fk31dYZIFBPExKcDEKjH",
+      "name": "tweet queue & draft management — xqboost",
+      "date": "2026-03-23",
+      "directIds": [
+        "react",
+        "vite",
+        "firebase-cloud-functions",
+        "x-api",
+        "firestore",
+        "firebase-auth",
+        "netlify"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "vite",
+        "firebase-cloud-functions",
+        "x-api",
+        "firestore",
+        "firebase-auth",
+        "netlify"
+      ]
+    },
+    {
+      "id": "fpyN3i4dd2br9oUu3mDh",
+      "name": "AI brain-response video comparison with TRIBE v2",
+      "date": "2026-04-10",
+      "directIds": [
+        "python",
+        "google-colab",
+        "ffmpeg",
+        "hugging-face",
+        "pytorch",
+        "numpy",
+        "whisperx",
+        "tribe-v2",
+        "other"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "python",
+        "google-colab",
+        "ffmpeg",
+        "hugging-face",
+        "pytorch",
+        "numpy",
+        "whisperx",
+        "tribe-v2",
+        "other"
+      ]
+    },
+    {
+      "id": "guq1rc1FJe4HE7nnZaoX",
+      "name": "spoolcast mobile export — Reels/TikTok/Shorts (A.1)",
+      "date": "2026-04-23",
+      "directIds": [
+        "python",
+        "spoolcast",
+        "ffmpeg",
+        "kie-ai",
+        "openrouter",
+        "libass",
+        "rsvg-convert",
+        "claude"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "python",
+        "spoolcast",
+        "ffmpeg",
+        "kie-ai",
+        "openrouter",
+        "libass",
+        "rsvg-convert",
+        "claude"
+      ]
+    },
+    {
+      "id": "jTNAOodj7gVcCZSGRSPK",
+      "name": "meta ads performance intelligence dashboard - adsmetri",
+      "date": "2026-05-12",
+      "directIds": [
+        "react",
+        "tailwind",
+        "shadcn-ui",
+        "recharts",
+        "express",
+        "trpc",
+        "oauth",
+        "mysql",
+        "drizzle",
+        "meta-graph-api"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "tailwind",
+        "shadcn-ui",
+        "recharts",
+        "express",
+        "trpc",
+        "oauth",
+        "mysql",
+        "drizzle",
+        "meta-graph-api"
+      ]
+    },
+    {
+      "id": "jXm4LNLSahcZAIl1HTDv",
+      "name": "paid search niche research SaaS — Keyword Pipeline",
+      "date": "2026-04-06",
+      "directIds": [
+        "javascript",
+        "node-js",
+        "stripe",
+        "firestore",
+        "firebase-auth",
+        "railway"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "javascript",
+        "node-js",
+        "stripe",
+        "firestore",
+        "firebase-auth",
+        "railway"
+      ]
+    },
+    {
+      "id": "jgCKHZ4A1b5ZnmxBkOTw",
+      "name": "umbrella brand site + traffic hub launch — vellumray",
+      "date": "2026-03-29",
+      "directIds": [
+        "html",
+        "css",
+        "cloudflare-pages",
+        "cloudflare-dns",
+        "cloudflare-email-routing"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "html",
+        "css",
+        "cloudflare-pages",
+        "cloudflare-dns",
+        "cloudflare-email-routing"
+      ]
+    },
+    {
+      "id": "k41GzHD1esptJw07Swy0",
+      "name": "google + amazon's anthropic markup - aninews ep3",
+      "date": "2026-05-02",
+      "directIds": [
+        "spoolcast",
+        "ffmpeg",
+        "seedance",
+        "google-cloud-tts",
+        "gpt-image-2",
+        "other"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "spoolcast",
+        "ffmpeg",
+        "seedance",
+        "google-cloud-tts",
+        "gpt-image-2",
+        "other"
+      ]
+    },
+    {
+      "id": "kWSzIZuuMuD7hlf7HSm8",
+      "name": "automated posting to X — xqboost",
+      "date": "2026-03-24",
+      "directIds": [
+        "node-js",
+        "oauth",
+        "x-api",
+        "firestore",
+        "firebase",
+        "github-actions"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "node-js",
+        "oauth",
+        "x-api",
+        "firestore",
+        "firebase",
+        "github-actions"
+      ]
+    },
+    {
+      "id": "l296gwLY2RSvOZHJlZ9j",
+      "name": "Tradovate Auto-Cancel Chrome Extension (group orders)",
+      "date": "2026-03-18",
+      "directIds": [
+        "javascript",
+        "chrome-extension",
+        "chrome-storage-api",
+        "dom-automation",
+        "other"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "javascript",
+        "chrome-extension",
+        "chrome-storage-api",
+        "dom-automation",
+        "other"
+      ]
+    },
+    {
+      "id": "lNjhwBj2BbH679S3iOIU",
+      "name": "TRIBE brain-prediction ad-test explainer — spoolcast pilot video",
+      "date": "2026-04-20",
+      "directIds": [
+        "react",
+        "typescript",
+        "python",
+        "spoolcast",
+        "remotion",
+        "ffmpeg",
+        "google-cloud-tts",
+        "kie-ai",
+        "opencv",
+        "youtube"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "typescript",
+        "python",
+        "spoolcast",
+        "remotion",
+        "ffmpeg",
+        "google-cloud-tts",
+        "kie-ai",
+        "opencv",
+        "youtube"
+      ]
+    },
+    {
+      "id": "lPdrBc4pD0tY5JLgDphX",
+      "name": "shopify polaris-inspired light theme — artlu.ai",
+      "date": "2026-04-18",
+      "directIds": [
+        "react",
+        "vite",
+        "css-variables",
+        "spoolcast"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "vite",
+        "css-variables",
+        "spoolcast"
+      ]
+    },
+    {
+      "id": "mE3rAaf8IZqxEn4t3Rj4",
+      "name": "artlu.ai",
+      "date": "2026-03-19",
+      "directIds": [
+        "react",
+        "vite",
+        "firestore",
+        "firebase",
+        "netlify",
+        "claude"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "vite",
+        "firestore",
+        "firebase",
+        "netlify",
+        "claude"
+      ]
+    },
+    {
+      "id": "mPQ97bUVUt35DzbIKgBO",
+      "name": "Terminal File Browser",
+      "date": "2026-03-19",
+      "directIds": [
+        "react",
+        "firebase",
+        "netlify",
+        "github-api"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "firebase",
+        "netlify",
+        "github-api"
+      ]
+    },
+    {
+      "id": "n5ywBp7Du1BGvriliszp",
+      "name": "evidence engine for skill-based progress tracking — VibeSkill",
+      "date": "2026-04-01",
+      "directIds": [
+        "react",
+        "vite",
+        "typescript",
+        "tailwind",
+        "motion-react",
+        "lucide-react",
+        "cloudflare-pages",
+        "github-api",
+        "codex",
+        "gemini"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "vite",
+        "typescript",
+        "tailwind",
+        "motion-react",
+        "lucide-react",
+        "cloudflare-pages",
+        "github-api",
+        "codex",
+        "gemini"
+      ]
+    },
+    {
+      "id": "nVo7L6dHzLHhCTIG3Um2",
+      "name": "Meta Ads dashboard — AdsMetri",
+      "date": "2026-05-04",
+      "directIds": [
+        "react",
+        "typescript",
+        "tailwind",
+        "shadcn-ui",
+        "express",
+        "trpc",
+        "cron",
+        "oauth",
+        "mysql",
+        "drizzle",
+        "manus"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "typescript",
+        "tailwind",
+        "shadcn-ui",
+        "express",
+        "trpc",
+        "cron",
+        "oauth",
+        "mysql",
+        "drizzle",
+        "manus"
+      ]
+    },
+    {
+      "id": "nyVvS8iRIAYhviEkPvK3",
+      "name": "live credit checkout + payments launch — sitesnapshot",
+      "date": "2026-03-29",
+      "directIds": [
+        "react",
+        "vite",
+        "netlify-functions",
+        "stripe",
+        "firestore",
+        "firebase-auth"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "vite",
+        "netlify-functions",
+        "stripe",
+        "firestore",
+        "firebase-auth"
+      ]
+    },
+    {
+      "id": "o9431zuYldMh0P0NS6If",
+      "name": "spoolcast — AI-to-video pipeline",
+      "date": "2026-04-22",
+      "directIds": [
+        "node-js",
+        "python",
+        "spoolcast",
+        "remotion",
+        "ffmpeg",
+        "google-cloud-tts",
+        "kie-ai",
+        "codex",
+        "claude"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "node-js",
+        "python",
+        "spoolcast",
+        "remotion",
+        "ffmpeg",
+        "google-cloud-tts",
+        "kie-ai",
+        "codex",
+        "claude"
+      ]
+    },
+    {
+      "id": "p1yB47gWnAofqQxVdo5u",
+      "name": "interactive skill-tree visual mockup — VibeSkill",
+      "date": "2026-04-01",
+      "directIds": [
+        "html",
+        "css",
+        "javascript",
+        "cloudflare-pages",
+        "codex"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "html",
+        "css",
+        "javascript",
+        "cloudflare-pages",
+        "codex"
+      ]
+    },
+    {
+      "id": "togEGqXHYmy3BDi4pYRH",
+      "name": "live AI agent with Ethereum wallet and evolving personality — Animabot",
+      "date": "2026-04-08",
+      "directIds": [
+        "node-js",
+        "express",
+        "pm2",
+        "ethers-js",
+        "matrix-js-sdk",
+        "postgres",
+        "hetzner",
+        "openrouter"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "node-js",
+        "express",
+        "pm2",
+        "ethers-js",
+        "matrix-js-sdk",
+        "postgres",
+        "hetzner",
+        "openrouter"
+      ]
+    },
+    {
+      "id": "tpmiviWYZMvJ2jAuDJuP",
+      "name": "AI generated video - what is spoolcast?",
+      "date": "2026-04-21",
+      "directIds": [
+        "react",
+        "python",
+        "spoolcast",
+        "remotion",
+        "google-cloud-tts",
+        "kie-ai",
+        "opencv",
+        "claude"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "python",
+        "spoolcast",
+        "remotion",
+        "google-cloud-tts",
+        "kie-ai",
+        "opencv",
+        "claude"
+      ]
+    },
+    {
+      "id": "uMUtiMSX9qcoUWdvXsHU",
+      "name": "Keyword Pipeline — niche research tool",
+      "date": "2026-04-03",
+      "directIds": [
+        "javascript",
+        "node-js",
+        "dataforseo",
+        "google-ads"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "javascript",
+        "node-js",
+        "dataforseo",
+        "google-ads"
+      ]
+    },
+    {
+      "id": "yDubphY6vehq2Sv33mnQ",
+      "name": "CostIntel Fulfillment Automator",
+      "date": "2026-03-20",
+      "directIds": [
+        "javascript",
+        "chrome-extension",
+        "dom-automation",
+        "web-workers",
+        "sheetjs",
+        "other"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "javascript",
+        "chrome-extension",
+        "dom-automation",
+        "web-workers",
+        "sheetjs",
+        "other"
+      ]
+    },
+    {
+      "id": "yFyeAbpYUHgy2yG4MrvC",
+      "name": "Apple Pays $250 Million To Settle Suit Over AI Siri Features That Did Not Exist — Aninews ep 5",
+      "date": "2026-05-06",
+      "directIds": [
+        "spoolcast",
+        "ffmpeg",
+        "seedance",
+        "google-cloud-tts",
+        "chatgpt"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "spoolcast",
+        "ffmpeg",
+        "seedance",
+        "google-cloud-tts",
+        "chatgpt"
+      ]
+    },
+    {
+      "id": "yREX5rjGrau5YzbZA5cF",
+      "name": "artlu-tracker-mcp",
+      "date": "2026-03-19",
+      "directIds": [
+        "typescript",
+        "node-js",
+        "mcp",
+        "firebase-admin",
+        "firestore",
+        "codex"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "typescript",
+        "node-js",
+        "mcp",
+        "firebase-admin",
+        "firestore",
+        "codex"
+      ]
+    },
+    {
+      "id": "yTIH4mX8VwAiASIbWLP2",
+      "name": "Journal System",
+      "date": "2026-03-21",
+      "directIds": [
+        "react",
+        "react-router",
+        "firestore",
+        "netlify",
+        "youtube"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "react-router",
+        "firestore",
+        "netlify",
+        "youtube"
+      ]
+    },
+    {
+      "id": "yaS25g4EdYBqFMGXF1At",
+      "name": "shorts + tiktok embed — artlu.ai",
+      "date": "2026-05-01",
+      "directIds": [
+        "react",
+        "vite",
+        "node-js",
+        "spoolcast",
+        "ffmpeg",
+        "cwebp",
+        "youtube",
+        "tiktok"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "react",
+        "vite",
+        "node-js",
+        "spoolcast",
+        "ffmpeg",
+        "cwebp",
+        "youtube",
+        "tiktok"
+      ]
+    },
+    {
+      "id": "yxieoHW5bhw7Qx2BMysT",
+      "name": "Google Closes In On Nvidia As World's Most Valuable Company — Aninews ep 11",
+      "date": "2026-05-18",
+      "directIds": [
+        "spoolcast",
+        "ffmpeg",
+        "seedance",
+        "google-cloud-tts",
+        "chatgpt"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "spoolcast",
+        "ffmpeg",
+        "seedance",
+        "google-cloud-tts",
+        "chatgpt"
+      ]
+    },
+    {
+      "id": "ziW1UDSJSsPajrhqfdan",
+      "name": "how I caught AI lying — spoolcast dev log 2",
+      "date": "2026-04-24",
+      "directIds": [
+        "node-js",
+        "python",
+        "spoolcast",
+        "remotion",
+        "ffmpeg",
+        "google-cloud-tts",
+        "gpt-image-2",
+        "kie-ai",
+        "claude"
+      ],
+      "inferredOnly": [],
+      "unmatchedStack": [],
+      "suggestedStackRefs": [
+        "node-js",
+        "python",
+        "spoolcast",
+        "remotion",
+        "ffmpeg",
+        "google-cloud-tts",
+        "gpt-image-2",
+        "kie-ai",
+        "claude"
+      ]
+    }
+  ]
+}

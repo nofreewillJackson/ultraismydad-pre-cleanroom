@@ -1,0 +1,34 @@
+[
+  {
+    "id": "aninews",
+    "mainProjectId": "spoolcast",
+    "name": "Aninews",
+    "meta": "daily news satire",
+    "desc": "Short-form AI news satire episodes produced with Spoolcast.",
+    "kind": "video-series",
+    "aliases": ["news-anime-bot", "faux7"],
+    "visibility": "public",
+    "sortOrder": 10
+  },
+  {
+    "id": "spoolcast-dev-log",
+    "mainProjectId": "spoolcast",
+    "name": "Spoolcast Dev Log",
+    "meta": "build devlogs",
+    "desc": "Long-form devlogs about building with AI agents, shipping tools, and improving Spoolcast.",
+    "kind": "video-series",
+    "visibility": "public",
+    "sortOrder": 20
+  },
+  {
+    "id": "videos",
+    "mainProjectId": "spoolcast",
+    "name": "Videos",
+    "meta": "standalone videos",
+    "desc": "Standalone Spoolcast videos, explainers, pilots, and media experiments.",
+    "kind": "video-series",
+    "aliases": ["spoolcast-core"],
+    "visibility": "public",
+    "sortOrder": 30
+  }
+]

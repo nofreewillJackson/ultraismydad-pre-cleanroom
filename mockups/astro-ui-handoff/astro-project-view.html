@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>artlu.ai — meta ads performance dashboard — AdsMetri</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  html[data-theme="dark"] {
+    --bg:#08090a; --surface:#0e0f11; --surface-2:#16191d;
+    --border:#1a1d22; --border-strong:#2b3038; --border-hover:#4a525e;
+    --text:#c0c4cc; --text-bright:#f0f1f3; --text-sub:#9aa0aa;
+    --dim:#6b7280; --dimmer:#3a3f48;
+    --green:#4ade80; --green-bg:#062b12; --green-border:#1d4d31;
+    --blue:#60a5fa; --amber:#d8a657; --amber-bg:#1c1a12;
+    --node-shadow:0 8px 26px rgba(0,0,0,0.6);
+    --font:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  html[data-theme="light"] {
+    --bg:#e9eaec; --surface:#ffffff; --surface-2:#f2f3f5;
+    --border:#dcdfe2; --border-strong:#b7bcc3; --border-hover:#9ba0a8;
+    --text:#34373c; --text-bright:#15171a; --text-sub:#50545a;
+    --dim:#676c74; --dimmer:#9298a0;
+    --green:#0a7d5e; --green-bg:#e6f4ee; --green-border:#a9ddc9;
+    --blue:#2563eb; --amber:#8a6300; --amber-bg:#f3e9d2;
+    --node-shadow:0 1px 2px rgba(22,24,27,0.07), 0 4px 14px rgba(22,24,27,0.06);
+    --font:'Inter',system-ui,sans-serif;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { height:100%; }
+  body { background:var(--bg); color:var(--text); font-family:var(--font); font-size:14px;
+    -webkit-font-smoothing:antialiased; min-height:100%; }
+
+  /* ---------- header — shared with list / map / stack ---------- */
+  .topbar { height:72px; border-bottom:1px solid transparent; background:var(--bg);
+    display:flex; align-items:center; gap:24px; padding:0 18px; position:sticky; top:0; z-index:40;
+    transition:background .16s, border-color .16s, box-shadow .16s; }
+  .topbar.stuck { background:var(--surface); border-bottom-color:var(--border); box-shadow:var(--node-shadow); }
+  .brandwrap { display:flex; align-items:center; gap:18px; }
+  .identity { display:flex; flex-direction:column; gap:3px; }
+  .htitle { font-size:13px; font-weight:600; color:var(--text-bright); white-space:nowrap; }
+  .hbio { font-size:11.5px; color:var(--text-sub); white-space:nowrap; }
+  .hright { margin-left:auto; display:flex; align-items:center; gap:14px; }
+  .brand { font-weight:600; font-size:29px; letter-spacing:-0.02em; color:var(--text-bright); display:flex; align-items:center; gap:3px; }
+  .cursor-bl { width:10px; height:26px; background:var(--green); display:inline-block; animation:blink 1s step-end infinite; }
+  @keyframes blink { 50% { opacity:0; } }
+  .seg { display:flex; border:1px solid var(--border); border-radius:4px; overflow:hidden; }
+  .seg button { font-family:var(--mono); font-size:12px; background:transparent; color:var(--dim); border:none; padding:6px 15px; cursor:pointer; }
+  .seg button.on { background:var(--green-bg); color:var(--green); }
+  .seg .seg-theme { padding:6px 11px; font-size:13px; border-left:1px solid var(--border); }
+  .navgroup { display:flex; align-items:center; gap:8px; margin-left:22px; }
+  .progress { display:flex; flex-direction:column; align-items:flex-start; gap:5px; }
+  .pcount { font-family:var(--mono); font-size:11.5px; color:var(--text-sub); white-space:nowrap; }
+  .pcount b { color:var(--text-bright); }
+  .pstrip { display:flex; gap:3px; }
+  .pcell { width:9px; height:9px; border-radius:2px; background:var(--border); position:relative; }
+  .pcell:hover { outline:1.5px solid var(--text-sub); outline-offset:1px; }
+  .pcell:hover::after { content:attr(data-tip); position:absolute; top:17px; left:50%; transform:translateX(-50%);
+    background:var(--surface-2); border:1px solid var(--border-strong); border-radius:5px; padding:5px 9px;
+    font-size:11px; color:var(--text-bright); white-space:nowrap; z-index:60; box-shadow:var(--node-shadow); pointer-events:none; }
+
+  /* ---------- page — centered project column ---------- */
+  .page { padding:26px 24px 120px; }
+  .col { max-width:980px; margin:0 auto; }
+
+  /* back link */
+  .back { display:inline-block; background:none; border:none; font-family:inherit;
+    color:var(--green); font-size:12px; cursor:pointer; padding:0; margin-bottom:18px;
+    opacity:0.85; text-decoration:none; }
+  .back:hover { opacity:1; text-decoration:underline; }
+
+  /* project header */
+  .p-head { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:6px; }
+  .p-name { font-size:21px; font-weight:600; color:var(--text-bright); letter-spacing:-0.015em; line-height:1.32; }
+  .status { flex-shrink:0; margin-top:5px; font-size:11px; padding:2px 9px; border-radius:4px;
+    background:var(--green-bg); color:var(--green); border:1px solid var(--green-border); white-space:nowrap; }
+
+  .p-meta { font-size:12px; color:var(--dim); margin-bottom:8px; }
+  .p-meta .day { color:var(--green); }
+  .p-tags { font-size:11px; color:var(--dimmer); margin-bottom:16px; }
+
+  /* link pills */
+  .pills { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
+  .pill { font-size:11px; color:var(--green); text-decoration:none; border:1px solid var(--green-border);
+    background:var(--green-bg); padding:4px 12px; border-radius:5px; white-space:nowrap; transition:border-color .12s; }
+  a.pill:hover { border-color:var(--green); }
+  .pill.static { cursor:default; }
+
+  .divider { height:1px; background:var(--border); margin-bottom:14px; }
+
+  /* tab bar */
+  .tabbar { display:flex; border-bottom:1px solid var(--border); margin-bottom:18px; }
+  .tab { font-family:inherit; font-size:11px; letter-spacing:0.06em; color:var(--dim);
+    padding:8px 14px 7px; background:none; border:none; border-bottom:2px solid transparent;
+    cursor:pointer; display:flex; align-items:center; gap:6px; transition:color .15s; margin-bottom:-1px; }
+  .tab:hover { color:var(--text-sub); }
+  .tab.on { color:var(--green); border-bottom-color:var(--green); }
+  .tab .dot { width:5px; height:5px; border-radius:50%; background:var(--green); display:none; }
+  .tab.on .dot { display:inline-block; }
+
+  .panel { display:none; }
+  .panel.on { display:block; }
+
+  /* section header — small uppercase label */
+  .sec { margin-bottom:22px; }
+  .sec-label { font-size:10px; letter-spacing:1.6px; text-transform:uppercase; color:var(--dim); margin-bottom:9px; }
+
+  /* description markdown */
+  .desc { max-width:700px; }
+  .desc p { font-size:13px; color:var(--text); line-height:1.72; margin-bottom:12px; }
+  .desc p:last-child { margin-bottom:0; }
+  .desc strong { color:var(--text-bright); font-weight:600; }
+  .desc em { color:var(--text-bright); font-style:italic; }
+  .desc a { color:var(--green); text-decoration:none; }
+  .desc a:hover { text-decoration:underline; }
+  .desc code { font-family:var(--mono); font-size:0.88em; background:var(--surface-2);
+    border:1px solid var(--border); border-radius:3px; padding:0.5px 5px; color:var(--text-bright); }
+  .desc ul { margin:0 0 12px 4px; list-style:none; }
+  .desc li { font-size:12.5px; color:var(--text-sub); line-height:1.62; padding-left:14px; position:relative; }
+  .desc li::before { content:'·'; position:absolute; left:2px; color:var(--dim); }
+
+  /* stack chips */
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .chip { font-size:11px; color:var(--text-sub); background:var(--surface);
+    border:1px solid var(--border); border-radius:3px; padding:3px 9px; }
+
+  /* screenshots */
+  .shots { display:flex; gap:14px; flex-wrap:wrap; }
+  .shot { flex:1 1 320px; max-width:440px; aspect-ratio:16/10; background:var(--surface);
+    border:1px solid var(--border); border-radius:6px; display:flex; align-items:center; justify-content:center; }
+  .shot-cap { font-size:11px; color:var(--dimmer); letter-spacing:0.5px; }
+
+  /* file rows (info tab) */
+  .file-row { background:var(--surface); border:1px solid var(--border); border-radius:6px;
+    padding:10px 13px; margin-bottom:7px; }
+  .file-head { font-size:11.5px; display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
+  .file-name { color:var(--text-bright); }
+  .vis { font-size:9px; letter-spacing:0.5px; }
+  .vis-public { color:var(--green); }
+  .vis-private { color:var(--dim); }
+  .vis-locked { color:var(--amber); }
+  .file-pre { font-family:var(--mono); font-size:11px; color:var(--text); background:var(--bg);
+    border:1px solid var(--border); padding:9px 11px; border-radius:4px; margin:0; line-height:1.55;
+    white-space:pre-wrap; word-break:break-word; overflow:auto; max-height:200px; }
+  .file-locked { font-size:11px; color:var(--dimmer); padding:4px 0; }
+
+  /* live demo tab */
+  .demo-cap { font-family:var(--mono); font-size:11px; color:var(--dim); margin-bottom:9px; }
+  .demo-cap b { color:var(--text-sub); }
+  .demo-frame { width:100%; height:600px; border:1px solid var(--border-strong); border-radius:8px;
+    background:#000; box-shadow:var(--node-shadow); }
+
+  /* file browser (files tab) */
+  .fb { display:flex; height:480px; border:1px solid var(--border); border-radius:6px; overflow:hidden; }
+  .fb-tree { width:240px; flex-shrink:0; border-right:1px solid var(--border);
+    overflow-y:auto; background:var(--surface); }
+  .fb-tree-head { font-size:10px; color:var(--dim); letter-spacing:0.06em; padding:9px 11px 7px;
+    border-bottom:1px solid var(--border); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .fb-tree-head .hex { color:var(--green); }
+  .fb-item { display:flex; align-items:center; gap:6px; padding:5px 11px; font-size:11.5px;
+    cursor:pointer; color:var(--dim); white-space:nowrap; transition:background .1s; }
+  .fb-item:hover { background:var(--surface-2); }
+  .fb-item.sel { background:var(--green-bg); color:var(--green); }
+  .fb-arrow { font-size:9px; flex-shrink:0; width:10px; }
+  .fb-icon { font-size:9px; flex-shrink:0; color:var(--dimmer); }
+  .fb-folder { color:var(--amber); }
+  .fb-children { display:none; }
+  .fb-children.open { display:block; }
+  .fb-viewer { flex:1; min-width:0; display:flex; align-items:center; justify-content:center;
+    background:var(--bg); }
+  .fb-placeholder { font-size:11px; color:var(--dimmer); }
+
+  /* ---------- mobile ---------- */
+  @media (max-width:720px) {
+    body { font-size:13px; }
+    .topbar { height:auto; min-height:54px; gap:10px 14px; padding:9px 13px; flex-wrap:wrap; }
+    .brandwrap { gap:12px; }
+    .brand { font-size:22px; }
+    .cursor-bl { width:7px; height:19px; }
+    .identity { display:none; }
+    .progress { display:none; }
+    .hright { margin-left:auto; gap:10px; }
+    .navgroup { margin-left:0; gap:6px; }
+    .seg button { padding:6px 11px; font-size:11px; }
+    .seg .seg-theme { padding:6px 9px; }
+    .page { padding:14px 13px 88px; }
+    .p-name { font-size:18px; }
+    .desc { max-width:100%; }
+    .shot { flex:1 1 100%; max-width:100%; }
+    .demo-frame { height:440px; }
+    .fb { flex-direction:column; height:auto; }
+    .fb-tree { width:100%; border-right:none; border-bottom:1px solid var(--border); }
+    .fb-viewer { min-height:120px; }
+    .tabbar { overflow-x:auto; }
+  }
+</style>
+<script>try{var _t=localStorage.getItem('artlu-theme');if(_t)document.documentElement.dataset.theme=_t;}catch(e){}</script>
+</head>
+<body>
+
+<div class="topbar" id="topbar">
+  <div class="brandwrap">
+    <div class="brand">artlu.ai<span class="cursor-bl"></span></div>
+    <div class="identity">
+      <div class="htitle">100 days. 100 features.</div>
+      <div class="hbio">one person. no coding experience. just AI and an internet connection.</div>
+    </div>
+  </div>
+  <div class="hright">
+    <div class="progress">
+      <span class="pcount">day <b>63</b>/100 · <b>79</b> shipped · <b>21</b> to go</span>
+      <div class="pstrip" id="actStrip"></div>
+    </div>
+    <div class="navgroup">
+      <div class="seg"><button onclick="location.href='astro-list-view.html'">list</button><button onclick="location.href='astro-map-view.html'">map</button><button onclick="location.href='astro-stack-view.html'">stack</button><button class="seg-theme" onclick="toggleTheme()" title="toggle theme">◐</button></div>
+      <div class="seg"><button onclick="location.href='astro-log-view.html'">log</button><button onclick="location.href='astro-research-view.html'">research</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="col">
+
+    <a class="back" href="astro-list-view.html">← all projects</a>
+
+    <div class="p-head">
+      <div class="p-name">meta ads performance dashboard — AdsMetri</div>
+      <span class="status">launched</span>
+    </div>
+
+    <div class="p-meta">day <span class="day">56</span> · may 12, 2026</div>
+    <div class="p-tags">meta ads · analytics · dashboard · saas</div>
+
+    <div class="pills">
+      <a class="pill" href="https://adsmetri.com" target="_blank" rel="noopener">site ↗</a>
+      <a class="pill" href="https://github.com/artluai/adsmetri" target="_blank" rel="noopener">github ↗</a>
+      <span class="pill static">▶ demo</span>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="tabbar" id="tabbar">
+      <button class="tab" data-tab="info"><span class="dot"></span>info</button>
+      <button class="tab on" data-tab="demo"><span class="dot"></span>live demo</button>
+      <button class="tab" data-tab="files"><span class="dot"></span>files</button>
+    </div>
+
+    <!-- ===== INFO ===== -->
+    <div class="panel" data-panel="info">
+      <div class="sec">
+        <div class="sec-label">description</div>
+        <div class="desc" id="descBody"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-label">stack</div>
+        <div class="chips" id="stackChips"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-label">screenshots</div>
+        <div class="shots">
+          <div class="shot"><span class="shot-cap">screenshot</span></div>
+          <div class="shot"><span class="shot-cap">screenshot</span></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-label">files</div>
+        <div class="file-row">
+          <div class="file-head">
+            <span class="file-name">README.md</span>
+          </div>
+          <pre class="file-pre"># AdsMetri
+
+Meta Ads performance intelligence dashboard for operators
+running multiple ad accounts. Lifecycle charts, daily P&amp;L,
+and break-even ROAS in one place.
+
+## Stack
+React · tRPC · Express · Drizzle · MySQL · Recharts</pre>
+        </div>
+        <div class="file-row">
+          <div class="file-head">
+            <span class="file-name">analyzer-notes.md</span>
+            <span class="vis vis-locked">locked</span>
+          </div>
+          <div class="file-locked">content locked — unlock to read</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== LIVE DEMO ===== -->
+    <div class="panel on" data-panel="demo">
+      <div class="demo-cap">live url · <b>adsmetri.com</b></div>
+      <iframe class="demo-frame" src="https://adsmetri.com" title="AdsMetri live demo" loading="lazy"></iframe>
+    </div>
+
+    <!-- ===== FILES ===== -->
+    <div class="panel" data-panel="files">
+      <div class="fb">
+        <div class="fb-tree" id="fbTree">
+          <div class="fb-tree-head"><span class="hex">⬡</span> artluai/adsmetri</div>
+          <div id="fbNodes"></div>
+        </div>
+        <div class="fb-viewer">
+          <span class="fb-placeholder">← select a file to view</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  /* ===== real data — AdsMetri project (id a2), from the artlu.ai tracker ===== */
+  const project = {
+    name:'meta ads performance dashboard — AdsMetri',
+    status:'launched',
+    date:'may 12',
+    day:56,
+    stack:['React','Tailwind','tRPC','Express','Drizzle','MySQL','Recharts'],
+    long:`**What is AdsMetri?**
+A Meta ads intelligence dashboard for people managing multiple ad accounts. It is built to make performance review, budget decisions, and account-level comparisons faster than flipping between Ads Manager, notes, and spreadsheets.
+
+**What it does**
+Lifecycle charts across campaigns, ad sets, and ads with 3d, 7d, 30d, and all-time views. ROAS, CPA, CPC, and CVR trend analysis with account-aware switching. A compact dashboard with spend mix, daily Meta P&L, conversion funnel, and fulfillment break-even ROAS.
+
+**How it works**
+Meta OAuth connects ad accounts. Campaign data is synced into a MySQL cache, while lifecycle charts are built from snapshot backfills. The app keeps dashboard, analyzer, settings, and budget actions scoped to the selected ad account.`
+  };
+
+  /* ---- markdown-lite renderer — bold / **Section** headings / links / inline code / bullets ---- */
+  function inlineMd(s){
+    return s
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/`([^`]+)`/g,'<code>$1</code>')
+      .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>')
+      .replace(/(^|[^*])\*([^*]+)\*/g,'$1<em>$2</em>');
+  }
+  function renderMd(t){
+    return t.split(/\n\n+/).map(block=>{
+      const lines=block.split('\n');
+      if(lines.length>1 && lines.every(l=>l.trim().startsWith('- ')))
+        return '<ul>'+lines.map(l=>'<li>'+inlineMd(l.trim().slice(2))+'</li>').join('')+'</ul>';
+      return '<p>'+inlineMd(block.replace(/\n/g,' '))+'</p>';
+    }).join('');
+  }
+
+  document.getElementById('descBody').innerHTML = renderMd(project.long);
+  document.getElementById('stackChips').innerHTML =
+    project.stack.map(s=>`<span class="chip">${s}</span>`).join('');
+
+  /* ---- tab switching ---- */
+  const tabbar=document.getElementById('tabbar');
+  const panels=document.querySelectorAll('.panel');
+  tabbar.addEventListener('click',e=>{
+    const b=e.target.closest('.tab'); if(!b) return;
+    tabbar.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t===b));
+    panels.forEach(p=>p.classList.toggle('on',p.dataset.panel===b.dataset.tab));
+  });
+
+  /* ---- file browser tree — representative UI mock of a React + tRPC + Drizzle + MySQL app ---- */
+  const fileTree = [
+    { type:'folder', name:'src', children:[
+      { type:'folder', name:'components', children:[
+        { type:'file', name:'Dashboard.tsx' },
+        { type:'file', name:'LifecycleChart.tsx' },
+        { type:'file', name:'AccountSwitcher.tsx' },
+      ]},
+      { type:'folder', name:'server', children:[
+        { type:'file', name:'router.ts' },
+        { type:'file', name:'trpc.ts' },
+        { type:'file', name:'sync.ts' },
+      ]},
+      { type:'folder', name:'lib', children:[
+        { type:'file', name:'meta-oauth.ts' },
+        { type:'file', name:'metrics.ts' },
+      ]},
+      { type:'file', name:'main.tsx' },
+    ]},
+    { type:'file', name:'package.json' },
+    { type:'file', name:'drizzle.config.ts' },
+    { type:'file', name:'README.md' },
+  ];
+
+  function renderNodes(nodes, depth){
+    return nodes.map(n=>{
+      const pad = 10 + depth*14;
+      if(n.type==='folder'){
+        return `<div>
+          <div class="fb-item fb-fold" style="padding-left:${pad}px">
+            <span class="fb-arrow">▸</span><span class="fb-folder">${n.name}/</span>
+          </div>
+          <div class="fb-children">${renderNodes(n.children, depth+1)}</div>
+        </div>`;
+      }
+      return `<div class="fb-item" style="padding-left:${pad}px">
+        <span class="fb-icon">◈</span><span>${n.name}</span>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('fbNodes').innerHTML = renderNodes(fileTree, 0);
+
+  document.getElementById('fbNodes').addEventListener('click',e=>{
+    const fold=e.target.closest('.fb-fold');
+    if(fold){
+      const kids=fold.nextElementSibling;
+      const open=kids.classList.toggle('open');
+      fold.querySelector('.fb-arrow').textContent = open ? '▾' : '▸';
+      return;
+    }
+    const file=e.target.closest('.fb-item');
+    if(file && !file.classList.contains('fb-fold')){
+      document.querySelectorAll('#fbNodes .fb-item').forEach(x=>x.classList.remove('sel'));
+      file.classList.add('sel');
+    }
+  });
+
+  /* ---- activity strip ---- */
+  (function(){
+    const act=[1,0,2,1,3,2,0,1,4,2,1,3,2,0,2,1,3,2,4,1];
+    const h=document.getElementById('actStrip'); if(!h) return;
+    const end=new Date(2026,4,18);
+    act.forEach((lv,i)=>{
+      const c=document.createElement('div'); c.className='pcell';
+      const d=new Date(end); d.setDate(d.getDate()-7*(act.length-1-i));
+      const lbl=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      c.dataset.tip='week of '+lbl+' · '+lv+' shipped';
+      if(lv){ c.style.background='var(--green)'; c.style.opacity=(0.3+lv*0.17); }
+      h.appendChild(c);
+    });
+  })();
+
+  /* ---- frozen header on scroll ---- */
+  const topbar=document.getElementById('topbar');
+  function onScroll(){ topbar.classList.toggle('stuck',(window.scrollY||document.documentElement.scrollTop)>6); }
+  window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+
+  function toggleTheme(){ const h=document.documentElement; const t=h.dataset.theme==='light'?'dark':'light';
+    h.dataset.theme=t; try{ localStorage.setItem('artlu-theme',t); }catch(e){} }
+  window.toggleTheme=toggleTheme;
+</script>
+</body>
+</html>

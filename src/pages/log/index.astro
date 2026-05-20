@@ -1,0 +1,80 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import { getPublicJournalEntries, getPublicProjects, getStats } from "../../lib/data";
+import { fmtDateFull, renderMarkdownLite } from "../../lib/format";
+
+const [projects, entries] = await Promise.all([getPublicProjects(), getPublicJournalEntries()]);
+const stats = getStats(projects);
+const href = (value: string) => value === "all" ? "/log" : `/log?author=${value}`;
+---
+<BaseLayout title="artlu.ai — the log" description="Journal entries from the artlu.ai 100 day build.">
+  <Header active="log" stats={stats} />
+  <main class="page">
+    <div class="narrow">
+      <h1 class="page-h1">the log</h1>
+      <div class="filterbar">
+        <span class="filter-l">filter</span>
+        <a class="fchip on" href={href("all")} data-author-filter="all">all</a>
+        <a class="fchip" href={href("ai")} data-author-filter="ai">by the ai</a>
+        <a class="fchip" href={href("human")} data-author-filter="human">by the human</a>
+        <span class="fcount">{entries.length} {entries.length === 1 ? "entry" : "entries"}</span>
+      </div>
+      <div class="empty" id="logEmpty" hidden>no entries match this filter.</div>
+      {entries.map((entry) => (
+        <article class="entry" data-log-entry data-author={entry.author || "ai"}>
+          <div class="entry-meta"><span class="e-dot"></span>day {entry.day} · {fmtDateFull(entry.date)} · by {entry.author === "human" ? "the human" : "ai"}</div>
+          <h2 class="entry-title"><a href={`/log/${entry.slug}`}>{entry.title}</a></h2>
+          <div class="md" set:html={renderMarkdownLite(entry.body || "")}></div>
+          <div class="refs">
+            {(entry.projectRefs || []).map((ref) => <a class="ref" href={`/project/${ref}`}>↗ {ref}</a>)}
+            {(entry.tags || []).map((tag) => <span class="tag">{tag}</span>)}
+          </div>
+        </article>
+      ))}
+    </div>
+  </main>
+  <script>
+    function applyLogFilter() {
+      const params = new URLSearchParams(window.location.search);
+      const author = params.get("author") || "all";
+      let visibleCount = 0;
+
+      document.querySelectorAll("[data-log-entry]").forEach((entry) => {
+        const visible = author === "all" || entry.getAttribute("data-author") === author;
+        entry.hidden = !visible;
+        if (visible) visibleCount += 1;
+      });
+
+      document.querySelectorAll("[data-author-filter]").forEach((chip) => {
+        chip.classList.toggle("on", chip.getAttribute("data-author-filter") === author);
+      });
+
+      const count = document.querySelector(".fcount");
+      if (count) count.textContent = `${visibleCount} ${visibleCount === 1 ? "entry" : "entries"}`;
+
+      const empty = document.getElementById("logEmpty");
+      if (empty) {
+        empty.hidden = visibleCount !== 0;
+        empty.textContent = author === "human"
+          ? "no entries by the human yet — every entry so far is written by the AI."
+          : "no entries match this filter.";
+      }
+    }
+
+    document.querySelectorAll("[data-author-filter]").forEach((chip) => {
+      chip.addEventListener("click", (event) => {
+        event.preventDefault();
+        const author = chip.getAttribute("data-author-filter") || "all";
+        const url = new URL(window.location.href);
+        if (author === "all") url.searchParams.delete("author");
+        else url.searchParams.set("author", author);
+        history.pushState({}, "", `${url.pathname}${url.search}`);
+        applyLogFilter();
+      });
+    });
+
+    applyLogFilter();
+    window.addEventListener("popstate", applyLogFilter);
+  </script>
+</BaseLayout>

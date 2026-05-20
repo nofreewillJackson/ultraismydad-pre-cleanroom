@@ -766,6 +766,9 @@ function indexRowFromBundle(b) {
     desc: b.desc || "",
     shippedAt: b.shippedAt,
     durationSec: b.durationSec,
+    youtubeId: b.video?.youtubeId || null,
+    tiktokId: b.video?.tiktokId || null,
+    tiktokUrl: b.video?.tiktokUrl || null,
     thumbnailUrl: b.video?.thumbnailUrl || null,
   };
 }

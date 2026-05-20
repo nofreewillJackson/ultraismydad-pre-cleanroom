@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>artlu.ai — option 3 · filter-first</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:#08090a; --surface:#0e0f11; --surface-2:#16191d;
+    --border:#1a1d22; --border-strong:#2b3038; --border-hover:#4a525e;
+    --text:#c0c4cc; --text-bright:#f0f1f3; --text-sub:#9aa0aa;
+    --dim:#6b7280; --green:#4ade80; --green-bg:#062b12; --green-border:#1d4d31;
+    --blue:#60a5fa; --amber:#d8a657;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; }
+  body { background:var(--bg); color:var(--text); font-family:var(--mono); font-size:13px; overflow:hidden; }
+  .topbar { height:52px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; align-items:center; gap:14px; padding:0 18px; }
+  .brand { font-weight:600; font-size:15px; color:var(--text-bright); }
+  .opt { font-size:11px; color:var(--green); border:1px solid var(--green-border); background:var(--green-bg); padding:3px 9px; border-radius:4px; }
+  .tip { margin-left:auto; font-size:11.5px; color:var(--dim); }
+  .tip b { color:var(--text-sub); font-weight:500; }
+
+  .layout { position:absolute; top:52px; left:0; right:0; bottom:0; display:flex; }
+  /* left index */
+  .index { width:260px; border-right:1px solid var(--border); background:var(--surface); overflow-y:auto; padding:14px 0; flex-shrink:0; }
+  .ix-h { font-size:9.5px; letter-spacing:1.4px; text-transform:uppercase; color:var(--dim); padding:12px 16px 6px; }
+  .ix-item { display:flex; align-items:center; gap:9px; padding:7px 16px; cursor:pointer; font-size:12.5px; }
+  .ix-item:hover { background:var(--surface-2); }
+  .ix-item.on { background:var(--green-bg); }
+  .ix-item.on .ixn { color:var(--green); }
+  .ixd { width:7px; height:7px; border-radius:2px; flex-shrink:0; }
+  .ixd.tech { background:var(--blue); } .ixd.proj { border-radius:50%; background:var(--green); }
+  .ixn { color:var(--text-bright); flex:1; }
+  .ixc { font-size:9.5px; color:var(--dim); }
+
+  /* canvas */
+  .stage { flex:1; position:relative; overflow:hidden;
+    background:radial-gradient(circle,#15181d 1.4px,transparent 1.4px); background-size:30px 30px; }
+  .empty { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; color:var(--dim); }
+  .empty .big { font-size:15px; color:var(--text-sub); }
+  .world { position:absolute; top:0; left:0; }
+  svg { position:absolute; top:0; left:0; overflow:visible; }
+  .node { position:absolute; border-radius:8px; box-shadow:0 6px 20px rgba(0,0,0,0.5); }
+  .node.t { background:var(--surface); border:1px solid var(--border-strong); padding:9px 13px; width:200px; }
+  .node.t .tn { color:var(--text-bright); font-weight:600; font-size:13px; }
+  .node.t .tc { font-size:10px; color:var(--dim); margin-top:2px; }
+  .node.p { background:var(--surface); border:1px solid #27412f; width:250px; }
+  .node.p .ph { background:var(--green-bg); border-bottom:1px solid var(--border); border-radius:8px 8px 0 0; padding:9px 12px; display:flex; gap:7px; align-items:center; }
+  .node.p .pn { color:var(--text-bright); font-weight:600; font-size:13.5px; }
+  .node.p .pg { color:var(--green); font-size:10px; }
+  .node.p .pb { padding:9px 12px; font-size:11.5px; color:var(--text-sub); }
+  .focuslabel { position:absolute; top:14px; left:18px; font-size:11px; color:var(--dim); z-index:5; }
+  .focuslabel b { color:var(--text-bright); }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">artlu.ai</div><span class="opt">option 3 · filter-first</span>
+  <div class="tip"><b>the canvas never shows everything — pick one tech or project from the index and only that slice renders.</b></div>
+</div>
+<div class="layout">
+  <div class="index" id="index"></div>
+  <div class="stage" id="stage">
+    <div class="empty" id="empty">
+      <div class="big">pick a tech or a project</div>
+      <div>the index on the left stays fixed — the canvas only ever draws one slice</div>
+    </div>
+    <div class="focuslabel" id="flabel" style="display:none"></div>
+    <div class="world" id="world"><svg id="svg"></svg></div>
+  </div>
+</div>
+
+<script>
+  const techs=[
+    {id:'react',n:'React',c:'frontend'},{id:'tailwind',n:'Tailwind',c:'frontend'},{id:'vanilla',n:'vanilla JS',c:'frontend'},
+    {id:'trpc',n:'tRPC',c:'api'},{id:'node',n:'Node.js',c:'api'},{id:'mcp',n:'MCP',c:'api'},
+    {id:'drizzle',n:'Drizzle',c:'data'},{id:'mysql',n:'MySQL',c:'data'},{id:'postgres',n:'Postgres',c:'data'},{id:'firebase',n:'Firebase',c:'data'},
+    {id:'railway',n:'Railway',c:'infra'},{id:'playwright',n:'Playwright',c:'infra'},
+    {id:'remotion',n:'Remotion',c:'media'},{id:'ffmpeg',n:'ffmpeg',c:'media'},{id:'gtts',n:'Google Cloud TTS',c:'media'},{id:'seedance',n:'Seedance',c:'media'},
+  ];
+  const projects=[
+    {id:'adsmetri',n:'AdsMetri',t:['react','tailwind','trpc','drizzle','mysql']},
+    {id:'pipelinecpc',n:'PipelineCPC',t:['node','mcp','firebase','railway']},
+    {id:'spoolcast',n:'spoolcast',t:['remotion','ffmpeg','gtts','seedance']},
+    {id:'vibeskill',n:'VibeSkill',t:['react','tailwind','vanilla']},
+    {id:'animabot',n:'Animabot',t:['node','postgres','playwright']},
+    {id:'xqboost',n:'xqboost',t:['node','react','firebase']},
+    {id:'sitesnapshot',n:'sitesnapshot',t:['node','playwright','firebase']},
+    {id:'track',n:'TRACK',t:['react','firebase']},
+  ];
+  const techById=id=>techs.find(t=>t.id===id);
+  const index=document.getElementById('index');
+  index.innerHTML='<div class="ix-h">technologies</div>'
+    + techs.map(t=>`<div class="ix-item" data-k="t" data-id="${t.id}"><span class="ixd tech"></span><span class="ixn">${t.n}</span><span class="ixc">${t.c}</span></div>`).join('')
+    + '<div class="ix-h">major projects</div>'
+    + projects.map(p=>`<div class="ix-item" data-k="p" data-id="${p.id}"><span class="ixd proj"></span><span class="ixn">${p.n}</span></div>`).join('');
+
+  const world=document.getElementById('world'), svg=document.getElementById('svg');
+  const empty=document.getElementById('empty'), flabel=document.getElementById('flabel');
+
+  function render(kind,id){
+    document.querySelectorAll('.ix-item').forEach(x=>x.classList.toggle('on',x.dataset.k===kind&&x.dataset.id===id));
+    empty.style.display='none'; flabel.style.display='block';
+    world.innerHTML='<svg id="svg"></svg>';
+    const s=document.getElementById('svg');
+    let nodesHTML='', wires='';
+    if(kind==='t'){
+      const t=techById(id);
+      const ps=projects.filter(p=>p.t.includes(id));
+      flabel.innerHTML=`showing everything built with <b>${t.n}</b> — ${ps.length} project${ps.length===1?'':'s'}`;
+      // tech node left, projects right
+      const ty=70+ps.length*48;
+      nodesHTML+=`<div class="node t" style="left:60px;top:${ty}px"><div class="tn">${t.n}</div><div class="tc">${t.c} · tech</div></div>`;
+      ps.forEach((p,i)=>{
+        const py=60+i*116;
+        nodesHTML+=`<div class="node p" style="left:430px;top:${py}px"><div class="ph"><span class="pg">◆</span><span class="pn">${p.n}</span></div><div class="pb">${p.t.length} technologies</div></div>`;
+        wires+=`<path d="M260,${ty+19} C340,${ty+19} 350,${py+19} 430,${py+19}" fill="none" stroke="#4ade80" stroke-width="1.8" opacity="0.8"/>`;
+      });
+      s.setAttribute('width',760); s.setAttribute('height',Math.max(ty+60,ps.length*116+80));
+    } else {
+      const p=projects.find(x=>x.id===id);
+      flabel.innerHTML=`showing the full stack of <b>${p.n}</b> — ${p.t.length} technologies`;
+      const py=60+p.t.length*30;
+      nodesHTML+=`<div class="node p" style="left:430px;top:${py}px"><div class="ph"><span class="pg">◆</span><span class="pn">${p.n}</span></div><div class="pb">${p.t.length} technologies</div></div>`;
+      p.t.forEach((tid,i)=>{
+        const t=techById(tid), ty=60+i*60;
+        nodesHTML+=`<div class="node t" style="left:60px;top:${ty}px"><div class="tn">${t.n}</div><div class="tc">${t.c}</div></div>`;
+        wires+=`<path d="M260,${ty+19} C340,${ty+19} 350,${py+19} 430,${py+19}" fill="none" stroke="#4ade80" stroke-width="1.8" opacity="0.8"/>`;
+      });
+      s.setAttribute('width',760); s.setAttribute('height',Math.max(py+80,p.t.length*60+80));
+    }
+    s.innerHTML=wires;
+    world.insertAdjacentHTML('beforeend',nodesHTML);
+  }
+  index.addEventListener('click',e=>{
+    const it=e.target.closest('.ix-item'); if(!it) return;
+    render(it.dataset.k,it.dataset.id);
+  });
+</script>
+</body>
+</html>

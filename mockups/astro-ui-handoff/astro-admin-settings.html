@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>artlu.ai — admin · settings</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  html[data-theme="dark"] {
+    --bg:#08090a; --surface:#0e0f11; --surface-2:#16191d;
+    --border:#1a1d22; --border-strong:#2b3038; --border-hover:#4a525e;
+    --text:#c0c4cc; --text-bright:#f0f1f3; --text-sub:#9aa0aa;
+    --dim:#6b7280; --dimmer:#3a3f48;
+    --green:#4ade80; --green-bg:#062b12; --green-border:#1d4d31;
+    --amber:#d8a657; --amber-bg:#1c1a12; --amber-border:#3a3320;
+    --node-shadow:0 8px 26px rgba(0,0,0,0.6);
+    --font:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  html[data-theme="light"] {
+    --bg:#e9eaec; --surface:#ffffff; --surface-2:#f2f3f5;
+    --border:#dcdfe2; --border-strong:#b7bcc3; --border-hover:#9ba0a8;
+    --text:#34373c; --text-bright:#15171a; --text-sub:#50545a;
+    --dim:#676c74; --dimmer:#9298a0;
+    --green:#0a7d5e; --green-bg:#e6f4ee; --green-border:#a9ddc9;
+    --amber:#8a6300; --amber-bg:#f3e9d2; --amber-border:#e1d5aa;
+    --node-shadow:0 1px 2px rgba(22,24,27,0.07), 0 4px 14px rgba(22,24,27,0.06);
+    --font:'Inter',system-ui,sans-serif;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { height:100%; }
+  body { background:var(--bg); color:var(--text); font-family:var(--font); font-size:14px;
+    -webkit-font-smoothing:antialiased; min-height:100%; }
+
+  .topbar { height:72px; border-bottom:1px solid var(--border); background:var(--bg);
+    display:flex; align-items:center; gap:24px; padding:0 18px; position:sticky; top:0; z-index:40; }
+  .brandwrap { display:flex; align-items:center; gap:18px; }
+  .identity { display:flex; flex-direction:column; gap:3px; }
+  .htitle { font-size:13px; font-weight:600; color:var(--text-bright); white-space:nowrap; }
+  .hbio { font-size:11.5px; color:var(--text-sub); white-space:nowrap; }
+  .hright { margin-left:auto; display:flex; align-items:center; gap:12px; }
+  .brand { font-weight:600; font-size:29px; letter-spacing:-0.02em; color:var(--text-bright); display:flex; align-items:center; gap:3px; }
+  .cursor-bl { width:10px; height:26px; background:var(--green); display:inline-block; animation:blink 1s step-end infinite; }
+  @keyframes blink { 50% { opacity:0; } }
+  .admin-badge { font-family:var(--mono); font-size:11px; color:var(--amber); border:1px solid var(--amber);
+    border-radius:5px; padding:4px 10px; display:flex; align-items:center; gap:6px; }
+  .admin-badge .d { width:6px; height:6px; border-radius:50%; background:var(--amber); }
+  .theme-tog { width:30px; height:28px; border:1px solid var(--border); background:transparent; color:var(--text-sub); border-radius:5px; cursor:pointer; font-size:13px; }
+  .signout { font-family:var(--mono); font-size:11px; color:var(--dim); background:transparent;
+    border:1px solid var(--border); border-radius:5px; padding:6px 11px; cursor:pointer; text-decoration:none; }
+  .signout:hover { color:var(--text-bright); }
+
+  .page { padding:24px 30px 90px; }
+  .col { max-width:1100px; margin:0 auto; }
+  .back { font-family:var(--mono); font-size:11.5px; color:var(--text-sub); text-decoration:none;
+    border:1px solid var(--border); border-radius:6px; padding:5px 11px; display:inline-block; }
+  .back:hover { color:var(--text-bright); border-color:var(--border-hover); }
+  .s-title { margin:18px 0 22px; font-size:24px; font-weight:600; color:var(--text-bright);
+    letter-spacing:-0.01em; display:flex; align-items:center; gap:10px; }
+  .s-title .g { color:var(--green); font-size:15px; }
+
+  /* settings layout — left nav + content */
+  .settings { display:flex; gap:34px; align-items:flex-start; }
+  .s-nav { width:170px; flex-shrink:0; position:sticky; top:96px; display:flex; flex-direction:column; gap:2px; }
+  .s-nav button { text-align:left; background:none; border:none; cursor:pointer;
+    font-family:var(--mono); font-size:12px; color:var(--text-sub); padding:8px 11px; border-radius:6px;
+    display:flex; align-items:center; gap:8px; }
+  .s-nav button:hover { color:var(--text-bright); background:var(--surface-2); }
+  .s-nav button.on { background:var(--green-bg); color:var(--green); }
+  .s-nav button .nd { width:6px; height:6px; border-radius:50%; background:currentColor; opacity:0.5; }
+  .s-content { flex:1; min-width:0; }
+  .s-section { display:none; }
+  .s-section.on { display:block; }
+  .s-h { font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--dim); margin:0 0 11px; }
+  .s-h:not(:first-child) { margin-top:30px; }
+  .s-desc { font-size:13px; color:var(--text-sub); line-height:1.65; margin-bottom:16px; max-width:560px; }
+
+  /* panel + rows */
+  .panel { border:1px solid var(--border-strong); border-radius:9px; overflow:hidden;
+    background:var(--surface); box-shadow:var(--node-shadow); }
+  .glabel { display:flex; align-items:center; justify-content:space-between; padding:9px 14px 8px;
+    font-family:var(--mono); font-size:9px; letter-spacing:1.4px; text-transform:uppercase; color:var(--dim);
+    background:var(--surface-2); }
+  .glabel .gadd { color:var(--green); cursor:pointer; letter-spacing:0.5px; }
+  .crow { display:flex; align-items:center; gap:11px; padding:10px 14px; border-top:1px solid var(--border); }
+  .crow:hover { background:var(--surface-2); }
+  .cstat { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+  .cstat.on { background:var(--green); box-shadow:0 0 6px var(--green); }
+  .cstat.idle { background:var(--amber); }
+  .c-name { font-family:var(--mono); font-size:12px; color:var(--text-bright); flex-shrink:0; }
+  .c-meta { font-size:11px; color:var(--text-sub); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .c-key { font-family:var(--mono); font-size:10px; color:var(--dim); background:var(--bg);
+    border:1px solid var(--border); border-radius:3px; padding:2px 7px; flex-shrink:0; }
+  .c-spacer { flex:1; min-width:8px; }
+  .c-state { font-family:var(--mono); font-size:10px; color:var(--green); flex-shrink:0; }
+  .c-state.idle { color:var(--amber); }
+  .c-act { font-family:var(--mono); font-size:10.5px; color:var(--dim); background:none;
+    border:1px solid var(--border); border-radius:4px; padding:3px 9px; cursor:pointer; flex-shrink:0; }
+  .c-act:hover { color:var(--text-bright); border-color:var(--border-hover); }
+
+  /* general settings rows */
+  .grow { display:flex; align-items:center; gap:14px; padding:13px 14px; border-top:1px solid var(--border); }
+  .grow:first-child { border-top:none; }
+  .g-info { flex:1; }
+  .g-name { font-size:13px; color:var(--text-bright); font-weight:500; }
+  .g-sub { font-size:11.5px; color:var(--text-sub); margin-top:3px; }
+  .g-input { font-family:var(--mono); font-size:12px; background:var(--bg); border:1px solid var(--border-strong);
+    border-radius:5px; color:var(--text-bright); padding:6px 9px; }
+  .switch { width:42px; height:23px; border-radius:13px; background:var(--green-bg); border:1px solid var(--green-border);
+    position:relative; cursor:pointer; flex-shrink:0; }
+  .switch i { position:absolute; top:1.5px; left:21px; width:18px; height:18px; border-radius:50%; background:var(--green); transition:.14s; }
+  .switch.off { background:var(--surface-2); border-color:var(--border-strong); }
+  .switch.off i { left:1.5px; background:var(--dim); }
+</style>
+<script>try{var _t=localStorage.getItem('artlu-theme');if(_t)document.documentElement.dataset.theme=_t;}catch(e){}</script>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brandwrap">
+    <div class="brand">artlu.ai<span class="cursor-bl"></span></div>
+    <div class="identity">
+      <div class="htitle">100 days. 100 features.</div>
+      <div class="hbio">one person. no coding experience. just AI and an internet connection.</div>
+    </div>
+  </div>
+  <div class="hright">
+    <span class="admin-badge"><span class="d"></span>ADMIN</span>
+    <button class="theme-tog" onclick="toggleTheme()" title="toggle theme">◐</button>
+    <a class="signout" href="#">sign out</a>
+  </div>
+</div>
+
+<div class="page">
+  <div class="col">
+    <a class="back" href="astro-admin-view.html">← dashboard</a>
+    <div class="s-title"><span class="g">⚙</span>settings</div>
+
+    <div class="settings">
+      <div class="s-nav" id="snav">
+        <button class="on" data-s="conn"><span class="nd"></span>connections</button>
+        <button data-s="proc"><span class="nd"></span>processes</button>
+        <button data-s="general"><span class="nd"></span>general</button>
+      </div>
+
+      <div class="s-content">
+        <section class="s-section on" data-s="conn">
+          <div class="s-h">mcp servers</div>
+          <div class="s-desc">Model Context Protocol servers let Claude, Codex and other agents read and act on artlu projects directly.</div>
+          <div class="panel" id="mcpPanel"></div>
+          <div class="s-h">api keys</div>
+          <div class="s-desc">Third-party credentials the projects run on. Keys are stored encrypted and shown masked.</div>
+          <div class="panel" id="keyPanel"></div>
+        </section>
+
+        <section class="s-section" data-s="proc">
+          <div class="s-h">automated processes</div>
+          <div class="s-desc">Scheduled jobs and pipelines — the daily show, social posting, deploy syncs and render queues.</div>
+          <div class="panel" id="procPanel"></div>
+        </section>
+
+        <section class="s-section" data-s="general">
+          <div class="s-h">general</div>
+          <div class="panel" id="genPanel"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const mcp=[
+    { name:'artlu-tracker-mcp', meta:'agents read & write the project tracker', state:'online' },
+    { name:'pipelinecpc-mcp', meta:'agents plan Google Ads campaigns from saved keywords', state:'online' },
+    { name:'xqboost-mcp', meta:'agents queue, draft & post tweets', state:'online' },
+    { name:'vibeskill-mcp', meta:'tracker-backed evidence bridge for skill progress', state:'online' },
+  ];
+  const keys=[
+    { name:'DataForSEO', meta:'keyword research · PipelineCPC', key:'Basic ••••••3f2a' },
+    { name:'Stripe', meta:'billing · PipelineCPC + sitesnapshot', key:'sk_live_••••4c91' },
+    { name:'Meta Graph API', meta:'ad performance · AdsMetri', key:'EAAG••••••e7' },
+    { name:'Google Cloud TTS', meta:'narration · spoolcast', key:'service acct' },
+    { name:'kie.ai', meta:'Seedance video generation · spoolcast', key:'••••••2b' },
+    { name:'Firebase Admin', meta:'auth + Firestore · the tracker', key:'service acct' },
+  ];
+  const procs=[
+    { name:'daily aninews episode', meta:'scheduled · every day 09:00', state:'✓ ran may 18' },
+    { name:'automated X posting', meta:'GitHub Actions · daily · xqboost', state:'✓ ran may 18' },
+    { name:'artlu.ai video sync', meta:'runs on push to main', state:'✓ ran may 16' },
+    { name:'AdsMetri campaign sync', meta:'cron · hourly', state:'✓ ran 14m ago' },
+    { name:'spoolcast render queue', meta:'on-demand · triggered per video', state:'idle · no job queued', idle:true },
+  ];
+
+  function connRows(list,act){
+    return list.map(r=>`<div class="crow">
+      <span class="cstat ${r.idle?'idle':'on'}"></span>
+      <span class="c-name">${r.name}</span>
+      <span class="c-meta">${r.meta}</span>
+      ${r.key?`<span class="c-key">${r.key}</span>`:''}
+      <span class="c-spacer"></span>
+      <span class="c-state${r.idle?' idle':''}">${r.state||'active'}</span>
+      <button class="c-act">${act}</button>
+    </div>`).join('');
+  }
+  document.getElementById('mcpPanel').innerHTML=
+    `<div class="glabel">${mcp.length} connected<span class="gadd">+ connect server</span></div>`+connRows(mcp,'config');
+  document.getElementById('keyPanel').innerHTML=
+    `<div class="glabel">${keys.length} keys<span class="gadd">+ add key</span></div>`+connRows(keys,'rotate');
+  document.getElementById('procPanel').innerHTML=
+    `<div class="glabel">${procs.length} jobs<span class="gadd">+ new job</span></div>`+connRows(procs,'logs');
+
+  /* general settings */
+  const gen=[
+    { name:'100-day challenge — start date', sub:'drives the day counter shown across every view', type:'date', val:'2026-03-18' },
+    { name:'public site', sub:'when off, artlu.ai shows a holding page to non-admins', type:'switch', on:true },
+    { name:'default theme for visitors', sub:'the theme a first-time visitor lands on', type:'select', opts:['dark','light'] },
+    { name:'show private entries in admin views', sub:'private projects appear greyed in the timeline', type:'switch', on:true },
+  ];
+  document.getElementById('genPanel').innerHTML=gen.map(g=>{
+    let ctrl='';
+    if(g.type==='switch') ctrl=`<div class="switch${g.on?'':' off'}"><i></i></div>`;
+    else if(g.type==='date') ctrl=`<input class="g-input" type="date" value="${g.val}">`;
+    else ctrl=`<select class="g-input">${g.opts.map(o=>`<option>${o}</option>`).join('')}</select>`;
+    return `<div class="grow"><div class="g-info"><div class="g-name">${g.name}</div><div class="g-sub">${g.sub}</div></div>${ctrl}</div>`;
+  }).join('');
+  document.getElementById('genPanel').addEventListener('click',e=>{
+    const sw=e.target.closest('.switch'); if(sw) sw.classList.toggle('off');
+  });
+
+  /* nav */
+  document.getElementById('snav').addEventListener('click',e=>{
+    const b=e.target.closest('button'); if(!b) return;
+    document.querySelectorAll('.s-nav button').forEach(x=>x.classList.toggle('on',x===b));
+    document.querySelectorAll('.s-section').forEach(s=>s.classList.toggle('on',s.dataset.s===b.dataset.s));
+  });
+
+  function toggleTheme(){ const h=document.documentElement; const t=h.dataset.theme==='light'?'dark':'light';
+    h.dataset.theme=t; try{ localStorage.setItem('artlu-theme',t); }catch(e){} }
+  window.toggleTheme=toggleTheme;
+</script>
+</body>
+</html>

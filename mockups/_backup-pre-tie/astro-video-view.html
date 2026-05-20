@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>artlu.ai — Cisco stock pops 15% — Aninews ep 10</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  html[data-theme="dark"] {
+    --bg:#08090a; --surface:#0e0f11; --surface-2:#16191d;
+    --border:#1a1d22; --border-strong:#2b3038; --border-hover:#4a525e;
+    --text:#c0c4cc; --text-bright:#f0f1f3; --text-sub:#9aa0aa;
+    --dim:#6b7280; --dimmer:#3a3f48;
+    --green:#4ade80; --green-bg:#062b12; --green-border:#1d4d31;
+    --blue:#60a5fa; --amber:#d8a657; --amber-bg:#1c1a12; --pink:#f0589e;
+    --node-shadow:0 8px 26px rgba(0,0,0,0.6);
+    --font:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  html[data-theme="light"] {
+    --bg:#e9eaec; --surface:#ffffff; --surface-2:#f2f3f5;
+    --border:#dcdfe2; --border-strong:#ccd0d4; --border-hover:#9ba0a8;
+    --text:#34373c; --text-bright:#15171a; --text-sub:#50545a;
+    --dim:#7c8087; --dimmer:#aeb2b8;
+    --green:#0a7d5e; --green-bg:#e6f4ee; --green-border:#a9ddc9;
+    --blue:#2563eb; --amber:#8a6300; --amber-bg:#f3e9d2; --pink:#b3216f;
+    --node-shadow:0 1px 2px rgba(22,24,27,0.07), 0 4px 14px rgba(22,24,27,0.06);
+    --font:'Inter',system-ui,sans-serif;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { height:100%; }
+  body { background:var(--bg); color:var(--text); font-family:var(--font); font-size:14px;
+    -webkit-font-smoothing:antialiased; min-height:100%; }
+
+  /* ---------- header — shared ---------- */
+  .topbar { height:72px; border-bottom:1px solid transparent; background:var(--bg);
+    display:flex; align-items:center; gap:24px; padding:0 18px; position:sticky; top:0; z-index:40;
+    transition:background .16s, border-color .16s, box-shadow .16s; }
+  .topbar.stuck { background:var(--surface); border-bottom-color:var(--border); box-shadow:var(--node-shadow); }
+  .brandwrap { display:flex; align-items:center; gap:18px; }
+  .identity { display:flex; flex-direction:column; gap:3px; }
+  .htitle { font-size:13px; font-weight:600; color:var(--text-bright); white-space:nowrap; }
+  .hbio { font-size:11.5px; color:var(--text-sub); white-space:nowrap; }
+  .hright { margin-left:auto; display:flex; align-items:center; gap:14px; }
+  .brand { font-weight:600; font-size:29px; letter-spacing:-0.02em; color:var(--text-bright); display:flex; align-items:center; gap:3px; }
+  .cursor-bl { width:10px; height:26px; background:var(--green); display:inline-block; animation:blink 1s step-end infinite; }
+  @keyframes blink { 50% { opacity:0; } }
+  .seg { display:flex; border:1px solid var(--border); border-radius:4px; overflow:hidden; }
+  .seg button { font-family:var(--mono); font-size:12px; background:transparent; color:var(--dim); border:none; padding:6px 15px; cursor:pointer; }
+  .seg .seg-theme { padding:6px 11px; font-size:13px; border-left:1px solid var(--border); }
+  .navgroup { display:flex; align-items:center; gap:8px; margin-left:22px; }
+  .progress { display:flex; flex-direction:column; align-items:flex-start; gap:5px; }
+  .pcount { font-family:var(--mono); font-size:11.5px; color:var(--text-sub); white-space:nowrap; }
+  .pcount b { color:var(--text-bright); }
+  .pstrip { display:flex; gap:3px; }
+  .pcell { width:9px; height:9px; border-radius:2px; background:var(--border); }
+
+  /* ---------- page ---------- */
+  .page { padding:24px 30px 110px; }
+  .col { max-width:1080px; margin:0 auto; }
+  .back { font-family:var(--mono); font-size:11.5px; color:var(--text-sub); text-decoration:none;
+    border:1px solid var(--border); border-radius:6px; padding:5px 11px; display:inline-block; }
+  .back:hover { color:var(--text-bright); border-color:var(--border-hover); }
+
+  .vhead { margin:20px 0 22px; }
+  .v-eyebrow { display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px;
+    color:var(--green); margin-bottom:10px; }
+  .v-eyebrow .vg { font-size:9px; }
+  .v-eyebrow .sep { color:var(--dimmer); }
+  .v-eyebrow .vid { color:var(--text-sub); }
+  .v-eyebrow .short { color:var(--green); font-weight:600; letter-spacing:0.6px;
+    border:1px solid var(--green-border); background:var(--green-bg); border-radius:3px; padding:1px 6px; }
+  .v-title { font-size:25px; font-weight:600; color:var(--text-bright); line-height:1.3; letter-spacing:-0.01em; }
+  .v-meta { margin-top:10px; font-family:var(--mono); font-size:11.5px; color:var(--text-sub);
+    display:flex; flex-wrap:wrap; gap:6px; }
+  .v-meta .sep { color:var(--dimmer); }
+
+  .vgrid { display:flex; gap:34px; align-items:flex-start; }
+  .vleft { flex-shrink:0; display:flex; flex-direction:column; gap:20px; }
+  .vright { flex:1; min-width:0; }
+
+  .vplayer h3, .sec h3 { font-family:var(--mono); font-size:12px; font-weight:600; color:var(--text-bright); }
+  .sec-head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:11px; }
+  .sec-head .sm { font-family:var(--mono); font-size:11px; color:var(--text-sub); }
+  .vframe { width:312px; aspect-ratio:9/16; background:#000; border:1px solid var(--border-strong);
+    border-radius:9px; overflow:hidden; box-shadow:var(--node-shadow); margin-top:9px; }
+  .vframe iframe { width:100%; height:100%; border:0; display:block; }
+
+  .sec { margin-bottom:26px; }
+  .panel { background:var(--surface); border:1px solid var(--border-strong); border-radius:9px;
+    box-shadow:var(--node-shadow); }
+
+  /* summary */
+  .sum { padding:3px 15px; }
+  .sum-row { display:grid; grid-template-columns:120px 1fr; gap:14px; padding:9px 0;
+    border-bottom:1px solid var(--border); align-items:baseline; }
+  .sum-row:last-child { border-bottom:none; }
+  .sum-k { font-family:var(--mono); font-size:10px; letter-spacing:0.6px; text-transform:uppercase; color:var(--dim); }
+  .sum-v { font-family:var(--mono); font-size:12px; color:var(--text); }
+  .sum-v b { color:var(--text-bright); font-weight:600; }
+  .sum-v .d { color:var(--dim); }
+  .sum-v .ok { color:var(--green); }
+
+  /* beats */
+  .beat-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .beat { background:var(--surface); border:1px solid var(--border-strong); border-radius:8px;
+    box-shadow:var(--node-shadow); padding:11px 12px; display:flex; flex-direction:column; gap:6px; }
+  .beat-top { display:flex; align-items:center; gap:8px; }
+  .beat-n { font-family:var(--mono); font-size:11px; font-weight:600; color:var(--green); }
+  .beat-name { font-family:var(--mono); font-size:10px; color:var(--text-sub); flex:1;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .beat-dur { font-family:var(--mono); font-size:10px; color:var(--dim); }
+  .beat-narr { font-size:12.5px; line-height:1.5; color:var(--text); font-style:italic; }
+  .beat-chyron { align-self:flex-start; font-family:var(--mono); font-size:9.5px; letter-spacing:0.5px;
+    color:var(--pink); border:1px solid var(--border); border-radius:3px; padding:2px 6px; }
+
+  /* sources */
+  .src { padding:3px 16px; }
+  .src-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; padding:11px 0;
+    border-bottom:1px solid var(--border); align-items:baseline; }
+  .src-row:last-child { border-bottom:none; }
+  .src-fact { font-size:12.5px; color:var(--text); line-height:1.45; }
+  .src-fact .n { font-family:var(--mono); font-size:10px; color:var(--green); font-weight:600; margin-right:7px; }
+  .src-attr { font-family:var(--mono); font-size:11px; color:var(--green); text-align:right; text-decoration:none; line-height:1.5; }
+  .src-attr:hover { text-decoration:underline; }
+
+  /* transcript */
+  .tr { padding:6px 18px 12px; }
+  .tr-line { display:grid; grid-template-columns:26px 1fr; gap:11px; padding:6px 0; align-items:baseline; }
+  .tr-n { font-family:var(--mono); font-size:10px; color:var(--green); font-weight:600; }
+  .tr-t { font-size:13.5px; line-height:1.6; color:var(--text); }
+
+  /* pre-roll */
+  .preroll { border-left:3px solid var(--amber); background:var(--amber-bg); border-radius:0 8px 8px 0;
+    padding:13px 16px; }
+  .pr-label { font-family:var(--mono); font-size:10px; letter-spacing:0.8px; text-transform:uppercase;
+    color:var(--amber); margin-bottom:7px; }
+  .pr-text { font-size:13px; color:var(--text); line-height:1.55; }
+  .pr-text b { color:var(--text-bright); }
+  .pr-why { margin-top:9px; font-size:11.5px; color:var(--text-sub); line-height:1.6; }
+</style>
+</head>
+<body>
+
+<div class="topbar" id="topbar">
+  <div class="brandwrap">
+    <div class="brand">artlu.ai<span class="cursor-bl"></span></div>
+    <div class="identity">
+      <div class="htitle">100 days. 100 features.</div>
+      <div class="hbio">one person. no coding experience. just AI and an internet connection.</div>
+    </div>
+  </div>
+  <div class="hright">
+    <div class="progress">
+      <span class="pcount">day <b>63</b>/100 · <b>79</b> shipped · <b>21</b> to go</span>
+      <div class="pstrip" id="actStrip"></div>
+    </div>
+    <div class="navgroup">
+      <div class="seg"><button>list</button><button>map</button><button>stack</button><button class="seg-theme" onclick="toggleTheme()" title="toggle theme">◐</button></div>
+      <div class="seg"><button>log</button><button>research</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="col">
+    <a class="back" href="#">← back to the timeline</a>
+
+    <div class="vhead">
+      <div class="v-eyebrow"><span class="vg">◆</span>video<span class="sep">·</span><span class="vid">news-anime-bot-2026-05-16</span><span class="sep">·</span><span class="short">SHORT</span></div>
+      <div class="v-title">Cisco stock pops 15% on 4,000 layoffs and an AI order surge</div>
+      <div class="v-meta">
+        <span>may 16, 2026</span><span class="sep">·</span><span>1m 7s</span><span class="sep">·</span>
+        <span>show: news-anime-bot</span><span class="sep">·</span><span>topic: GREEN</span><span class="sep">·</span><span>12 beats</span>
+      </div>
+    </div>
+
+    <div class="vgrid">
+      <div class="vleft">
+        <div class="vplayer">
+          <h3>youtube</h3>
+          <div class="vframe"><iframe src="https://www.youtube.com/embed/1Ai641l38oc?rel=0&modestbranding=1" allowfullscreen></iframe></div>
+        </div>
+        <div class="vplayer">
+          <h3>tiktok</h3>
+          <div class="vframe"><iframe src="https://www.tiktok.com/player/v1/7640196025990368542?music_info=0&description=0" allow="encrypted-media; fullscreen" scrolling="no"></iframe></div>
+        </div>
+      </div>
+      <div class="vright" id="vright"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ===== real video bundle — public/videos/news-anime-bot-2026-05-16/bundle.json ===== */
+  const bundle = {
+    summary:{
+      writing:{ author:'Claude', role:'script · beat plan · narration · sources audit' },
+      videoClips:{ platform:'kie.ai', models:['Seedance 2.0 Fast'], clipCount:12 },
+      audio:{ tts:'Google Cloud TTS', voice:'Schedar', beatCount:12 },
+      render:{ engine:'ffmpeg', passed:true },
+      cost:'~$5.25',
+    },
+    beats:[
+      { n:1, name:'temple-cisco-cold-open', dur:5, chyron:'', narr:'Cisco announced its largest restructuring in years on Wednesday.' },
+      { n:2, name:'earnings-scroll-unfurls', dur:5, chyron:'CISCO Q3 FY26', narr:'The company will cut close to four thousand jobs this quarter.' },
+      { n:3, name:'workers-file-out', dur:5, chyron:'~4,000 JOBS CUT', narr:'That is just under five percent of its global workforce.' },
+      { n:4, name:'empty-temple-wide', dur:5, chyron:'UNDER 5 PCT OF WORKFORCE', narr:'The layoffs are part of a deeper pivot into A.I. infrastructure.' },
+      { n:5, name:'shrine-pulses-brighter', dur:5, chyron:'STOCK UP ~15 PCT', narr:"Per CNBC, Cisco's stock rose roughly fifteen percent on the news of the cuts." },
+      { n:6, name:'stock-ticker-climbs-wall', dur:5, chyron:'RECORD REV $15.8B', narr:'The company also reported record quarterly revenue of fifteen point eight billion dollars.' },
+      { n:7, name:'ingot-pile-grows', dur:5, chyron:'$5.3B AI ORDERS YTD', narr:'Cisco said it has booked five point three billion dollars in A.I. infrastructure orders this fiscal year.' },
+      { n:8, name:'guidance-scroll-raised', dur:5, chyron:'FY GUIDE $5B TO $9B', narr:'It raised its annual A.I. order guidance from five billion to nine billion dollars.' },
+      { n:9, name:'ceo-silhouette-blesses-shrine', dur:5, chyron:'PER COMPANY BLOG', narr:'Chief Executive Chuck Robbins said in a blog post that becoming a winner in A.I. meant making hard decisions.' },
+      { n:10, name:'blog-post-scroll-publish', dur:5, chyron:'SAME-DAY POST', narr:'The blog post went up the same day the cuts were announced.' },
+      { n:11, name:'titans-bring-monoliths', dur:5, chyron:'HYPERSCALER ORDERS', narr:'Per the company, the order surge is driven by its hyperscaler customers — the firms running the largest A.I. data centers.' },
+      { n:12, name:'shrine-reads-layoff-list', dur:6, chyron:'THE NETWORKS THEY BUILT', narr:'The workers being let go are largely the ones who built the networks those data centers run on.' },
+    ],
+    sources:[
+      { fact:'Cisco cut ~4,000 jobs as its stock rose ~15% on surging AI orders.',
+        attribution:"Cisco's stock pops 15% on surging AI orders, as company says it's cutting almost 4,000 jobs (CNBC)",
+        url:'https://www.cnbc.com/2026/05/13/cisco-csco-q3-earnings-report-2026.html' },
+      { fact:'The layoffs accompany a deeper pivot into AI infrastructure after a strong quarter.',
+        attribution:'Cisco layoffs loom as company pivots deeper into AI after strong quarter (Fox Business)',
+        url:'https://www.foxbusiness.com/technology/cisco-cut-thousands-jobs-ai-push-accelerates-earnings-beat' },
+      { fact:'Workforce cuts came in under 5% as Cisco posted record revenue.',
+        attribution:'Cisco Layoffs 2026: Workforce Cuts Under 5% as Company Pivots to AI and Posts Record Revenue (IndexBox)',
+        url:'https://www.indexbox.io/blog/cisco-plans-layoffs-of-under-4000-jobs-to-focus-on-ai/' },
+    ],
+    preRoll:{ burnedText:'⚠ SATIRE — AI-GENERATED PARODY — NOT REAL', voiceTag:'FAUX7 News. Satire.' },
+  };
+
+  const vright=document.getElementById('vright');
+  const s=bundle.summary;
+  const sumRows=[
+    ['writing',`<b>${s.writing.author}</b><span class="d"> · ${s.writing.role}</span>`],
+    ['video clips',`<b>${s.videoClips.platform}</b><span class="d"> · </span>${s.videoClips.models.join(', ')}<span class="d"> · ${s.videoClips.clipCount} clips</span>`],
+    ['audio',`<b>${s.audio.tts}</b><span class="d"> · voice: </span>${s.audio.voice}<span class="d"> · ${s.audio.beatCount} beats</span>`],
+    ['render',`<b>${s.render.engine}</b><span class="d"> · </span><span class="ok">✓ stitched</span>`],
+    ['cost',`<b>${s.summary?'':''}${bundle.summary.cost}</b>`],
+  ];
+  vright.innerHTML=`
+    <section class="sec">
+      <div class="sec-head"><h3>summary</h3><span class="sm">how this video was made</span></div>
+      <div class="panel sum">${sumRows.map(([k,v])=>`<div class="sum-row"><div class="sum-k">${k}</div><div class="sum-v">${v}</div></div>`).join('')}</div>
+    </section>
+    <section class="sec">
+      <div class="sec-head"><h3>beats (12)</h3><span class="sm">each beat = one clip + narration line</span></div>
+      <div class="beat-grid">${bundle.beats.map(b=>`
+        <div class="beat">
+          <div class="beat-top"><span class="beat-n">#${String(b.n).padStart(2,'0')}</span><span class="beat-name">${b.name}</span><span class="beat-dur">${b.dur}s</span></div>
+          <div class="beat-narr">"${b.narr}"</div>
+          ${b.chyron?`<span class="beat-chyron">${b.chyron}</span>`:''}
+        </div>`).join('')}</div>
+    </section>
+    <section class="sec">
+      <div class="sec-head"><h3>sources</h3><span class="sm">every cited number, attributed</span></div>
+      <div class="panel src">${bundle.sources.map((src,i)=>`
+        <div class="src-row">
+          <div class="src-fact"><span class="n">${String(i+1).padStart(2,'0')}.</span>${src.fact}</div>
+          <a class="src-attr" href="${src.url}" target="_blank" rel="noopener">${src.attribution} ↗</a>
+        </div>`).join('')}</div>
+    </section>
+    <section class="sec">
+      <div class="sec-head"><h3>full transcript</h3><span class="sm">narration only, no SSML markup</span></div>
+      <div class="panel tr">${bundle.beats.map(b=>`
+        <div class="tr-line"><span class="tr-n">${String(b.n).padStart(2,'0')}</span><span class="tr-t">${b.narr}</span></div>`).join('')}</div>
+    </section>
+    <section class="sec">
+      <div class="sec-head"><h3>pre-roll disclosure</h3><span class="sm">why every episode opens with a satire card</span></div>
+      <div class="preroll">
+        <div class="pr-label">on-screen pre-roll · 1.7s</div>
+        <div class="pr-text"><b>${bundle.preRoll.burnedText}</b> — with a "${bundle.preRoll.voiceTag}" voice tag burned into the audio.</div>
+        <div class="pr-why">YouTube and TikTok algorithms shadowban news-format AI content that lacks explicit disclosure. The pre-roll keeps the platforms from misclassifying these as real news — and keeps the satire honest.</div>
+      </div>
+    </section>`;
+
+  /* activity strip + header */
+  (function(){
+    const act=[1,0,2,1,3,2,0,1,4,2,1,3,2,0,2,1,3,2,4,1];
+    const h=document.getElementById('actStrip'); if(!h) return;
+    act.forEach(lv=>{ const c=document.createElement('div'); c.className='pcell';
+      if(lv){ c.style.background='var(--green)'; c.style.opacity=(0.3+lv*0.17); } h.appendChild(c); });
+  })();
+  const topbar=document.getElementById('topbar');
+  function onScroll(){ topbar.classList.toggle('stuck',(window.scrollY||document.documentElement.scrollTop)>6); }
+  window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+  function toggleTheme(){ const h=document.documentElement; h.dataset.theme=h.dataset.theme==='light'?'dark':'light'; }
+  window.toggleTheme=toggleTheme;
+</script>
+</body>
+</html>

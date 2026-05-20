@@ -1,0 +1,64 @@
+---
+import ActivityStrip from "./ActivityStrip.astro";
+
+type Props = {
+  active?: "list" | "map" | "stack" | "log" | "research" | "admin" | "settings";
+  stats?: any;
+  variant?: "public" | "admin";
+  heatmapTooltip?: boolean;
+  sticky?: "scroll" | "canvas" | "none";
+};
+
+const { active = "stack", stats, variant = "public", heatmapTooltip = true, sticky = "scroll" } = Astro.props;
+const isAdmin = variant === "admin";
+const stickyAttr = sticky === "scroll" ? "scroll" : undefined;
+const adminClass = sticky === "none" || isAdmin ? "admin-static" : "";
+---
+<div class:list={["topbar", adminClass]} id="topbar" data-sticky={stickyAttr}>
+  <div class="brandwrap">
+    <a class="brand" href="/">artlu.ai<span class="cursor-bl"></span></a>
+    <div class="identity">
+      <div class="htitle">{isAdmin ? "admin dashboard" : "100 days. 100 features."}</div>
+      <div class="hbio">{isAdmin ? "projects · series · entries · data operations" : "Just AI and an internet connection."}</div>
+    </div>
+  </div>
+  <div class="hright">
+    {!isAdmin && stats && (
+      <div class="progress">
+        <span class="pcount">day <b>{stats.day}</b>/100 · <b>{stats.shipped}</b> shipped · <b>{stats.toGo}</b> to go</span>
+        <ActivityStrip cells={stats.activity} tooltip={heatmapTooltip} />
+      </div>
+    )}
+    {isAdmin && (
+      <span class="admin-badge" data-admin-authed-only hidden><span class="d"></span>ADMIN</span>
+    )}
+    <div class="navgroup">
+      {isAdmin ? (
+        <>
+          <div class="seg" data-admin-authed-only hidden>
+            <a class={active === "admin" ? "on" : ""} href="/admin">dashboard</a>
+            <a class={active === "settings" ? "on" : ""} href="/admin/settings">settings</a>
+            <button type="button" class="seg-theme" onclick="toggleTheme()" title="toggle theme">◐</button>
+          </div>
+          <div class="seg">
+            <a href="/">public</a>
+            <button type="button" id="adminSignOut" data-admin-authed-only hidden>sign out</button>
+          </div>
+        </>
+      ) : (
+        <>
+          <div class="seg">
+            <a class={active === "list" ? "on" : ""} href="/list">list</a>
+            <a class={active === "map" ? "on" : ""} href="/map">map</a>
+            <a class={active === "stack" ? "on" : ""} href="/">stack</a>
+            <button type="button" class="seg-theme" onclick="toggleTheme()" title="toggle theme">◐</button>
+          </div>
+          <div class="seg">
+            <a class={active === "log" ? "on" : ""} href="/log">log</a>
+            <a class={active === "research" ? "on" : ""} href="/research">research</a>
+          </div>
+        </>
+      )}
+    </div>
+  </div>
+</div>

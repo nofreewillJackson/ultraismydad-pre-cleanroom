@@ -3,16 +3,16 @@
   publish = "dist"
 
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+  from = "/journal"
+  to = "/log"
+  status = 301
 
 [[redirects]]
-  from = "/project/*"
-  to = "/index.html"
-  status = 200
+  from = "/journal/*"
+  to = "/log/:splat"
+  status = 301
 
 [[redirects]]
-  from = "/video/*"
-  to = "/index.html"
-  status = 200
+  from = "/dashboard"
+  to = "/admin"
+  status = 301

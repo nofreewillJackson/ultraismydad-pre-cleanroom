@@ -1,5 +1,31 @@
 [
   {
+    "id": "news-anime-bot-2026-05-18",
+    "format": "short",
+    "show": "news-anime-bot",
+    "title": "Google closes in on Nvidia as world's most valuable company",
+    "desc": "Daily AI news satire. Two years after Google was written off as having lost the AI race, Alphabet is closing in on Nvidia as the world's most valuable company.",
+    "shippedAt": "2026-05-18",
+    "durationSec": 66,
+    "youtubeId": "zsYb_mliXnc",
+    "tiktokId": "7641250366276832542",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7641250366276832542",
+    "thumbnailUrl": "https://i.ytimg.com/vi/zsYb_mliXnc/oardefault.jpg"
+  },
+  {
+    "id": "spoolcast-dev-log-08",
+    "format": "long",
+    "show": null,
+    "title": "giving an AI agent a key to your wallet — spoolcast dev log 8",
+    "desc": "devlog about letting AI agents spend real money in PipelineCPC, and the fences that keep it from going wrong.",
+    "shippedAt": "2026-05-18",
+    "durationSec": 344,
+    "youtubeId": "vwqv8VIc2fA",
+    "tiktokId": null,
+    "tiktokUrl": null,
+    "thumbnailUrl": "https://img.youtube.com/vi/vwqv8VIc2fA/maxresdefault.jpg"
+  },
+  {
     "id": "news-anime-bot-2026-05-16",
     "format": "short",
     "show": "news-anime-bot",
@@ -7,6 +33,9 @@
     "desc": "Daily AI news satire. Cisco cuts ~4,000 jobs, books $5.3B in AI infrastructure orders, raises guidance to $9B — and lays off the engineers who built the networks.",
     "shippedAt": "2026-05-16",
     "durationSec": 67,
+    "youtubeId": "1Ai641l38oc",
+    "tiktokId": "7640196025990368542",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7640196025990368542",
     "thumbnailUrl": "https://i.ytimg.com/vi/1Ai641l38oc/oardefault.jpg"
   },
   {
@@ -17,17 +46,36 @@
     "desc": "Daily AI news satire. Rival labs launch competing cybersecurity AIs — Claude Mythos flags 271 Firefox bugs (3 real), OpenAI answers with Daybreak.",
     "shippedAt": "2026-05-15",
     "durationSec": 63,
+    "youtubeId": "trx2a5jYTf8",
+    "tiktokId": "7639822885837720862",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7639822885837720862",
     "thumbnailUrl": "https://i.ytimg.com/vi/trx2a5jYTf8/oardefault.jpg"
   },
   {
-    "id": "spoolcast-dev-log-06",
+    "id": "spoolcast-dev-log-07",
     "format": "long",
     "show": null,
-    "title": "why ai makes things up about its own work — spoolcast dev log 6",
-    "desc": "",
-    "shippedAt": "2026-05-08",
-    "durationSec": 248,
-    "thumbnailUrl": "https://img.youtube.com/vi/c1tWTNh2D1Y/maxresdefault.jpg"
+    "title": "three-ai AdsMetri build story — spoolcast dev log 7",
+    "desc": "devlog about building AdsMetri across Codex, Manus, and Claude, and why role clarity mattered more than raw AI output.",
+    "shippedAt": "2026-05-13",
+    "durationSec": 773,
+    "youtubeId": "21zjy7BDEI0",
+    "tiktokId": null,
+    "tiktokUrl": null,
+    "thumbnailUrl": "https://img.youtube.com/vi/21zjy7BDEI0/maxresdefault.jpg"
+  },
+  {
+    "id": "news-anime-bot-2026-05-12",
+    "format": "short",
+    "show": "news-anime-bot",
+    "title": "Nvidia invests $40B in companies that spend on Nvidia",
+    "desc": "Daily AI news satire. Nvidia pours $40B into companies whose business model is buying more Nvidia GPUs.",
+    "shippedAt": "2026-05-12",
+    "durationSec": 58,
+    "youtubeId": "hGTkj0kYmoo",
+    "tiktokId": "7638994693791026463",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7638994693791026463",
+    "thumbnailUrl": "https://i.ytimg.com/vi/hGTkj0kYmoo/oardefault.jpg"
   },
   {
     "id": "news-anime-bot-2026-05-08",
@@ -37,7 +85,23 @@
     "desc": "Daily AI news satire. Google turns Fitbit into Google Health, launches a Gemini-powered coach behind a $9.99/mo gate. Not for medical purposes.",
     "shippedAt": "2026-05-08",
     "durationSec": 57,
+    "youtubeId": "5tFAfZr5biI",
+    "tiktokId": "7637591100617772318",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7637591100617772318",
     "thumbnailUrl": "https://i.ytimg.com/vi/5tFAfZr5biI/oardefault.jpg"
+  },
+  {
+    "id": "spoolcast-dev-log-06",
+    "format": "long",
+    "show": null,
+    "title": "why ai makes things up about its own work — spoolcast dev log 6",
+    "desc": "",
+    "shippedAt": "2026-05-08",
+    "durationSec": 248,
+    "youtubeId": "c1tWTNh2D1Y",
+    "tiktokId": null,
+    "tiktokUrl": null,
+    "thumbnailUrl": "https://img.youtube.com/vi/c1tWTNh2D1Y/maxresdefault.jpg"
   },
   {
     "id": "news-anime-bot-2026-05-07",
@@ -47,6 +111,9 @@
     "desc": "Daily AI news satire. Anthropic gets all 220K GPUs of Colossus 1; xAI dissolves into SpaceXAI; the rivals are now roommates planning compute in orbit.",
     "shippedAt": "2026-05-07",
     "durationSec": 57,
+    "youtubeId": "jiwn-DjIVno",
+    "tiktokId": "7637232628285934879",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7637232628285934879",
     "thumbnailUrl": "https://i.ytimg.com/vi/jiwn-DjIVno/oardefault.jpg"
   },
   {
@@ -57,6 +124,9 @@
     "desc": "",
     "shippedAt": "2026-05-07",
     "durationSec": 558,
+    "youtubeId": "nOfkukxHjm4",
+    "tiktokId": null,
+    "tiktokUrl": null,
     "thumbnailUrl": "https://img.youtube.com/vi/nOfkukxHjm4/maxresdefault.jpg"
   },
   {
@@ -67,6 +137,9 @@
     "desc": "Daily AI news satire. Apple settles for $250M over a Siri 2.0 it announced at WWDC 2024 but never shipped. The new one ships at WWDC 2026 — powered by Google's Gemini.",
     "shippedAt": "2026-05-06",
     "durationSec": 63,
+    "youtubeId": "8aepPT4p4OI",
+    "tiktokId": "7636834959440743711",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7636834959440743711",
     "thumbnailUrl": "https://i.ytimg.com/vi/8aepPT4p4OI/oardefault.jpg"
   },
   {
@@ -77,6 +150,9 @@
     "desc": "Daily AI news satire. Humanoid robot factories ramping; the early units fold one shirt at a time. Wall Street pegs the market at $13B by 2029.",
     "shippedAt": "2026-05-03",
     "durationSec": 57,
+    "youtubeId": "59M50WwnxPk",
+    "tiktokId": "7636016376309665055",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7636016376309665055",
     "thumbnailUrl": "https://i.ytimg.com/vi/59M50WwnxPk/oardefault.jpg"
   },
   {
@@ -87,6 +163,9 @@
     "desc": "Daily AI news satire. Half of Google's and Amazon's Q1 AI profit came from marking up their stake in Anthropic.",
     "shippedAt": "2026-05-02",
     "durationSec": 65,
+    "youtubeId": "blptwJ1hGGM",
+    "tiktokId": "7635324826869173534",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7635324826869173534",
     "thumbnailUrl": "https://i.ytimg.com/vi/blptwJ1hGGM/oardefault.jpg"
   },
   {
@@ -97,6 +176,9 @@
     "desc": "",
     "shippedAt": "2026-05-02",
     "durationSec": 264,
+    "youtubeId": "7Cp2e9Eo00M",
+    "tiktokId": null,
+    "tiktokUrl": null,
     "thumbnailUrl": "https://img.youtube.com/vi/7Cp2e9Eo00M/maxresdefault.jpg"
   },
   {
@@ -107,6 +189,9 @@
     "desc": "Daily AI-generated tech news satire. Microsoft Q3 earnings + Copilot adoption.",
     "shippedAt": "2026-04-30",
     "durationSec": 62,
+    "youtubeId": "uBfr45P2aOM",
+    "tiktokId": "7634647531091234078",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7634647531091234078",
     "thumbnailUrl": "https://i.ytimg.com/vi/uBfr45P2aOM/oardefault.jpg"
   },
   {
@@ -117,6 +202,9 @@
     "desc": "Pilot episode of the daily AI news satire show. OpenAI Q1 + hyperscaler capex.",
     "shippedAt": "2026-04-29",
     "durationSec": 60,
+    "youtubeId": "_umRCKLUG8k",
+    "tiktokId": null,
+    "tiktokUrl": null,
     "thumbnailUrl": "https://i.ytimg.com/vi/_umRCKLUG8k/oardefault.jpg"
   },
   {
@@ -127,6 +215,9 @@
     "desc": "",
     "shippedAt": "2026-04-27",
     "durationSec": 182,
+    "youtubeId": "yozYCL3qOBs",
+    "tiktokId": null,
+    "tiktokUrl": null,
     "thumbnailUrl": "https://img.youtube.com/vi/yozYCL3qOBs/maxresdefault.jpg"
   },
   {
@@ -137,6 +228,9 @@
     "desc": "",
     "shippedAt": "2026-04-24",
     "durationSec": 199,
+    "youtubeId": "-tvxNxfTnDc",
+    "tiktokId": null,
+    "tiktokUrl": null,
     "thumbnailUrl": "https://img.youtube.com/vi/-tvxNxfTnDc/maxresdefault.jpg"
   },
   {
@@ -147,6 +241,9 @@
     "desc": "",
     "shippedAt": "2026-04-21",
     "durationSec": 252,
+    "youtubeId": "i3Z480n1k6k",
+    "tiktokId": null,
+    "tiktokUrl": null,
     "thumbnailUrl": "https://img.youtube.com/vi/i3Z480n1k6k/maxresdefault.jpg"
   },
   {
@@ -157,6 +254,9 @@
     "desc": "",
     "shippedAt": "2026-04-15",
     "durationSec": 480,
+    "youtubeId": "7p43_3gHJj0",
+    "tiktokId": null,
+    "tiktokUrl": null,
     "thumbnailUrl": "https://img.youtube.com/vi/7p43_3gHJj0/maxresdefault.jpg"
   },
   {
@@ -167,6 +267,9 @@
     "desc": "",
     "shippedAt": "2026-03-25",
     "durationSec": 300,
+    "youtubeId": "hqbmHuEtayM",
+    "tiktokId": null,
+    "tiktokUrl": null,
     "thumbnailUrl": "https://img.youtube.com/vi/hqbmHuEtayM/maxresdefault.jpg"
   }
 ]

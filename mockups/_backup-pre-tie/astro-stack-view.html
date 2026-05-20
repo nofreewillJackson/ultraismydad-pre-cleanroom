@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>artlu.ai — stack spectrum</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  html[data-theme="dark"] {
+    --bg:#08090a; --surface:#0e0f11; --surface-2:#16191d;
+    --border:#1a1d22; --border-strong:#2b3038; --border-hover:#4a525e;
+    --text:#c0c4cc; --text-bright:#f0f1f3; --text-sub:#9aa0aa;
+    --dim:#6b7280; --dimmer:#3a3f48;
+    --green:#4ade80; --green-bg:#062b12; --green-border:#1d4d31;
+    --blue:#60a5fa; --amber:#d8a657; --amber-bg:#1c1a12;
+    --port:#3a6f4c; --grid-line:#0d1014; --grid-dot:#15181d;
+    --node-shadow:0 8px 26px rgba(0,0,0,0.6);
+    --hud-bg:rgba(8,9,10,0.9);
+    --wire:#34543f; --wire-on:#4ade80;
+    --panel-bg:#0e0f11; --panel-shadow:-14px 0 44px rgba(0,0,0,0.55);
+    --font:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  html[data-theme="light"] {
+    --bg:#e9eaec; --surface:#ffffff; --surface-2:#f2f3f5;
+    --border:#dcdfe2; --border-strong:#ccd0d4; --border-hover:#9ba0a8;
+    --text:#34373c; --text-bright:#15171a; --text-sub:#50545a;
+    --dim:#7c8087; --dimmer:#aeb2b8;
+    --green:#0a7d5e; --green-bg:#e6f4ee; --green-border:#a9ddc9;
+    --blue:#2563eb; --amber:#8a6300; --amber-bg:#f3e9d2;
+    --port:#b4b8be; --grid-line:transparent; --grid-dot:transparent;
+    --node-shadow:0 1px 2px rgba(22,24,27,0.07), 0 4px 14px rgba(22,24,27,0.06);
+    --hud-bg:rgba(255,255,255,0.95);
+    --wire:#ccced2; --wire-on:#0a7d5e;
+    --panel-bg:#ffffff; --panel-shadow:-14px 0 40px rgba(20,24,28,0.13);
+    --font:'Inter',system-ui,sans-serif;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; }
+  body { background:var(--bg); color:var(--text); font-family:var(--font); font-size:14px; overflow:hidden; -webkit-font-smoothing:antialiased; }
+
+  .topbar { height:72px; border-bottom:1px solid transparent; background:var(--bg); display:flex; align-items:center; gap:24px; padding:0 18px; position:relative; z-index:40; transition:background .16s, border-color .16s, box-shadow .16s; }
+  .topbar.stuck { background:var(--surface); border-bottom-color:var(--border); box-shadow:var(--node-shadow); }
+  .brandwrap { display:flex; align-items:center; gap:18px; }
+  .identity { display:flex; flex-direction:column; gap:3px; }
+  .htitle { font-size:13px; font-weight:600; color:var(--text-bright); white-space:nowrap; }
+  .hbio { font-size:11.5px; color:var(--text-sub); white-space:nowrap; }
+  .hright { margin-left:auto; display:flex; align-items:center; gap:14px; }
+  .brand { font-weight:600; font-size:29px; letter-spacing:-0.02em; color:var(--text-bright); display:flex; align-items:center; gap:3px; }
+  .cursor-bl { width:10px; height:26px; background:var(--green); display:inline-block; animation:blink 1s step-end infinite; }
+  @keyframes blink { 50% { opacity:0; } }
+  .seg { display:flex; border:1px solid var(--border); border-radius:4px; overflow:hidden; }
+  .seg button { font-family:var(--mono); font-size:12px; background:transparent; color:var(--dim); border:none; padding:6px 15px; cursor:pointer; }
+  .seg button.on { background:var(--green-bg); color:var(--green); }
+  .tip { margin-left:auto; font-size:12.5px; color:var(--dim); }
+  .tip b { color:var(--text-sub); font-weight:500; }
+  .theme-tog { width:30px; height:28px; border:1px solid var(--border); background:transparent; color:var(--text-sub); border-radius:5px; cursor:pointer; font-size:13px; }
+
+  .viewport {
+    position:absolute; top:72px; left:0; right:0; bottom:0; overflow:hidden; cursor:grab;
+    background:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
+      radial-gradient(circle, var(--grid-dot) 1.5px, transparent 1.5px);
+    background-size:160px 160px, 160px 160px, 32px 32px;
+  }
+  .viewport.grabbing { cursor:grabbing; }
+  .world { position:absolute; top:0; left:0; width:2100px; height:2000px; transform-origin:0 0; }
+  svg.wires { position:absolute; top:0; left:0; width:2100px; height:2000px; overflow:visible; z-index:1; }
+
+  .col-head { position:absolute; top:124px; font-size:13px; color:var(--dim); letter-spacing:1.5px; text-transform:uppercase; }
+  .axis-spine { position:absolute; width:1px; background:var(--border-strong); }
+  .axis-chip { position:absolute; transform:translate(-50%,-50%); white-space:nowrap; z-index:2;
+    background:var(--bg); border:1px solid var(--border-strong); border-radius:5px;
+    font-size:14px; font-weight:600; color:var(--text-bright); padding:4px 11px; }
+  .axis-chip.band { font-size:11px; font-weight:500; letter-spacing:1px; text-transform:uppercase; color:var(--dim); padding:5px 11px; }
+  .axis-cap { position:absolute; transform:translateX(-50%); white-space:nowrap;
+    font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--dimmer); }
+
+  .node {
+    position:absolute; z-index:2; background:var(--surface);
+    border:1px solid var(--border-strong); border-radius:8px;
+    box-shadow:var(--node-shadow); cursor:pointer; transition:opacity .16s;
+  }
+  .node:hover { border-color:var(--border-hover); }
+  .node.sel { box-shadow:var(--node-shadow), 0 0 0 2px var(--border-hover); }
+  .node.dimmed { opacity:0.16; }
+  .node.tech { width:226px; }
+  .node.work { width:272px; }
+  .node.project { width:300px; }
+  .node.rolodex { width:492px; }
+
+  /* comfyui port pegs — shared with map view */
+  .port { position:absolute; width:12px; height:12px; border-radius:50%; background:var(--bg); border:2px solid var(--port); top:50%; transform:translateY(-50%); z-index:3; }
+  .port.pin { left:-7px; } .port.pout { right:-7px; }
+
+  .tech-row { display:flex; align-items:center; gap:9px; padding:11px 13px; }
+  .tdot { width:8px; height:8px; border-radius:2px; flex-shrink:0; background:var(--blue); }
+  .tname { color:var(--text-bright); font-weight:600; font-size:13.5px; flex:1; }
+  .tcat { font-size:10px; letter-spacing:0.5px; color:var(--dim); }
+
+  .nhead { display:flex; align-items:center; gap:8px; padding:10px 13px; background:var(--surface-2); border-bottom:1px solid var(--border); cursor:grab; border-radius:8px 8px 0 0; }
+  .node.project .nhead { background:var(--green-bg); }
+  .node.work.series .nhead { background:var(--amber-bg); }
+  .glyph { font-size:11px; }
+  .glyph.project { color:var(--green); }
+  .glyph.series  { color:var(--amber); }
+  .sdot { width:8px; height:8px; border-radius:50%; flex-shrink:0; background:var(--green); }
+  .nname { color:var(--text-bright); font-weight:600; font-size:14px; line-height:1.38; }
+  .ntag { margin-left:auto; flex-shrink:0; font-size:11px; color:var(--dim); border:1px solid var(--border); border-radius:3px; padding:2px 7px; }
+  .node.project .ntag { color:var(--green); border-color:var(--green-border); }
+  .node.work.series .ntag { color:var(--amber); border-color:var(--amber-bg); }
+  .nbody { padding:11px 13px; }
+  .ndesc { color:var(--text-sub); font-size:13px; line-height:1.55; }
+  .nmeta { margin-top:9px; font-size:12px; color:var(--dim); }
+  .nmeta.first { margin-top:0; }
+  .nmeta .accent { color:var(--green); }
+  .status { padding:2px 7px; border-radius:3px; font-size:11px; background:var(--green-bg); color:var(--green); margin-right:7px; }
+
+  /* ---------- rolodex — one per project, a horizontal-scroll row per series ---------- */
+  .rhead { display:flex; align-items:center; gap:8px; padding:10px 13px; background:var(--surface-2); border-bottom:1px solid var(--border); cursor:grab; border-radius:8px 8px 0 0; }
+  .rhead .glyph { color:var(--amber); }
+  .rhead .rcount { margin-left:auto; font-size:11px; color:var(--dim); border:1px solid var(--border); border-radius:3px; padding:2px 7px; }
+  .rrows { padding:6px 0; }
+  .rseries { padding:15px 16px; transition:opacity .15s; }
+  .rseries + .rseries { border-top:1px solid var(--border); }
+  .rrows:hover .rseries:not(:hover) { opacity:0.3; }
+  .rserlabel { display:flex; align-items:center; gap:7px; font-size:12.5px; font-weight:500; color:var(--amber); margin-bottom:12px; }
+  .rserlabel .scount { color:var(--dim); font-weight:400; font-size:11px; }
+  .rstrip { display:flex; gap:13px; overflow-x:auto; padding-bottom:9px; }
+  .rstrip::-webkit-scrollbar { height:6px; }
+  .rstrip::-webkit-scrollbar-thumb { background:var(--border-strong); border-radius:3px; }
+  .vcard { flex-shrink:0; border:1px solid var(--border); border-radius:7px; overflow:hidden; cursor:pointer; background:var(--surface-2); }
+  .vcard:hover { border-color:var(--border-hover); }
+  .vcard.h { width:208px; }
+  .vcard.h .vthumb { width:100%; aspect-ratio:16/9; position:relative; background:#000; }
+  .vcard.h .vthumb img { width:100%; height:100%; object-fit:cover; display:block; }
+  .vcard.v { width:124px; }
+  .vcard.v .vthumb { width:100%; height:186px; position:relative; background:#000; overflow:hidden; }
+  .vcard.v .vthumb img { width:100%; height:100%; object-fit:cover; display:block; }
+  .vcard.demo { width:240px; }
+  .vcard.demo .dthumb { width:100%; height:152px; background:#0e0f11; overflow:hidden; border-bottom:1px solid var(--border); }
+  .vcard.demo .dthumb iframe { width:100%; height:100%; border:0; display:block; pointer-events:none; }
+  .vplay { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:32px; height:32px; border-radius:50%; border:1.5px solid #fff; color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:12px; background:rgba(0,0,0,0.45); }
+  .vmeta { padding:8px 10px; }
+  .vtitle { color:var(--text-bright); font-size:11.5px; font-weight:500; line-height:1.4;
+    overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+  .vdesc { margin-top:4px; font-size:10px; color:var(--text-sub); line-height:1.45;
+    overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+  .vdate { margin-top:5px; font-size:10px; color:var(--dim); }
+  .rfoot { padding:11px 13px; text-align:center; font-size:12px; color:var(--amber); cursor:pointer; border-top:1px solid var(--border); }
+  .rfoot:hover { background:var(--amber-bg); }
+
+  /* ---------- chic panel ---------- */
+  .panel {
+    position:absolute; top:72px; right:0; bottom:0; width:438px; z-index:38;
+    background:var(--panel-bg); border-left:1px solid var(--border-strong);
+    box-shadow:var(--panel-shadow);
+    transform:translateX(101%); transition:transform .24s cubic-bezier(.2,.7,.2,1);
+    display:flex; flex-direction:column;
+  }
+  .panel.open { transform:translateX(0); }
+  .p-top { display:flex; justify-content:flex-end; padding:14px 16px 0; }
+  .p-x { width:32px; height:32px; border:none; background:var(--surface-2); color:var(--text-sub); border-radius:50%; cursor:pointer; font-size:16px; }
+  .p-head { padding:6px 28px 18px; }
+  .p-eyebrow { display:flex; align-items:center; gap:8px; font-size:11px; letter-spacing:1.6px; text-transform:uppercase; color:var(--dim); }
+  .p-eyebrow .ed { width:7px; height:7px; border-radius:50%; }
+  .p-title { margin-top:14px; font-size:26px; font-weight:600; color:var(--text-bright); line-height:1.2; letter-spacing:-0.01em; }
+  .p-sub { margin-top:9px; font-size:13px; color:var(--text-sub); }
+  .p-body { flex:1; overflow-y:auto; padding:4px 28px 32px; }
+  .p-embed { margin:16px 0 4px; border:1px solid var(--border-strong); border-radius:9px; overflow:hidden; background:#000; box-shadow:0 6px 22px rgba(0,0,0,0.4); }
+  .p-embed.h { aspect-ratio:16/9; } .p-embed.v { width:250px; height:445px; margin-left:auto; margin-right:auto; }
+  .p-embed.demo { height:340px; }
+  .p-embed iframe { width:100%; height:100%; border:0; display:block; }
+  .p-lead { font-size:15px; line-height:1.7; color:var(--text); padding:18px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+  .p-sec { margin-top:24px; }
+  .p-sec h4 { font-size:10.5px; letter-spacing:1.8px; text-transform:uppercase; color:var(--dim); margin-bottom:6px; }
+  .lrow { display:flex; align-items:center; gap:11px; padding:14px 0; border-bottom:1px solid var(--border); cursor:pointer; }
+  .lrow:last-child { border-bottom:none; }
+  .lrow .ld { width:8px; height:8px; border-radius:2px; flex-shrink:0; }
+  .lrow .lname { flex:1; font-size:14px; color:var(--text-bright); font-weight:500; }
+  .lrow .lkind { font-size:11px; color:var(--dim); }
+  .lrow .arr { color:var(--dim); font-size:15px; }
+  .lrow:hover .arr { color:var(--text-bright); }
+  .tchips { display:flex; flex-wrap:wrap; gap:7px; margin-top:10px; }
+  .tchip { font-size:12px; color:var(--text-sub); background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:5px 12px; }
+
+  .hud { position:absolute; left:16px; bottom:14px; z-index:25; font-size:11.5px; color:var(--dim); background:var(--hud-bg); border:1px solid var(--border); border-radius:5px; padding:8px 12px; }
+  .world-intro { position:absolute; left:118px; top:12px; width:1100px; z-index:2; }
+  .world-intro .wi-h { font-size:15px; font-weight:600; color:var(--text-bright); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:9px; }
+  .world-intro .wi-p { font-size:13.5px; color:var(--text-sub); line-height:1.72; max-width:1040px; }
+  .zoomctl { position:absolute; right:16px; bottom:14px; z-index:25; display:flex; gap:5px; }
+  .zoomctl button { width:28px; height:28px; background:var(--surface); border:1px solid var(--border); color:var(--text-sub); border-radius:5px; cursor:pointer; font-size:14px; font-family:var(--mono); }
+
+  /* progress block in the header */
+  .progress { display:flex; flex-direction:column; align-items:flex-start; gap:5px; }
+  .pcount { font-family:var(--mono); font-size:11.5px; color:var(--text-sub); white-space:nowrap; }
+  .pcount b { color:var(--text-bright); }
+  .pstrip { display:flex; gap:3px; }
+  .pcell { width:9px; height:9px; border-radius:2px; background:var(--border); position:relative; }
+  .pcell:hover { outline:1.5px solid var(--text-sub); outline-offset:1px; }
+  .pcell:hover::after { content:attr(data-tip); position:absolute; top:17px; left:50%; transform:translateX(-50%);
+    background:var(--surface-2); border:1px solid var(--border-strong); border-radius:5px; padding:5px 9px;
+    font-size:11px; color:var(--text-bright); white-space:nowrap; z-index:60; box-shadow:var(--node-shadow); pointer-events:none; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brandwrap">
+    <div class="brand">artlu.ai<span class="cursor-bl"></span></div>
+    <div class="identity">
+      <div class="htitle">100 days. 100 features.</div>
+      <div class="hbio">one person. no coding experience. just AI and an internet connection.</div>
+    </div>
+  </div>
+  <div class="hright">
+    <div class="progress">
+      <span class="pcount">day <b>63</b>/100 · <b>79</b> shipped · <b>21</b> to go</span>
+      <div class="pstrip" id="actStrip"></div>
+    </div>
+    <div class="seg"><button>list</button><button>map</button><button class="on">stack</button></div>
+    <button class="theme-tog" onclick="toggleTheme()" title="toggle theme">◐</button>
+  </div>
+</div>
+
+<div class="viewport" id="viewport">
+  <div class="world" id="world"><svg class="wires" id="wires"></svg>
+    <div class="world-intro">
+      <div class="wi-h">what is this?</div>
+      <div class="wi-p">Everything shipped on artlu.ai, read across the stack — from the tech each feature is built on, through the feature or series, to the main project and its video &amp; demo showcase. Click any node to focus its lineage.</div>
+    </div>
+  </div>
+</div>
+
+<aside class="panel" id="panel">
+  <div class="p-top"><button class="p-x" onclick="closePanel()">×</button></div>
+  <div class="p-head">
+    <div class="p-eyebrow"><span class="ed" id="ped"></span><span id="pkind"></span></div>
+    <div class="p-title" id="ptitle"></div>
+    <div class="p-sub" id="psub"></div>
+  </div>
+  <div class="p-body" id="pbody"></div>
+</aside>
+
+<div class="hud">drag to pan · scroll to zoom · click a node to focus · scroll inside a rolodex for more episodes</div>
+<div class="zoomctl">
+  <button onclick="zoomBy(-1)">−</button><button onclick="zoomBy(1)">+</button>
+  <button onclick="resetView()" style="width:auto;padding:0 9px;font-size:11px">fit</button>
+</div>
+
+<script>
+  const CATS=[['frontend','frontend'],['api','api'],['data','data'],['infra','infra'],['media','ai · media']];
+  const techs=[
+    {id:'react',n:'React',c:'frontend'},{id:'tailwind',n:'Tailwind',c:'frontend'},{id:'shadcn',n:'shadcn/ui',c:'frontend'},{id:'recharts',n:'Recharts',c:'frontend'},
+    {id:'trpc',n:'tRPC',c:'api'},{id:'express',n:'Express',c:'api'},{id:'node',n:'Node.js',c:'api'},{id:'mcp',n:'MCP',c:'api'},
+    {id:'drizzle',n:'Drizzle',c:'data'},{id:'mysql',n:'MySQL',c:'data'},{id:'firebase',n:'Firebase',c:'data'},
+    {id:'railway',n:'Railway',c:'infra'},
+    {id:'remotion',n:'Remotion',c:'media'},{id:'ffmpeg',n:'ffmpeg',c:'media'},{id:'gtts',n:'Google Cloud TTS',c:'media'},{id:'seedance',n:'Seedance',c:'media'},
+  ];
+  const techName=id=>techs.find(t=>t.id===id).n;
+
+  const works={
+    aninews:{kind:'series',name:'Aninews',project:'spoolcast',techs:['seedance','gtts','ffmpeg'],sd:'2026-05-18',date:'may 18',
+      desc:'Daily AI-news anime satire — the FAUX7 NEWS show.',meta:'11 episodes · latest may 18'},
+    devlog:{kind:'series',name:'spoolcast dev-log',project:'spoolcast',techs:['remotion','gtts'],sd:'2026-05-13',date:'may 13',
+      desc:'Behind-the-scenes YouTube series on building with AI.',meta:'6 episodes · latest may 13'},
+    a1:{kind:'update',name:'creative intelligence tagging workbench',project:'adsmetri',techs:['react','tailwind','trpc','drizzle'],date:'may 16',sd:'2026-05-16',status:'launched',
+      demo:'https://artluai.github.io/context-gate-ai-hallucination/'},
+    a2:{kind:'update',name:'meta ads performance dashboard',project:'adsmetri',techs:['react','recharts','mysql'],date:'may 12',sd:'2026-05-12',status:'launched'},
+    p1:{kind:'update',name:'agent campaign planning bridge',project:'pipelinecpc',techs:['node','mcp','firebase'],date:'may 16',sd:'2026-05-16',status:'launched'},
+    p2:{kind:'update',name:'keyword filtering + Stripe billing',project:'pipelinecpc',techs:['node','firebase','railway'],date:'apr 6',sd:'2026-04-06',status:'launched'},
+  };
+  const WORK_ORDER=['a1','a2','p1','p2','devlog','aninews'];
+  const projects={
+    adsmetri:{name:'AdsMetri',desc:'Meta Ads performance intelligence dashboard.',meta:'launched · may 2026'},
+    pipelinecpc:{name:'PipelineCPC',desc:'Paid-search keyword research SaaS for Google Ads.',meta:'launched · apr 2026'},
+    spoolcast:{name:'spoolcast',desc:'The AI-to-video pipeline. Turns a chat session into a finished video.',meta:'launched · apr 2026'},
+  };
+  // ---------- interactive demo artifacts (embedded in the panel) ----------
+  const DEMO_A=`<!doctype html><meta charset=utf-8><style>
+    body{margin:0;font-family:'IBM Plex Mono',monospace;background:#16191d;color:#9aa0aa;padding:16px;font-size:13px}
+    h4{margin:0 0 14px;color:#f0f1f3;font-size:14px}
+    .f{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}
+    input{width:88px;background:#0e0f11;border:1px solid #2b3038;color:#f0f1f3;font:inherit;padding:6px 8px;border-radius:5px}
+    .out{margin-top:14px;padding:15px;border-radius:6px;text-align:center}
+    .out b{font-size:27px;display:block;margin-top:4px}
+  </style><h4>$/conv calculator</h4>
+  <div class=f><span>CPC ($)</span><input id=cpc type=number value=2.40 step=.1></div>
+  <div class=f><span>CVR (%)</span><input id=cvr type=number value=3 step=.5></div>
+  <div class=out id=o></div>
+  <script>var c=cpc,v=cvr,o=document.getElementById('o');
+  function r(){var x=(+c.value)/((+v.value)/100||1);var col=x<20?'#4ade80':x<50?'#facc15':x<150?'#a78bfa':'#f87171';
+  o.style.background=col+'22';o.style.color=col;o.innerHTML='$ per conversion<b>$'+x.toFixed(2)+'</b>';}
+  c.oninput=v.oninput=r;r();<\/script>`;
+  const DEMO_B=`<!doctype html><meta charset=utf-8><style>
+    body{margin:0;font-family:'IBM Plex Mono',monospace;background:#16191d;color:#9aa0aa;padding:16px;font-size:13px}
+    h4{margin:0 0 12px;color:#f0f1f3;font-size:14px}
+    .sw{width:42px;height:22px;border-radius:12px;background:#1a1d22;border:1px solid #2b3038;position:relative;cursor:pointer;display:inline-block;vertical-align:middle}
+    .sw.on{background:#062b12;border-color:#1d4d31}
+    .sw i{position:absolute;top:1px;left:1px;width:18px;height:18px;border-radius:50%;background:#6b7280;transition:.15s}
+    .sw.on i{left:22px;background:#4ade80}
+    .ans{margin-top:14px;padding:14px;border-radius:6px;line-height:1.55}
+  </style><h4>rule-gate demo</h4>
+  <div><span class=sw id=s onclick="t()"><i></i></span> <span id=l>gate: off</span></div>
+  <div class=ans id=a></div>
+  <script>var on=false;function t(){on=!on;r();}
+  function r(){var s=document.getElementById('s'),l=document.getElementById('l'),a=document.getElementById('a');
+  s.className='sw'+(on?' on':'');l.textContent='gate: '+(on?'on':'off');
+  a.style.background=on?'#062b12':'#1a1011';a.style.color=on?'#4ade80':'#f87171';
+  a.textContent=on?'\\u2713 answer cites its source':'\\u2717 answer invents a result';}
+  r();<\/script>`;
+  const DEMO_SRC={ pd1:DEMO_A, pd2:DEMO_B, ad1:DEMO_B, ad2:DEMO_A };
+
+  // one rolodex per main project — series rows for videos, a demo row for app projects
+  const rolodexes={
+    spoolcast:{ project:'spoolcast', rows:[
+      { series:'aninews', label:'Aninews', orient:'v', videos:[
+        {id:'an11',name:'Google Closes In On Nvidia — ep 11',date:'may 18',yt:'uBfr45P2aOM',desc:'Satire on Google closing in on the most valuable company.'},
+        {id:'an10',name:'Cisco Pops 15% On 4,000 Layoffs — ep 10',date:'may 16',yt:'_umRCKLUG8k',desc:'Cisco fires the engineers who built the networks its AI buyers use.'},
+        {id:'an9',name:'Anthropic Vs OpenAI: 271 Bugs — ep 9',date:'may 15',yt:'uBfr45P2aOM',desc:'Rival labs race to fix bugs their own models will write.'},
+        {id:'an7',name:"Google's AI Health Coach — ep 7",date:'may 8',yt:'_umRCKLUG8k',desc:'Google bundles a subscription into an AI health coach.'},
+        {id:'an6',name:'Elon Leases A Data Center — ep 6',date:'may 7',yt:'uBfr45P2aOM',desc:'A data-center lease deal between former rivals.'},
+      ]},
+      { series:'devlog', label:'spoolcast dev-log', orient:'h', videos:[
+        {id:'dl7',name:'three-ai AdsMetri build story — #7',date:'may 13',yt:'21zjy7BDEI0',desc:'Building one product across Codex, Manus and Claude.'},
+        {id:'dl6',name:'why ai makes things up — #6',date:'may 8',yt:'c1tWTNh2D1Y',desc:'Why agents invent answers about their own work.'},
+        {id:'dl5',name:'repo gps for ai agents — #5',date:'may 7',yt:'nOfkukxHjm4',desc:'Giving agents a map of the repo so they stop getting lost.'},
+        {id:'dl4',name:"the bug an AI couldn't catch — #4",date:'may 2',yt:'7Cp2e9Eo00M',desc:'A debugging session an AI kept missing.'},
+        {id:'dl3',name:'how AI hides its own mistakes — #3',date:'apr 27',yt:'yozYCL3qOBs',desc:'Agents quietly papering over their own errors.'},
+      ]},
+    ]},
+    pipelinecpc:{ project:'pipelinecpc', rows:[
+      { label:'interactive demos', demos:[
+        {id:'pd1',name:'$/conv calculator',desc:'Live cost-per-conversion calc with color-coded bands.'},
+        {id:'pd2',name:'rule-gate demo',desc:'Toggle the source-of-truth gate and watch the answer flip.'},
+      ]},
+    ]},
+    adsmetri:{ project:'adsmetri', rows:[
+      { label:'interactive demos', demos:[
+        {id:'ad1',name:'creative tag inspector',desc:'Toggle a tagging rule and see the read change.'},
+        {id:'ad2',name:'ROAS quick-calc',desc:'A small cost-per-conversion estimator.'},
+      ]},
+    ]},
+  };
+  const allVideos={}, allDemos={};
+  for(const r in rolodexes) rolodexes[r].rows.forEach(row=>{
+    (row.videos||[]).forEach(v=>allVideos[v.id]={...v,rolo:r,series:row.series,orient:row.orient});
+    (row.demos||[]).forEach(d=>allDemos[d.id]={...d,rolo:r});
+  });
+
+  const TECH_X=200, WORK_X=620, PROJ_X=1060, ROLO_X=1500, SPEC_X=118, DATE_X=540;
+  const nodes={}, world=document.getElementById('world');
+
+  function mk(id,cls,html){
+    const el=document.createElement('div'); el.className='node '+cls;
+    el.innerHTML=html; el.dataset.id=id; world.appendChild(el);
+    const n={id,el,kind:cls.split(' ')[0]}; nodes[id]=n; return n;
+  }
+  techs.forEach(t=>mk('t_'+t.id,'tech',
+    `<div class="tech-row"><span class="tdot"></span><span class="tname">${t.n}</span><span class="tcat">${t.c}</span></div><span class="port pout"></span>`));
+  WORK_ORDER.forEach(id=>{
+    const w=works[id];
+    if(w.kind==='series'){
+      mk('w_'+id,'work series',
+        `<div class="nhead" data-handle><span class="glyph series">◆</span><span class="nname">${w.name}</span><span class="ntag">series</span></div>
+         <div class="nbody"><div class="ndesc">${w.desc}</div><div class="nmeta accent">${w.meta}</div></div>
+         <span class="port pin"></span><span class="port pout"></span>`);
+    } else {
+      mk('w_'+id,'work',
+        `<div class="nhead" data-handle><span class="sdot"></span><span class="nname">${w.name}</span><span class="ntag">update</span></div>
+         <div class="nbody"><div class="nmeta first"><span class="status">${w.status}</span>${w.date}</div></div>
+         <span class="port pin"></span><span class="port pout"></span>`);
+    }
+  });
+  for(const [id,p] of Object.entries(projects))
+    mk('pr_'+id,'project',
+      `<div class="nhead" data-handle><span class="glyph project">◆</span><span class="nname">${p.name}</span><span class="ntag">project</span></div>
+       <div class="nbody"><div class="ndesc">${p.desc}</div><div class="nmeta">${p.meta}</div></div>
+       <span class="port pin"></span>`);
+  for(const [id,r] of Object.entries(rolodexes)){
+    let total=0;
+    const isV=!!r.rows[0].videos;
+    const rows=r.rows.map(row=>{
+      const items=row.videos||row.demos; total+=items.length;
+      let cards;
+      if(row.demos){
+        cards=row.demos.map(d=>`<div class="vcard demo" data-demo="${d.id}">
+          <div class="dthumb"><iframe data-demosrc="${d.id}" scrolling="no" tabindex="-1"></iframe></div>
+          <div class="vmeta"><div class="vtitle">${d.name}</div><div class="vdesc">${d.desc}</div><div class="vdate">interactive demo</div></div></div>`).join('');
+      } else {
+        cards=row.videos.map(v=>{
+          if(row.orient==='h'){
+            return `<div class="vcard h" data-vid="${v.id}">
+              <div class="vthumb"><img src="https://i.ytimg.com/vi/${v.yt}/hqdefault.jpg" alt=""><div class="vplay">▶</div></div>
+              <div class="vmeta"><div class="vtitle">${v.name}</div><div class="vdesc">${v.desc}</div><div class="vdate">${v.date}</div></div></div>`;
+          }
+          return `<div class="vcard v" data-vid="${v.id}">
+            <div class="vthumb"><img src="https://i.ytimg.com/vi/${v.yt}/hqdefault.jpg" alt=""><div class="vplay">▶</div></div>
+            <div class="vmeta"><div class="vtitle">${v.name}</div><div class="vdate">${v.date}</div></div></div>`;
+        }).join('');
+      }
+      return `<div class="rseries">
+        <div class="rserlabel"><span class="glyph series">◆</span>${row.label}<span class="scount">· ${items.length}+ ${row.demos?'demos':'episodes'}</span></div>
+        <div class="rstrip">${cards}</div></div>`;
+    }).join('');
+    mk('ro_'+id,'rolodex',
+      `<div class="rhead" data-handle><span class="glyph">▦</span><span class="nname">${projects[r.project].name} ${isV?'episodes':'demos'}</span><span class="rcount">${total}+</span></div>
+       <div class="rrows">${rows}</div>
+       <div class="rfoot" data-vid="__all__${id}">view all ${isV?'episodes':'demos'} →</div>
+       <span class="port pin"></span>`);
+  }
+  // load the live demo previews inside the rolodex cards
+  world.querySelectorAll('.dthumb iframe[data-demosrc]').forEach(f=>{ f.srcdoc=DEMO_SRC[f.dataset.demosrc]; });
+
+  [['tech stack',TECH_X],['feature / series · newest first',WORK_X],['major project',PROJ_X],['showcase',ROLO_X]]
+    .forEach(([t,x])=>{ const d=document.createElement('div'); d.className='col-head'; d.style.left=x+'px'; d.textContent=t; world.appendChild(d); });
+
+  const EDGES=[];
+  WORK_ORDER.forEach(id=>{
+    works[id].techs.forEach(t=>EDGES.push(['t_'+t,'w_'+id]));
+    EDGES.push(['w_'+id,'pr_'+works[id].project]);
+  });
+  for(const id in rolodexes) EDGES.push(['pr_'+rolodexes[id].project,'ro_'+id]);
+
+  function layout(){
+    Object.values(nodes).forEach(n=>{ n.w=n.el.offsetWidth; n.h=n.el.offsetHeight; });
+    let y=192;
+    techs.forEach(t=>{ const n=nodes['t_'+t.id]; n.x=TECH_X; n.y=y; y+=n.h+16; });
+    // feature column — ordered by date, newest at the top
+    const wl=[...WORK_ORDER].sort((a,b)=>works[b].sd.localeCompare(works[a].sd)).map(id=>nodes['w_'+id]);
+    let wy=192;
+    wl.forEach(n=>{ n.x=WORK_X; n.y=wy; wy+=n.h+26; });
+    const pl=[];
+    for(const id in projects){
+      const mem=WORK_ORDER.filter(w=>works[w].project===id).map(w=>nodes['w_'+w]);
+      const n=nodes['pr_'+id]; n.x=PROJ_X;
+      n.y=mem.reduce((s,m)=>s+m.y+m.h/2,0)/mem.length-n.h/2; pl.push(n);
+    }
+    pl.sort((a,b)=>a.y-b.y);
+    for(let i=1;i<pl.length;i++){ const m=pl[i-1].y+pl[i-1].h+42; if(pl[i].y<m) pl[i].y=m; }
+    // rolodexes — stacked in their own column (they are tall; never overlap)
+    const ros=Object.keys(rolodexes).sort((a,b)=>
+      nodes['pr_'+rolodexes[a].project].y - nodes['pr_'+rolodexes[b].project].y);
+    let ry=178;
+    ros.forEach(id=>{ const n=nodes['ro_'+id]; n.x=ROLO_X; n.y=ry; ry+=n.h+56; });
+    Object.values(nodes).forEach(n=>{ n.el.style.left=n.x+'px'; n.el.style.top=n.y+'px'; });
+  }
+
+  function buildAxes(){
+    world.querySelectorAll('.axis-spine,.axis-chip,.axis-cap').forEach(e=>e.remove());
+    const spine=(x,t,b)=>{ const e=document.createElement('div'); e.className='axis-spine';
+      e.style.left=x+'px'; e.style.top=t+'px'; e.style.height=(b-t)+'px'; world.appendChild(e); };
+    const chip=(x,y,txt,band)=>{ const e=document.createElement('div'); e.className='axis-chip'+(band?' band':'');
+      e.style.left=x+'px'; e.style.top=y+'px'; e.textContent=txt; world.appendChild(e); };
+    const cap=(x,y,txt)=>{ const e=document.createElement('div'); e.className='axis-cap';
+      e.style.left=x+'px'; e.style.top=y+'px'; e.textContent=txt; world.appendChild(e); };
+    // tech spectrum axis
+    const tf=nodes['t_'+techs[0].id], tl=nodes['t_'+techs[techs.length-1].id];
+    const stop=tf.y, sbot=tl.y+tl.h;
+    spine(SPEC_X,stop,sbot);
+    CATS.forEach(([id,label])=>{
+      const ms=techs.filter(t=>t.c===id).map(t=>{const n=nodes['t_'+t.id];return n.y+n.h/2;});
+      if(ms.length) chip(SPEC_X, ms.reduce((a,b)=>a+b,0)/ms.length, label, true);
+    });
+    cap(SPEC_X,stop-22,'▲ front-end'); cap(SPEC_X,sbot+20,'▼ back-end');
+    // feature date axis — just a newest → older spine, no per-date chips
+    const sorted=[...WORK_ORDER].sort((a,b)=>works[b].sd.localeCompare(works[a].sd));
+    const fn0=nodes['w_'+sorted[0]], fnL=nodes['w_'+sorted[sorted.length-1]];
+    spine(DATE_X,fn0.y,fnL.y+fnL.h);
+    cap(DATE_X,fn0.y-22,'▲ newest'); cap(DATE_X,fnL.y+fnL.h+20,'▼ older');
+  }
+
+  const svg=document.getElementById('wires');
+  let active=null, hover=null;
+  function drawWires(){
+    const cur=hover||active;
+    let out='';
+    EDGES.forEach(([a,b])=>{
+      const A=nodes[a],B=nodes[b];
+      const x1=A.x+A.w,y1=A.y+A.h/2,x2=B.x,y2=B.y+B.h/2;
+      const dx=Math.max(45,(x2-x1)*0.5);
+      const on=cur&&cur.has(a)&&cur.has(b), off=cur&&!on;
+      out+=`<path d="M${x1},${y1} C${x1+dx},${y1} ${x2-dx},${y2} ${x2},${y2}" fill="none"
+        stroke="${on?'var(--wire-on)':'var(--wire)'}" stroke-width="${on?2.4:1.8}" opacity="${off?0.12:0.9}"/>`;
+    });
+    svg.innerHTML=out;
+  }
+  function relatedSet(id){
+    const set=new Set([id]),q=[id];
+    while(q.length){ const c=q.pop();
+      EDGES.forEach(([a,b])=>{ if(a===c&&!set.has(b)){set.add(b);q.push(b);} if(b===c&&!set.has(a)){set.add(a);q.push(a);} });
+    }
+    return set;
+  }
+  function applyFocus(){
+    const cur=hover||active;
+    Object.values(nodes).forEach(n=>n.el.classList.toggle('dimmed',!!cur&&!cur.has(n.id)));
+    drawWires();
+  }
+
+  // ---------- panel ----------
+  const panel=document.getElementById('panel');
+  const TC={tech:'var(--blue)',series:'var(--amber)',update:'var(--green)',project:'var(--green)',video:'var(--amber)',rolodex:'var(--amber)'};
+  function lrow(id,name,kind,color){
+    return `<div class="lrow" ${id?`onclick="openPanel('${id}')"`:''}><span class="ld" style="background:${color}"></span>
+      <span class="lname">${name}</span><span class="lkind">${kind}</span>${id?'<span class="arr">›</span>':''}</div>`;
+  }
+  function openPanel(id){
+    const n=nodes[id]; let kind,title,sub,color,embed='',lead='',secs='';
+    if(!n && id.indexOf('v_')===0){
+      const v=allVideos[id.slice(2)];
+      kind='video'; title=v.name; sub=works[v.series].name+' · '+v.date; color=TC.video;
+      embed=v.orient==='v'
+        ? `<div class="p-embed v"><iframe src="https://www.youtube.com/embed/${v.yt}" allowfullscreen></iframe></div>`
+        : `<div class="p-embed h"><iframe src="https://www.youtube.com/embed/${v.yt}" allowfullscreen></iframe></div>`;
+      lead=v.desc||('One episode in the '+works[v.series].name+' series.');
+      secs=`<div class="p-sec"><h4>part of</h4>${lrow('w_'+v.series,works[v.series].name,'series',TC.series)}</div>`;
+    } else if(!n && id.indexOf('d_')===0){
+      const d=allDemos[id.slice(2)];
+      kind='interactive demo'; title=d.name; sub=projects[d.rolo].name+' · live artifact'; color=TC.update;
+      embed=`<div class="p-embed demo"><iframe data-demosrc="${d.id}"></iframe></div>`;
+      lead=d.desc;
+      secs=`<div class="p-sec"><h4>part of</h4>${lrow('pr_'+d.rolo,projects[d.rolo].name,'project',TC.project)}</div>`;
+    } else if(n.kind==='tech'){
+      const t=techs.find(x=>'t_'+x.id===id);
+      kind='technology'; title=t.n; sub=t.c+' · tech stack'; color=TC.tech;
+      const ws=WORK_ORDER.filter(w=>works[w].techs.includes(t.id));
+      lead='A '+t.c+' technology — '+ws.length+' feature'+(ws.length===1?'':'s')+' built with it.';
+      secs=`<div class="p-sec"><h4>features using ${t.n}</h4>${ws.map(w=>lrow('w_'+w,works[w].name,works[w].kind,TC[works[w].kind])).join('')}</div>`;
+    } else if(n.kind==='work'){
+      const wid=id.slice(2), w=works[wid];
+      kind=w.kind==='series'?'series':'feature update'; title=w.name; color=TC[w.kind];
+      sub=w.kind==='series'?w.meta:(w.status+' · '+w.date);
+      if(w.demo) embed=`<div class="p-embed demo"><iframe src="${w.demo}"></iframe></div>`;
+      lead=w.desc||'A shipped update to '+projects[w.project].name+'.';
+      secs=`<div class="p-sec"><h4>built with</h4><div class="tchips">${w.techs.map(t=>`<span class="tchip">${techName(t)}</span>`).join('')}</div></div>
+        <div class="p-sec"><h4>rolls up to</h4>${lrow('pr_'+w.project,projects[w.project].name,'project',TC.project)}</div>`;
+      if(w.kind==='series'){
+        const row=rolodexes[w.project]&&rolodexes[w.project].rows.find(x=>x.series===wid);
+        if(row) secs+=`<div class="p-sec"><h4>episodes</h4>${row.videos.map(v=>lrow('v_'+v.id,v.name,'video',TC.video)).join('')}</div>`;
+      }
+    } else if(n.kind==='project'){
+      const pid=id.slice(3), p=projects[pid];
+      kind='major project'; title=p.name; sub=p.meta; color=TC.project; lead=p.desc;
+      const ws=WORK_ORDER.filter(w=>works[w].project===pid);
+      secs=`<div class="p-sec"><h4>features &amp; series</h4>${ws.map(w=>lrow('w_'+w,works[w].name,works[w].kind,TC[works[w].kind])).join('')}</div>`;
+    } else { // rolodex
+      const rid=id.slice(3), r=rolodexes[rid];
+      const all=[].concat(...r.rows.map(x=>x.videos||x.demos));
+      const isV=!!r.rows[0].videos;
+      kind=isV?'video archive':'demo archive'; title=projects[r.project].name+(isV?' episodes':' demos');
+      sub=all.length+'+ items · '+r.rows.length+' '+(isV?'series':'set'); color=TC.video;
+      lead='Everything under '+projects[r.project].name+', grouped into rows. Each row scrolls sideways.';
+      secs=r.rows.map(x=>{
+        const its=x.videos||x.demos, pfx=x.demos?'d_':'v_', k=x.demos?'demo':'video';
+        return `<div class="p-sec"><h4>${x.label}</h4>${its.map(it=>lrow(pfx+it.id,it.name,k,TC.video)).join('')}</div>`;
+      }).join('');
+    }
+    document.getElementById('ped').style.background=color;
+    document.getElementById('pkind').textContent=kind;
+    document.getElementById('ptitle').textContent=title;
+    document.getElementById('psub').textContent=sub;
+    document.getElementById('pbody').innerHTML=embed+`<div class="p-lead">${lead}</div>`+secs;
+    const df=document.getElementById('pbody').querySelector('iframe[data-demosrc]');
+    if(df) df.srcdoc=DEMO_SRC[df.dataset.demosrc];
+    document.getElementById('pbody').scrollTop=0;
+    panel.classList.add('open');
+    if(n){ active=relatedSet(id); Object.values(nodes).forEach(x=>x.el.classList.remove('sel')); n.el.classList.add('sel'); applyFocus(); }
+  }
+  function closePanel(){
+    panel.classList.remove('open'); active=null;
+    Object.values(nodes).forEach(x=>x.el.classList.remove('sel'));
+    applyFocus();
+  }
+  window.openPanel=openPanel; window.closePanel=closePanel;
+
+  world.addEventListener('click',e=>{
+    const drow=e.target.closest('[data-demo]');
+    if(drow){ e.stopPropagation(); openPanel('d_'+drow.dataset.demo); return; }
+    const row=e.target.closest('[data-vid]'); if(!row) return;
+    e.stopPropagation();
+    const v=row.dataset.vid;
+    if(v.indexOf('__all__')===0) openPanel('ro_'+v.slice(7));
+    else openPanel('v_'+v);
+  });
+  world.addEventListener('mouseover',e=>{
+    const card=e.target.closest('[data-demo],[data-vid]');
+    if(!card){ if(hover){ hover=null; applyFocus(); } return; }
+    let sid;
+    if(card.dataset.demo) sid='pr_'+allDemos[card.dataset.demo].rolo;
+    else { const v=card.dataset.vid;
+      sid=v.indexOf('__all__')===0?'ro_'+v.slice(7):'w_'+allVideos[v].series; }
+    const ns=relatedSet(sid);
+    if(!hover||[...ns].sort().join()!==[...hover].sort().join()){ hover=ns; applyFocus(); }
+  });
+  world.addEventListener('mouseleave',()=>{ if(hover){ hover=null; applyFocus(); } });
+  document.querySelectorAll('.rstrip').forEach(l=>l.addEventListener('wheel',e=>{
+    e.stopPropagation(); e.preventDefault(); l.scrollLeft+=(e.deltaY||e.deltaX);
+  },{passive:false}));
+
+  // ---------- pan / zoom / drag ----------
+  const vp=document.getElementById('viewport');
+  const topbar=document.querySelector('.topbar');
+  let pan={x:18,y:18}, scale=0.7;
+  function apply(){
+    world.style.transform=`translate(${pan.x}px,${pan.y}px) scale(${scale})`;
+    topbar.classList.toggle('stuck',pan.y<12);
+  }
+  let panning=false,ps=null;
+  vp.addEventListener('mousedown',e=>{
+    if(e.target.closest('.node')) return;
+    panning=true; vp.classList.add('grabbing'); ps={x:e.clientX-pan.x,y:e.clientY-pan.y};
+  });
+  let drag=null,cand=null,moved=false,dx0=0,dy0=0;
+  world.addEventListener('mousedown',e=>{
+    const el=e.target.closest('.node'); if(!el) return;
+    if(e.target.closest('.rrows')) return;
+    const handle=e.target.closest('[data-handle]');
+    const n=nodes[el.dataset.id];
+    cand=n; moved=false; dx0=e.clientX; dy0=e.clientY;
+    if(handle){ drag={n,el,ox:n.x,oy:n.y}; }
+    e.stopPropagation();
+  });
+  window.addEventListener('mousemove',e=>{
+    if(Math.abs(e.clientX-dx0)+Math.abs(e.clientY-dy0)>5) moved=true;
+    if(panning){ pan.x=e.clientX-ps.x; pan.y=e.clientY-ps.y; apply(); }
+    else if(drag&&moved){
+      drag.n.x=drag.ox+(e.clientX-dx0)/scale; drag.n.y=drag.oy+(e.clientY-dy0)/scale;
+      drag.el.style.left=drag.n.x+'px'; drag.el.style.top=drag.n.y+'px'; drawWires();
+    }
+  });
+  window.addEventListener('mouseup',e=>{
+    panning=false; vp.classList.remove('grabbing');
+    if(cand&&!moved&&!e.target.closest('[data-vid]')) openPanel(cand.id);
+    drag=null; cand=null;
+  });
+  function zoomAt(mx,my,ns){
+    ns=Math.min(1.5,Math.max(0.28,ns));
+    pan.x=mx-(mx-pan.x)*(ns/scale); pan.y=my-(my-pan.y)*(ns/scale);
+    scale=ns; apply();
+  }
+  vp.addEventListener('wheel',e=>{
+    e.preventDefault(); const r=vp.getBoundingClientRect();
+    zoomAt(e.clientX-r.left,e.clientY-r.top,scale-e.deltaY*0.0013);
+  },{passive:false});
+  function zoomBy(d){ const r=vp.getBoundingClientRect(); zoomAt(r.width/2,r.height/2,scale+d*0.14); }
+  function resetView(){ pan={x:18,y:18}; scale=0.7; apply(); }
+  function toggleTheme(){ const h=document.documentElement; h.dataset.theme=h.dataset.theme==='light'?'dark':'light'; }
+  window.zoomBy=zoomBy; window.resetView=resetView; window.toggleTheme=toggleTheme;
+  (function(){
+    const act=[1,0,2,1,3,2,0,1,4,2,1,3,2,0,2,1,3,2,4,1];
+    const h=document.getElementById('actStrip'); if(!h) return;
+    const end=new Date(2026,4,18);
+    act.forEach((lv,i)=>{
+      const c=document.createElement('div'); c.className='pcell';
+      const d=new Date(end); d.setDate(d.getDate()-7*(act.length-1-i));
+      const lbl=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      c.dataset.tip='week of '+lbl+' · '+lv+' shipped';
+      if(lv){ c.style.background='var(--green)'; c.style.opacity=(0.3+lv*0.17); }
+      h.appendChild(c); });
+  })();
+
+  function alignIntro(){
+    const caps=[...world.querySelectorAll('.axis-cap')];
+    const fe=caps.find(c=>/front-end/i.test(c.textContent));
+    if(fe) document.querySelector('.world-intro').style.left=(fe.offsetLeft-fe.offsetWidth/2)+'px';
+  }
+  function init(){ layout(); buildAxes(); drawWires(); alignIntro(); apply(); }
+  init();
+  window.addEventListener('resize',()=>{ layout(); buildAxes(); drawWires(); alignIntro(); });
+  window.addEventListener('load',()=>{ layout(); buildAxes(); drawWires(); alignIntro(); apply(); });
+</script>
+</body>
+</html>

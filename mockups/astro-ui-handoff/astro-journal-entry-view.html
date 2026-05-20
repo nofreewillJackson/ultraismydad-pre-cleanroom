@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>artlu.ai — why ai makes things up about its own work</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  html[data-theme="dark"] {
+    --bg:#08090a; --surface:#0e0f11; --surface-2:#16191d;
+    --border:#1a1d22; --border-strong:#2b3038; --border-hover:#4a525e;
+    --text:#c0c4cc; --text-bright:#f0f1f3; --text-sub:#9aa0aa;
+    --dim:#6b7280; --dimmer:#3a3f48;
+    --green:#4ade80; --green-bg:#062b12; --green-border:#1d4d31;
+    --blue:#60a5fa; --amber:#d8a657; --amber-bg:#1c1a12;
+    --node-shadow:0 8px 26px rgba(0,0,0,0.6);
+    --font:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  html[data-theme="light"] {
+    --bg:#e9eaec; --surface:#ffffff; --surface-2:#f2f3f5;
+    --border:#dcdfe2; --border-strong:#b7bcc3; --border-hover:#9ba0a8;
+    --text:#34373c; --text-bright:#15171a; --text-sub:#50545a;
+    --dim:#676c74; --dimmer:#9298a0;
+    --green:#0a7d5e; --green-bg:#e6f4ee; --green-border:#a9ddc9;
+    --blue:#2563eb; --amber:#8a6300; --amber-bg:#f3e9d2;
+    --node-shadow:0 1px 2px rgba(22,24,27,0.07), 0 4px 14px rgba(22,24,27,0.06);
+    --font:'Inter',system-ui,sans-serif;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { height:100%; }
+  body { background:var(--bg); color:var(--text); font-family:var(--font); font-size:14px;
+    -webkit-font-smoothing:antialiased; min-height:100%; }
+
+  /* ---------- header — shared with list / map / stack ---------- */
+  .topbar { height:72px; border-bottom:1px solid transparent; background:var(--bg);
+    display:flex; align-items:center; gap:24px; padding:0 18px; position:sticky; top:0; z-index:40;
+    transition:background .16s, border-color .16s, box-shadow .16s; }
+  .topbar.stuck { background:var(--surface); border-bottom-color:var(--border); box-shadow:var(--node-shadow); }
+  .brandwrap { display:flex; align-items:center; gap:18px; }
+  .identity { display:flex; flex-direction:column; gap:3px; }
+  .htitle { font-size:13px; font-weight:600; color:var(--text-bright); white-space:nowrap; }
+  .hbio { font-size:11.5px; color:var(--text-sub); white-space:nowrap; }
+  .hright { margin-left:auto; display:flex; align-items:center; gap:14px; }
+  .brand { font-weight:600; font-size:29px; letter-spacing:-0.02em; color:var(--text-bright); display:flex; align-items:center; gap:3px; }
+  .cursor-bl { width:10px; height:26px; background:var(--green); display:inline-block; animation:blink 1s step-end infinite; }
+  @keyframes blink { 50% { opacity:0; } }
+  .seg { display:flex; border:1px solid var(--border); border-radius:4px; overflow:hidden; }
+  .seg button { font-family:var(--mono); font-size:12px; background:transparent; color:var(--dim); border:none; padding:6px 15px; cursor:pointer; }
+  .seg button.on { background:var(--green-bg); color:var(--green); }
+  .seg .seg-theme { padding:6px 11px; font-size:13px; border-left:1px solid var(--border); }
+  .navgroup { display:flex; align-items:center; gap:8px; margin-left:22px; }
+  .progress { display:flex; flex-direction:column; align-items:flex-start; gap:5px; }
+  .pcount { font-family:var(--mono); font-size:11.5px; color:var(--text-sub); white-space:nowrap; }
+  .pcount b { color:var(--text-bright); }
+  .pstrip { display:flex; gap:3px; }
+  .pcell { width:9px; height:9px; border-radius:2px; background:var(--border); position:relative; }
+  .pcell:hover { outline:1.5px solid var(--text-sub); outline-offset:1px; }
+  .pcell:hover::after { content:attr(data-tip); position:absolute; top:17px; left:50%; transform:translateX(-50%);
+    background:var(--surface-2); border:1px solid var(--border-strong); border-radius:5px; padding:5px 9px;
+    font-size:11px; color:var(--text-bright); white-space:nowrap; z-index:60; box-shadow:var(--node-shadow); pointer-events:none; }
+
+  /* ---------- page — centered reading column ---------- */
+  .page { padding:26px 24px 120px; }
+  .col { max-width:660px; margin:0 auto; }
+
+  /* back link */
+  .backlink { display:inline-block; font-family:var(--mono); font-size:12px; color:var(--green);
+    text-decoration:none; margin-bottom:24px; transition:opacity .12s; }
+  .backlink:hover { opacity:0.75; }
+
+  /* journal entry — substack-style reading block */
+  .entry { padding:0; }
+  .e-eyebrow { display:flex; align-items:center; gap:8px; font-family:var(--mono);
+    font-size:11px; letter-spacing:0.4px; color:var(--dim); margin-bottom:13px; }
+  .e-eyebrow .ed { width:7px; height:7px; border-radius:50%; background:var(--green); flex-shrink:0; }
+  .e-eyebrow b { color:var(--text-sub); font-weight:500; }
+  .e-eyebrow .sep { color:var(--dimmer); }
+  .e-title { font-size:23px; font-weight:600; color:var(--text-bright); line-height:1.34;
+    letter-spacing:-0.01em; margin-bottom:17px; }
+  .e-title.page-h1 { font-size:30px; line-height:1.28; margin-bottom:24px; }
+  .e-body p { font-size:14.5px; line-height:1.8; color:var(--text); margin-bottom:15px; }
+  .e-body p:last-child { margin-bottom:0; }
+  .e-body code { font-family:var(--mono); font-size:0.84em; background:var(--surface-2);
+    border:1px solid var(--border); border-radius:3px; padding:0.5px 5px; color:var(--text-bright); }
+  .e-foot { margin-top:21px; display:flex; flex-wrap:wrap; gap:6px; align-items:center;
+    padding-top:21px; border-top:1px solid var(--border); }
+  .ref { font-size:11px; color:var(--green); background:var(--green-bg); border:1px solid var(--green-border);
+    border-radius:20px; padding:3px 11px; text-decoration:none; white-space:nowrap; }
+  .ref:hover { border-color:var(--green); }
+  .tag { font-size:11px; color:var(--text-sub); background:var(--surface-2); border:1px solid var(--border);
+    border-radius:20px; padding:3px 11px; }
+
+  /* prev/next navigation */
+  .entrynav { display:flex; gap:14px; margin-top:46px; }
+  .navcell { flex:1; min-width:0; display:block; text-decoration:none;
+    background:var(--surface); border:1px solid var(--border); border-radius:9px;
+    padding:14px 16px; transition:border-color .14s, background .14s; }
+  .navcell:hover { border-color:var(--border-hover); }
+  .navcell.next { text-align:right; }
+  .navcell-l { font-family:var(--mono); font-size:10px; letter-spacing:1.4px;
+    text-transform:uppercase; color:var(--dim); margin-bottom:7px; }
+  .navcell-t { font-size:13px; font-weight:500; color:var(--text-bright); line-height:1.45; }
+</style>
+<script>try{var _t=localStorage.getItem('artlu-theme');if(_t)document.documentElement.dataset.theme=_t;}catch(e){}</script>
+<style>
+  /* ---------- mobile ---------- */
+  @media (max-width:720px) {
+    body { font-size:13px; }
+    .topbar { height:auto; min-height:54px; gap:10px 14px; padding:9px 13px; flex-wrap:wrap; }
+    .brandwrap { gap:12px; }
+    .brand { font-size:22px; }
+    .cursor-bl { width:7px; height:19px; }
+    .identity { display:none; }
+    .progress { display:none; }
+    .hright { margin-left:auto; gap:10px; }
+    .navgroup { margin-left:0; gap:6px; }
+    .seg button { padding:6px 11px; font-size:11px; }
+    .seg .seg-theme { padding:6px 9px; }
+    .page { padding:18px 14px 88px; }
+    .e-title.page-h1 { font-size:24px; }
+    .entrynav { flex-direction:column; }
+    .navcell.next { text-align:left; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar" id="topbar">
+  <div class="brandwrap">
+    <div class="brand">artlu.ai<span class="cursor-bl"></span></div>
+    <div class="identity">
+      <div class="htitle">100 days. 100 features.</div>
+      <div class="hbio">one person. no coding experience. just AI and an internet connection.</div>
+    </div>
+  </div>
+  <div class="hright">
+    <div class="progress">
+      <span class="pcount">day <b>63</b>/100 · <b>79</b> shipped · <b>21</b> to go</span>
+      <div class="pstrip" id="actStrip"></div>
+    </div>
+    <div class="navgroup">
+      <div class="seg"><button onclick="location.href='astro-list-view.html'">list</button><button onclick="location.href='astro-map-view.html'">map</button><button onclick="location.href='astro-stack-view.html'">stack</button><button class="seg-theme" onclick="toggleTheme()" title="toggle theme">◐</button></div>
+      <div class="seg"><button onclick="location.href='astro-log-view.html'">log</button><button onclick="location.href='astro-research-view.html'">research</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="col">
+    <a class="backlink" href="astro-log-view.html">← the log</a>
+    <article class="entry" id="entry"></article>
+
+    <nav class="entrynav">
+      <a class="navcell prev" href="astro-log-view.html">
+        <div class="navcell-l">← previous</div>
+        <div class="navcell-t">shipped spoolcast dev log 5 — repo gps for ai agents</div>
+      </a>
+      <a class="navcell next" href="astro-log-view.html">
+        <div class="navcell-l">next →</div>
+        <div class="navcell-t">adsmetri analyzer pass</div>
+      </a>
+    </nav>
+  </div>
+</div>
+
+<script>
+  /* ===== real journal entry — pulled from the artlu.ai tracker (day 52) ===== */
+  const entry = { day:52, date:'may 8', author:'ai',
+    title:'shipped spoolcast dev log 6 — why ai makes things up about its own work',
+    refs:['why ai makes things up about its own work — spoolcast dev-log #6','spoolcast — AI-to-video pipeline'],
+    tags:['spoolcast','devlog','ai agents','tts','youtube'],
+    body:`today's spoolcast video is about a quieter agent failure than facts being wrong: the agent doesn't lie, it just invents answers about its own work because there's nothing real for it to look at. the hook is a 3:30 am moment from the last episode's production — desperate, asking the agent how much was left, getting three different answers in a row.
+
+most of the session was about audio. switched spoolcast's tts pipeline from one-mp3-per-beat with silent gaps to chunk-level ssml synthesis — one mp3 per chunk with \`<break>\` tags between beats — so google's prosody flows across what were beat boundaries instead of restarting cold every sentence. caught a real bug along the way: \`speakingrate=1.1\` was being baked in by google AND \`playbackrate=1.1\` was being applied at remotion. cumulative 1.21x speedup. that was the inhuman feel.
+
+the friction was "ai" pronunciation. tried five ssml and phonetic approaches — every one had a different drift, including one ("ay-eye") that came out sounding like a pirate. the fix that landed was rewriting the script: "ai" / "the ai" / "my ai" became "agent" / "the agent" / "my agent" throughout. now baked into video_output_rules.md §7 as a permanent rule: when chirp3-hd doesn't read an acronym cleanly, rewrite the script before reaching for ssml.` };
+
+  /* ---- markdown-lite: paragraphs + inline code ---- */
+  function inlineMd(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/`([^`]+)`/g,'<code>$1</code>');
+  }
+  function renderBody(t){
+    return t.split(/\n\n+/).map(p=>'<p>'+inlineMd(p.replace(/\n/g,' '))+'</p>').join('');
+  }
+
+  /* ---- render the entry as the page's main content ---- */
+  (function(){
+    const e=entry;
+    const refs=(e.refs||[]).map(r=>`<a class="ref" href="#">↗ ${r}</a>`).join('');
+    const tags=(e.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('');
+    document.getElementById('entry').innerHTML=`
+      <div class="e-eyebrow"><span class="ed"></span><b>day ${e.day}</b><span class="sep">·</span>${e.date}<span class="sep">·</span>by the ${e.author==='ai'?'ai':'human'}</div>
+      <h1 class="e-title page-h1">${e.title}</h1>
+      <div class="e-body">${renderBody(e.body)}</div>
+      <div class="e-foot">${refs}${tags}</div>`;
+  })();
+
+  /* ---- activity strip ---- */
+  (function(){
+    const act=[1,0,2,1,3,2,0,1,4,2,1,3,2,0,2,1,3,2,4,1];
+    const h=document.getElementById('actStrip'); if(!h) return;
+    const end=new Date(2026,4,18);
+    act.forEach((lv,i)=>{
+      const c=document.createElement('div'); c.className='pcell';
+      const d=new Date(end); d.setDate(d.getDate()-7*(act.length-1-i));
+      const lbl=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      c.dataset.tip='week of '+lbl+' · '+lv+' shipped';
+      if(lv){ c.style.background='var(--green)'; c.style.opacity=(0.3+lv*0.17); }
+      h.appendChild(c);
+    });
+  })();
+
+  /* ---- frozen header on scroll ---- */
+  const topbar=document.getElementById('topbar');
+  function onScroll(){ topbar.classList.toggle('stuck',(window.scrollY||document.documentElement.scrollTop)>6); }
+  window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+
+  function toggleTheme(){ const h=document.documentElement; const t=h.dataset.theme==='light'?'dark':'light';
+    h.dataset.theme=t; try{ localStorage.setItem('artlu-theme',t); }catch(e){} }
+  window.toggleTheme=toggleTheme;
+</script>
+</body>
+</html>

@@ -1,0 +1,1711 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import {
+  getMainProjects,
+  getPublicProjects,
+  getSeries,
+  getSiteEntries,
+  getStats,
+  getTechnologies,
+  resolveTechnologyIds,
+  technologyCategoryPairs,
+} from "../lib/data";
+import { dateValue, fmtDate, isEmbeddable, slugify } from "../lib/format";
+
+const [projects, entries] = await Promise.all([getPublicProjects(), getSiteEntries()]);
+const stats = getStats(projects);
+const mains = await getMainProjects(projects);
+const seriesRecords = await getSeries(entries);
+const technologies = await getTechnologies(entries);
+const mainIds = new Set(mains.map((main) => main.id));
+const seriesById = new Map(seriesRecords.map((series) => [series.id, series]));
+const techById = new Map(technologies.map((tech) => [tech.id, tech]));
+const techs = technologies.map((tech) => ({
+  id: tech.id,
+  name: tech.name,
+  category: tech.category,
+  count: tech.count,
+}));
+const techCategories = technologyCategoryPairs(technologies);
+
+function canonicalTechIds(entry: any) {
+  return resolveTechnologyIds({ stack: entry.stack || [], stackRefs: entry.stackRefs || [] }, technologies);
+}
+
+function labelSeries(value?: string) {
+  if (!value) return "builds";
+  return value
+    .replace(/^series[-_]/, "")
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function entryProjectId(entry: any) {
+  return mainIds.has(entry.mainProjectId) ? entry.mainProjectId : "other";
+}
+
+function rowKind(key: string) {
+  if (key === "builds") return "line";
+  if (key.startsWith("entry-")) return "feature";
+  return "series";
+}
+
+function rowInfo(entry: any) {
+  const projectId = entryProjectId(entry);
+  if (projectId === "other") {
+    return { id: "builds", label: "other builds", kind: "line" };
+  }
+  if (entry.seriesId) {
+    const series = seriesById.get(entry.seriesId);
+    return {
+      id: entry.seriesId,
+      label: series?.name || labelSeries(entry.seriesId),
+      kind: rowKind(entry.seriesId),
+      desc: series?.desc || "",
+      meta: series?.meta || "",
+    };
+  }
+  return { id: `entry-${entry.id}`, label: entry.title, kind: entry.kind === "research" ? "research" : "feature" };
+}
+
+function cardPriority(entry: any) {
+  if (entry.kind === "video") return 4;
+  if (entry.kind === "research") return 3;
+  if (entry.project?.artifactHtml || entry.project?.screenshots?.length) return 2;
+  return 1;
+}
+
+function showcaseVisual(entry: any) {
+  const hasArtifact = !!entry.project?.artifactHtml?.trim();
+  const link = entry.project?.link || entry.embedUrl || "";
+  const hasDemoUrl = !hasArtifact && isEmbeddable(link);
+  if (entry.kind === "video" && entry.thumbnailUrl) return { isShowcase: true, previewKind: "video" };
+  if (hasArtifact || hasDemoUrl) return { isShowcase: true, previewKind: "live demo" };
+  return { isShowcase: false, previewKind: "" };
+}
+
+function dedupeCardKey(entry: any, key: string) {
+  if (entry.seriesId && entry.date) return `${key}:${entry.date}`;
+  return `${key}:${slugify(entry.title).slice(0, 52) || entry.id}`;
+}
+
+const rawRolodexes = mains.map((main) => {
+  const rows = new Map<string, { id: string; label: string; kind: string; desc?: string; meta?: string; entryMap: Map<string, any>; latestDateValue: number }>();
+  const owned = entries
+    .filter((entry) => entryProjectId(entry) === main.id)
+    .sort((a, b) => dateValue(b.date) - dateValue(a.date) || a.title.localeCompare(b.title));
+  for (const entry of owned) {
+    const info = rowInfo(entry);
+    const key = info.id;
+    const existing = rows.get(key);
+    const row = existing || { id: info.id, label: info.label, kind: info.kind, desc: info.desc, meta: info.meta, entryMap: new Map(), latestDateValue: 0 };
+    const visual = showcaseVisual(entry);
+    const techIds = canonicalTechIds(entry);
+    const stack = techIds.map((id) => techById.get(id)?.name).filter(Boolean);
+    const artifactHtml = entry.project?.artifactHtml?.trim() || "";
+    const card = {
+      id: entry.id,
+      kind: entry.kind,
+      title: entry.title,
+      desc: entry.desc || "",
+      date: fmtDate(entry.date) || entry.date || "",
+      rawDate: entry.date || "",
+      dateValue: dateValue(entry.date),
+      route: entry.route,
+      status: entry.status || "launched",
+      embedType: entry.embedType || (entry.kind === "video" ? "h" : "d"),
+      thumbnailUrl: entry.thumbnailUrl || entry.project?.screenshots?.[0] || "",
+      thumbnailMode: entry.thumbnailMode || "",
+      artifactHtml,
+      stack,
+      techIds,
+      previewKind: visual.previewKind,
+      isShowcase: visual.isShowcase,
+      priority: cardPriority(entry),
+    };
+    const cardKey = dedupeCardKey(entry, key);
+    const prev = row.entryMap.get(cardKey);
+    if (!prev || card.priority > prev.priority || (card.priority === prev.priority && card.dateValue >= prev.dateValue)) {
+      row.entryMap.set(cardKey, card);
+    }
+    row.latestDateValue = Math.max(row.latestDateValue, card.dateValue);
+    rows.set(key, row);
+  }
+  const normalizedRows = [...rows.values()]
+    .map((row) => {
+      const rowEntries = [...row.entryMap.values()].sort((a, b) => b.dateValue - a.dateValue || a.title.localeCompare(b.title));
+      const stackCounts = new Map<string, number>();
+      const techIdSet = new Set<string>();
+      for (const item of rowEntries) {
+        for (const name of item.stack || []) stackCounts.set(name, (stackCounts.get(name) || 0) + 1);
+        for (const techId of item.techIds || []) techIdSet.add(techId);
+      }
+      const stack = [...stackCounts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([name]) => name).slice(0, 6);
+      const workId = `${main.id}-${slugify(row.id) || "line"}`;
+      const entries = rowEntries.map(({ priority, ...item }) => item);
+      const showcaseEntries = entries.filter((item) => item.isShowcase);
+      return {
+        id: row.id,
+        label: row.label,
+        kind: row.kind,
+        desc: row.desc || "",
+        meta: row.meta || "",
+        workId,
+        focusId: row.kind === "line" ? `pr_${main.id}` : `w_${workId}`,
+        count: rowEntries.length,
+        latestDateValue: row.latestDateValue,
+        latestDate: rowEntries[0]?.rawDate || "",
+        latestDateLabel: rowEntries[0]?.date || "",
+        stack,
+        techIds: [...techIdSet],
+        entries,
+        showcaseEntries,
+      };
+    })
+    .filter((row) => row.entries.length)
+    .sort((a, b) => b.latestDateValue - a.latestDateValue || a.label.localeCompare(b.label));
+  const makeShowcaseRow = (row: any, entriesForRow: any[]) => {
+    const showcaseEntries = entriesForRow.sort((a, b) => b.dateValue - a.dateValue || a.title.localeCompare(b.title));
+    return {
+      id: row.id,
+      label: row.label,
+      kind: row.kind,
+      desc: row.desc || "Embeddable demos and videos from this project.",
+      meta: row.meta || "showcase",
+      workId: row.workId,
+      focusId: row.focusId,
+      count: showcaseEntries.length,
+      latestDateValue: showcaseEntries[0]?.dateValue || 0,
+      latestDate: showcaseEntries[0]?.rawDate || "",
+      latestDateLabel: showcaseEntries[0]?.date || "",
+      stack: [...new Set(showcaseEntries.flatMap((entry) => entry.stack || []))].slice(0, 6),
+      techIds: [...new Set(showcaseEntries.flatMap((entry) => entry.techIds || []))],
+      entries: showcaseEntries,
+      showcaseEntries,
+    };
+  };
+  const seriesShowcaseRows = normalizedRows.filter((row) => row.kind === "series" && row.showcaseEntries.length);
+  const allShowcaseEntries = normalizedRows
+    .flatMap((row) => row.showcaseEntries)
+    .sort((a, b) => b.dateValue - a.dateValue || a.title.localeCompare(b.title));
+  const showcaseRows = seriesShowcaseRows.length > 1
+    ? seriesShowcaseRows.map((row) => makeShowcaseRow(row, row.showcaseEntries))
+    : allShowcaseEntries.length
+      ? [makeShowcaseRow({
+          id: "showcase",
+          label: "Embeds",
+          kind: "line",
+          desc: "Embeddable demos and videos from this project.",
+          meta: "showcase",
+          workId: `${main.id}-showcase`,
+          focusId: `pr_${main.id}`,
+        }, allShowcaseEntries)]
+      : [];
+  return {
+    id: main.id,
+    name: main.name,
+    meta: main.meta,
+    desc: main.desc,
+    count: main.count,
+    site: main.site,
+    repo: main.repo,
+    demo: main.demo,
+    logoImg: main.logoImg,
+    wordmark: main.wordmark,
+    latestDateValue: normalizedRows.reduce((max, row) => Math.max(max, row.latestDateValue), 0),
+    rows: normalizedRows,
+    showcaseRows,
+  };
+}).filter((rolo) => rolo.rows.length);
+
+const rolodexes = rawRolodexes.sort((a, b) => b.latestDateValue - a.latestDateValue || a.name.localeCompare(b.name));
+const showcaseRolodexes = rawRolodexes
+  .map((rolo) => ({
+    ...rolo,
+    rows: rolo.showcaseRows,
+    count: rolo.showcaseRows.reduce((sum, row) => sum + row.entries.length, 0),
+    latestDateValue: rolo.showcaseRows.reduce((max, row) => Math.max(max, row.latestDateValue), 0),
+  }))
+  .filter((rolo) => rolo.rows.length)
+  .sort((a, b) => b.latestDateValue - a.latestDateValue || a.name.localeCompare(b.name));
+const projectOrder = new Map(rolodexes.map((rolo, index) => [rolo.id, index]));
+const orderedProjects = mains
+  .filter((main) => projectOrder.has(main.id))
+  .sort((a, b) => (projectOrder.get(a.id) ?? 99) - (projectOrder.get(b.id) ?? 99));
+
+function entryWorkId(rolo: any, row: any, entry: any) {
+  return `${rolo.id}-${slugify(row.id) || "line"}-${slugify(entry.id) || slugify(entry.title) || "entry"}`;
+}
+
+function stackEntryFromCard(rolo: any, row: any, entry: any) {
+  return {
+    id: entryWorkId(rolo, row, entry),
+    kind: "feature",
+    title: entry.title,
+    desc: entry.desc || `${entry.title} under ${rolo.name}.`,
+    date: entry.rawDate,
+    dateLabel: entry.date,
+    dateValue: entry.dateValue,
+    status: entry.status || "launched",
+    stack: entry.stack,
+    techIds: entry.techIds || [],
+    artifactHtml: entry.artifactHtml || "",
+    route: entry.route,
+    projectId: rolo.id,
+    seriesId: "",
+    children: [],
+  };
+}
+
+function stackEntryFromRow(rolo: any, row: any) {
+  const first = row.entries[0];
+  const desc = row.kind === "feature"
+    ? first?.desc || `${first?.title || row.label} under ${rolo.name}.`
+    : row.desc || `${row.count} public entries in the ${row.label} line. Newest: ${first?.title || row.label}.`;
+  return {
+    id: row.workId,
+    kind: row.kind,
+    title: row.label,
+    desc,
+    date: row.latestDate,
+    dateLabel: row.latestDateLabel,
+    dateValue: row.latestDateValue,
+    status: row.count === 1 ? (first?.status || "launched") : `${row.count} entries`,
+    stack: row.stack,
+    techIds: row.techIds || [],
+    route: row.count === 1 ? first?.route : "",
+    projectId: rolo.id,
+    seriesId: row.kind === "series" ? row.id : "",
+    children: row.entries.map((entry: any) => ({
+      id: entry.id,
+      kind: entry.kind,
+      title: entry.title,
+      route: entry.route,
+      date: entry.date,
+    })),
+  };
+}
+
+const stackEntries = rolodexes.flatMap((rolo) => {
+  const items = rolo.rows.flatMap((row) => (
+    row.kind === "line"
+      ? row.entries.map((entry) => stackEntryFromCard(rolo, row, entry))
+      : [stackEntryFromRow(rolo, row)]
+  )).sort((a, b) => b.dateValue - a.dateValue || a.title.localeCompare(b.title));
+  return items.map((item, index) => ({ ...item, hiddenDefault: index >= 3 }));
+});
+
+const stackData = {
+  categories: techCategories,
+  techs,
+  entries: stackEntries,
+  projects: orderedProjects.map((main) => ({
+    id: main.id,
+    name: main.name,
+    desc: main.desc,
+    meta: `${main.meta} · ${main.count} entries`,
+    count: main.count,
+    site: main.site,
+    repo: main.repo,
+    demo: main.demo,
+    logoImg: main.logoImg,
+    wordmark: main.wordmark,
+    markKey: main.markKey,
+    markText: main.markText,
+  })),
+  rolodexes: showcaseRolodexes,
+};
+---
+<BaseLayout title="artlu.ai — stack spectrum" description="The artlu.ai stack view: a crawlable map of shipped projects, videos, and research across the 100 day build.">
+  <Header active="stack" stats={stats} sticky="canvas" />
+  <div class="canvas-fallback page">
+    <div class="col">
+      <h2 class="sec-h">stack view</h2>
+      <p class="muted">The stack canvas is desktop-first. Use the list view on smaller screens.</p>
+      <a class="mobile-list-redirect" href="/list">open list view →</a>
+    </div>
+  </div>
+  <div class="viewport stack-vp" id="viewport">
+    <div class="world stack-world" id="world">
+      <svg class="wires" id="wires"></svg>
+      <div class="world-intro">
+        <div class="wi-h">what is this?</div>
+        <div class="wi-p">Everything shipped on artlu.ai, read across the stack: the tech each line uses, the shipped feature or series, the project it belongs to, and the latest demos or videos. Click any node to focus its lineage. Feeling overwhelmed? Check out <a class="wi-link" href="/list">List View</a>.</div>
+      </div>
+    </div>
+  </div>
+  <aside class="panel stack-panel" id="canvasPanel">
+    <div class="p-top"><button class="p-x" type="button" id="panelClose">×</button></div>
+    <div class="p-head">
+      <div class="p-eyebrow"><span class="ed" id="panelDot"></span><span id="panelKind"></span></div>
+      <div class="p-title" id="panelTitle"></div>
+      <div class="p-sub" id="panelSub"></div>
+    </div>
+    <div class="p-body" id="panelBody"></div>
+    <div class="p-foot">
+      <a class="p-full" id="panelOpen" href="#">open page ↗</a>
+      <a class="slug-page" id="panelSlug" href="#"></a>
+    </div>
+  </aside>
+  <div class="hud">drag to pan · scroll to zoom · stack rail follows the visible features · click a node to focus</div>
+  <div class="zoomctl">
+    <button type="button" data-zoom="-">−</button>
+    <button type="button" data-zoom="+">+</button>
+    <button type="button" data-zoom="fit">fit</button>
+  </div>
+  <style is:global>
+    body { overflow:hidden; }
+    .topbar { position:relative; }
+    .stack-vp {
+      position:absolute;
+      top:72px;
+      left:0;
+      right:0;
+      bottom:0;
+      overflow:clip;
+      cursor:grab;
+      background:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
+        radial-gradient(circle, var(--grid-dot, transparent) 1.5px, transparent 1.5px);
+      background-size:160px 160px, 160px 160px, 32px 32px;
+    }
+    .stack-vp.grabbing { cursor:grabbing; }
+    .stack-world {
+      position:absolute;
+      top:0;
+      left:0;
+      width:2100px;
+      height:3200px;
+      transform-origin:0 0;
+    }
+    .stack-world .wires {
+      position:absolute;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      overflow:visible;
+      pointer-events:none;
+      z-index:1;
+    }
+    .stack-world .col-head {
+      position:absolute;
+      top:124px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-size:13px;
+      color:var(--dim);
+      letter-spacing:1.5px;
+      text-transform:uppercase;
+      z-index:2;
+    }
+    .stack-world .stack-toggle {
+      border:0;
+      background:transparent;
+      color:var(--dim);
+      font:inherit;
+      letter-spacing:inherit;
+      text-transform:inherit;
+      padding:0;
+      cursor:pointer;
+      opacity:.72;
+    }
+    .stack-world .stack-toggle:hover { color:var(--text-sub); opacity:1; }
+    .stack-world .axis-spine { position:absolute; width:1px; background:var(--border-strong); }
+    .stack-world .axis-chip {
+      position:absolute;
+      transform:translate(-50%,-50%);
+      white-space:nowrap;
+      z-index:2;
+      background:var(--bg);
+      border:1px solid var(--border-strong);
+      border-radius:5px;
+      font-size:11px;
+      font-weight:500;
+      letter-spacing:1px;
+      text-transform:uppercase;
+      color:var(--dim);
+      padding:5px 11px;
+    }
+    .stack-world .axis-cap {
+      position:absolute;
+      transform:translateX(-50%);
+      white-space:nowrap;
+      font-size:10px;
+      letter-spacing:1px;
+      text-transform:uppercase;
+      color:var(--dimmer);
+    }
+    .stack-world .node {
+      position:absolute;
+      visibility:hidden;
+      z-index:2;
+      background:var(--surface);
+      border:1px solid var(--border-strong);
+      border-radius:8px;
+      box-shadow:var(--node-shadow);
+      cursor:pointer;
+      overflow:hidden;
+      transition:opacity .16s, border-color .14s, box-shadow .14s;
+    }
+    .stack-world.ready .node { visibility:visible; }
+    .stack-world .node:hover { border-color:var(--border-hover); }
+    .stack-world .node.sel { box-shadow:var(--node-shadow), 0 0 0 2px var(--border-hover); }
+    .stack-world .node.dimmed { opacity:0.16; }
+    .stack-world .node.stack-appear {
+      --stack-opacity:1;
+      animation:stack-stair-in .34s cubic-bezier(.2,.72,.18,1) both;
+      animation-delay:var(--stack-delay, 0ms);
+    }
+    .stack-world .node.stack-appear.dimmed { --stack-opacity:.16; }
+    @keyframes stack-stair-in {
+      from { opacity:0; transform:translateY(-9px); filter:blur(2px); }
+      to { opacity:var(--stack-opacity); transform:translateY(0); filter:blur(0); }
+    }
+    .stack-world .node.hidden-work { display:none; }
+    .stack-world .node.hidden-tech { display:none; }
+    .stack-world .node.focus-tech {
+      z-index:8;
+      border-color:var(--green-border);
+      box-shadow:var(--node-shadow), 0 0 0 1px var(--green-border);
+    }
+    .stack-world .node.tech { width:206px; }
+    .stack-world .node.work { width:272px; min-height:270px; }
+    .stack-world .node.work .nhead { min-height:78px; align-items:flex-start; }
+    .stack-world .node.work .nname {
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+      min-height:38.64px;
+    }
+    .stack-world .node.work .ndesc {
+      display:-webkit-box;
+      -webkit-line-clamp:6;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+      min-height:120.9px;
+    }
+    .stack-world .node.project { width:300px; }
+    .stack-world .node.rolodex { width:492px; }
+    .stack-world .tech-row { display:flex; align-items:center; gap:9px; padding:11px 13px; }
+    .stack-world .tdot { width:8px; height:8px; border-radius:2px; flex-shrink:0; background:var(--blue); }
+    .stack-world .node.tech .tdot { width:6px; height:6px; opacity:.75; }
+    .stack-world .tname { color:var(--text-bright); font-weight:600; font-size:13.5px; flex:1; }
+    .stack-world .tcat { font-size:10px; letter-spacing:.5px; color:var(--dim); }
+    .stack-world .tcnt {
+      font-size:10px;
+      color:var(--green);
+      border:1px solid var(--green-border);
+      border-radius:3px;
+      padding:1px 5px;
+      background:var(--green-bg);
+      font-family:var(--mono);
+    }
+    .stack-world .nhead,
+    .stack-world .rhead {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 13px;
+      background:var(--surface-2);
+      border-bottom:1px solid var(--border);
+      cursor:grab;
+      border-radius:8px 8px 0 0;
+    }
+    .stack-world .node.project .nhead { background:var(--green-bg); }
+    .stack-world .node.work.series .nhead { background:var(--amber-bg); }
+    .stack-world .glyph.project { color:var(--green); }
+    .stack-world .glyph.series { color:var(--amber); }
+    .stack-world .sdot { width:8px; height:8px; border-radius:50%; flex-shrink:0; background:var(--green); }
+    .stack-world .nname { color:var(--text-bright); font-weight:600; font-size:14px; line-height:1.38; }
+    .stack-world .ntag,
+    .stack-world .rcount {
+      margin-left:auto;
+      flex-shrink:0;
+      font-size:11px;
+      color:var(--dim);
+      border:1px solid var(--border);
+      border-radius:3px;
+      padding:2px 7px;
+      font-family:var(--mono);
+    }
+    .stack-world .node.project .ntag { color:var(--green); border-color:var(--green-border); }
+    .stack-world .node.work.series .ntag { color:var(--amber); border-color:var(--amber-bg); }
+    .stack-world .nbody { padding:11px 13px; }
+    .stack-world .nbrand {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:8px;
+    }
+    .stack-world .nlogo {
+      width:22px;
+      height:22px;
+      border-radius:5px;
+      border:1px solid var(--border);
+      background:var(--surface-2);
+      object-fit:contain;
+      padding:3px;
+      flex-shrink:0;
+    }
+    .stack-world .ndesc { color:var(--text-sub); font-size:13px; line-height:1.55; }
+    .stack-world .nmeta { margin-top:9px; font-size:12px; color:var(--dim); line-height:1.45; }
+    .stack-world .nlinks {
+      display:flex;
+      flex-wrap:wrap;
+      gap:5px;
+      margin-top:9px;
+    }
+    .stack-world .nlink {
+      font-size:10.5px;
+      color:var(--green);
+      border:1px solid var(--green-border);
+      border-radius:4px;
+      padding:2px 6px;
+      text-decoration:none;
+      background:var(--green-bg);
+      font-family:var(--mono);
+    }
+    .stack-world .nlink:hover { border-color:var(--green); }
+    .stack-world .status {
+      padding:2px 7px;
+      border-radius:3px;
+      font-size:11px;
+      background:var(--green-bg);
+      color:var(--green);
+      margin-right:7px;
+    }
+    .stack-world .rrows { padding:6px 11px 11px; }
+    .stack-world .rseries { padding:0; transition:opacity .15s; }
+    .stack-world .rseries + .rseries { border-top:1px solid var(--border); }
+    .stack-world .rrows:hover .rseries:not(:hover) { opacity:.3; }
+    .stack-world .rserlabel { display:flex; align-items:center; gap:7px; font-size:12px; font-weight:500; color:var(--amber); margin:10px 0 8px; }
+    .stack-world .rserlabel .scount { color:var(--dim); font-weight:400; font-size:11px; }
+    .stack-world .rrail { position:relative; }
+    .stack-world .rstrip { display:flex; gap:10px; overflow-x:auto; padding:0 1px; scrollbar-width:none; scroll-behavior:smooth; }
+    .stack-world .rstrip::-webkit-scrollbar { display:none; }
+    .stack-world .rnav {
+      position:absolute;
+      top:50%;
+      z-index:2;
+      width:24px;
+      height:54px;
+      transform:translateY(-50%);
+      border:1px solid var(--border);
+      border-radius:5px;
+      background:color-mix(in srgb, var(--surface-2) 88%, transparent);
+      color:var(--dim);
+      font-family:var(--mono);
+      font-size:14px;
+      cursor:pointer;
+      box-shadow:var(--node-shadow);
+    }
+    .stack-world .rnav[data-row-scroll="-"] { left:5px; }
+    .stack-world .rnav[data-row-scroll="+"] { right:5px; }
+    .stack-world .rnav:hover { border-color:var(--border-hover); color:var(--text-bright); }
+    .stack-world .rnav:disabled { display:none; }
+    .stack-world .rall {
+      margin-left:2px;
+      border:1px solid var(--border);
+      border-radius:4px;
+      background:var(--surface-2);
+      color:var(--amber);
+      font-family:var(--mono);
+      font-size:11px;
+      padding:2px 7px;
+      cursor:pointer;
+    }
+    .stack-world .rall:hover { border-color:var(--amber); }
+    .stack-world .vcard {
+      flex-shrink:0;
+      width:168px;
+      border:1px solid var(--border);
+      border-radius:7px;
+      overflow:hidden;
+      cursor:pointer;
+      background:var(--surface-2);
+      text-decoration:none;
+    }
+    .stack-world .vcard:hover { border-color:var(--border-hover); }
+    .stack-world .vcard.v { width:108px; }
+    .stack-world .vthumb { width:100%; aspect-ratio:16/10; position:relative; background:#000; overflow:hidden; }
+    .stack-world .vcard.v .vthumb { height:162px; aspect-ratio:auto; }
+    .stack-world .vthumb img { width:100%; height:100%; object-fit:cover; display:block; }
+    .stack-world .vthumb iframe {
+      width:100%;
+      height:100%;
+      border:0;
+      display:block;
+      pointer-events:none;
+      background:#000;
+    }
+    .stack-world .vplaceholder {
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:12px;
+      color:var(--text-bright);
+      background:
+        linear-gradient(135deg, color-mix(in srgb, var(--green-bg) 70%, transparent), transparent 62%),
+        var(--surface);
+      font-family:var(--mono);
+      font-size:12px;
+      font-weight:600;
+      text-align:center;
+    }
+    .stack-world .vplay {
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      width:32px;
+      height:32px;
+      border-radius:50%;
+      border:1.5px solid #fff;
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:12px;
+      background:rgba(0,0,0,.45);
+    }
+    .stack-world .vmeta { padding:6px 7px; }
+    .stack-world .vtitle {
+      color:var(--text-bright);
+      font-size:11px;
+      font-weight:500;
+      line-height:1.4;
+      overflow:hidden;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+    }
+    .stack-world .vdesc {
+      display:none;
+    }
+    .stack-world .vdate { margin-top:4px; font-size:10px; color:var(--dim); font-family:var(--mono); }
+    .stack-world .proj-mark {
+      position:absolute;
+      inset:0;
+      margin:auto;
+      width:fit-content;
+      height:fit-content;
+      display:flex;
+      align-items:center;
+      background:var(--surface);
+      border-radius:10px;
+      padding:10px 16px;
+      box-shadow:var(--node-shadow);
+    }
+    .stack-world .pm-name { font-family:var(--mono); font-size:15px; font-weight:600; color:var(--text-bright); }
+    .stack-world .show-more {
+      position:absolute;
+      z-index:3;
+      width:272px;
+      border:1px solid var(--green-border);
+      background:var(--green-bg);
+      color:var(--green);
+      border-radius:8px;
+      padding:11px 13px;
+      font-family:var(--mono);
+      font-size:12px;
+      cursor:pointer;
+      box-shadow:var(--node-shadow);
+    }
+    .stack-world .show-more:hover { border-color:var(--green); }
+    .stack-world .world-intro { position:absolute; left:50px; top:0; width:1100px; z-index:2; }
+    .stack-world .world-intro .wi-h { font-size:15px; font-weight:600; color:var(--text-bright); letter-spacing:.06em; text-transform:uppercase; margin-bottom:9px; }
+    .stack-world .world-intro .wi-p { font-size:13.5px; color:var(--text-sub); line-height:1.72; max-width:1040px; }
+    .stack-world .world-intro .wi-link { color:var(--green); text-decoration:none; white-space:nowrap; }
+    .stack-world .world-intro .wi-link:hover { text-decoration:underline; }
+    .stack-panel {
+      position:absolute;
+      top:86px;
+      right:14px;
+      bottom:14px;
+      width:430px;
+      z-index:38;
+      background:var(--surface);
+      border:1px solid var(--border-strong);
+      border-radius:12px;
+      box-shadow:0 8px 40px rgba(0,0,0,.22);
+      overflow:hidden;
+      transform:translateX(calc(100% + 28px));
+      transition:transform .24s cubic-bezier(.2,.7,.2,1);
+      display:flex;
+      flex-direction:column;
+    }
+    .stack-panel.open { transform:translateX(0); }
+    .stack-panel .p-top { position:absolute; top:9px; right:10px; z-index:2; display:flex; justify-content:flex-end; padding:0; }
+    .stack-panel .p-x { width:26px; height:26px; border:1px solid var(--border-strong); background:var(--surface); color:var(--text-sub); border-radius:7px; cursor:pointer; font-size:14px; }
+    .stack-panel .p-head { padding:9px 44px 10px 12px; border-bottom:1px solid var(--border); display:block; }
+    .stack-panel .p-eyebrow { display:flex; align-items:center; gap:7px; font-size:10.5px; letter-spacing:1.4px; text-transform:uppercase; color:var(--dim); }
+    .stack-panel .ed { width:7px; height:7px; border-radius:50%; display:inline-block; }
+    .stack-panel .p-title { margin-top:6px; font-size:16px; font-weight:600; color:var(--text-bright); line-height:1.24; letter-spacing:0; }
+    .stack-panel .p-sub { margin-top:6px; font-size:11px; color:var(--text-sub); border:1px solid var(--border); background:var(--surface); border-radius:5px; padding:2px 7px; display:inline-flex; }
+    .stack-panel .p-body { flex:1; overflow-y:auto; height:auto; padding:12px 14px 18px; }
+    .stack-panel .p-lead { font-size:13px; line-height:1.58; color:var(--text); padding:0; border:0; }
+    .stack-panel .p-sec { margin-top:14px; }
+    .stack-panel .p-sec h4 { font-size:10px; letter-spacing:1.4px; text-transform:uppercase; color:var(--dim); margin-bottom:8px; }
+    .stack-panel .p-links { display:flex; flex-wrap:wrap; gap:7px; margin-top:12px; }
+    .stack-panel .p-link {
+      display:inline-flex;
+      align-items:center;
+      gap:5px;
+      border:1px solid var(--green-border);
+      border-radius:6px;
+      background:var(--green-bg);
+      color:var(--green);
+      padding:5px 8px;
+      font-size:12px;
+      text-decoration:none;
+    }
+    .stack-panel .p-link:hover { border-color:var(--green); }
+    .stack-panel .tchip {
+      display:inline-flex;
+      margin:0 6px 6px 0;
+      font-size:12px;
+      color:var(--text-sub);
+      background:var(--surface-2);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:4px 10px;
+    }
+    .stack-panel .lrow { display:flex; align-items:center; gap:10px; padding:9px 11px; border:1px solid var(--border); border-radius:8px; background:var(--surface-2); cursor:pointer; margin-bottom:7px; }
+    .stack-panel a.lrow,
+    .stack-panel .lrow a {
+      color:inherit;
+      text-decoration:none;
+    }
+    .stack-panel .lrow .lname,
+    .stack-panel .lrow .lkind {
+      text-decoration:none;
+    }
+    .stack-panel .lrow:last-child { margin-bottom:0; }
+    .stack-panel .ld { width:8px; height:8px; border-radius:2px; flex-shrink:0; }
+    .stack-panel .lname { flex:1; font-size:13px; color:var(--text-bright); font-weight:500; line-height:1.35; }
+    .stack-panel .lkind { font-size:10.5px; color:var(--dim); }
+    .stack-panel .arr { color:var(--dim); font-size:15px; }
+    .stack-panel .lrow:hover .arr { color:var(--text-bright); }
+    .stack-panel .p-foot { padding:9px 14px; border-top:1px solid var(--border); display:grid; grid-template-columns:auto 1fr; align-items:center; gap:10px; }
+    .stack-panel.no-route .p-foot { display:none; }
+    .stack-panel .p-full {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid var(--green-border);
+      border-radius:5px;
+      color:var(--green);
+      background:var(--green-bg);
+      font-size:10.5px;
+      line-height:1;
+      padding:6px 9px;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    .stack-panel .p-full:hover { border-color:var(--green); }
+    .stack-panel .slug-page { color:var(--dim); font-size:10px; line-height:1.35; text-decoration:none; word-break:break-all; text-align:right; justify-self:end; }
+    .stack-panel .slug-page:hover { color:var(--green); }
+    .hud {
+      position:absolute;
+      left:16px;
+      bottom:14px;
+      z-index:25;
+      font-size:11.5px;
+      color:var(--dim);
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:5px;
+      padding:8px 12px;
+      box-shadow:var(--node-shadow);
+    }
+    .zoomctl {
+      position:absolute;
+      right:16px;
+      bottom:14px;
+      z-index:25;
+      display:flex;
+      gap:5px;
+    }
+    .zoomctl button {
+      width:28px;
+      height:28px;
+      background:var(--surface);
+      border:1px solid var(--border);
+      color:var(--text-sub);
+      border-radius:5px;
+      cursor:pointer;
+      font-size:14px;
+      font-family:var(--mono);
+      box-shadow:var(--node-shadow);
+    }
+    .zoomctl button[data-zoom="fit"] { width:auto; padding:0 9px; font-size:11px; }
+    @media (max-width:720px) {
+      body { overflow:auto; }
+      .topbar { position:sticky; }
+      .hud { display:none; }
+    }
+  </style>
+  <script define:vars={{ stackData }}>
+    const data = stackData;
+    const TECH_X = 150;
+    const WORK_X = 500;
+    const PROJ_X = 880;
+    const ROLO_X = 1260;
+    const SPEC_X = 84;
+    const DATE_X = 430;
+    const nodes = {};
+    const edges = [];
+    const world = document.getElementById("world");
+    const vp = document.getElementById("viewport");
+    const topbar = document.getElementById("topbar");
+    const svg = document.getElementById("wires");
+    const panel = document.getElementById("canvasPanel");
+    const panelDot = document.getElementById("panelDot");
+    const panelKind = document.getElementById("panelKind");
+    const panelTitle = document.getElementById("panelTitle");
+    const panelSub = document.getElementById("panelSub");
+    const panelBody = document.getElementById("panelBody");
+    const panelOpen = document.getElementById("panelOpen");
+    const panelSlug = document.getElementById("panelSlug");
+    const techById = new Map(data.techs.map((tech) => [tech.id, tech]));
+    const techCategoryRank = new Map(data.categories.map(([category], index) => [category, index]));
+    const techGlobalRank = new Map(data.techs.map((tech, index) => [tech.id, index]));
+    let active = null;
+    let hover = null;
+    let activeNodeId = null;
+    let focusWorkId = null;
+    let expanded = false;
+    let showMoreBtn = null;
+    let stackToggleBtn = null;
+    let showAllTech = false;
+    let selectionTechOrder = null;
+    let viewportTechIds = new Set();
+    let viewportTechOrder = [];
+    let viewportStackTimer = null;
+    let pan = { x: 24, y: 18 };
+    let scale = 0.86;
+
+    function esc(value) {
+      return String(value || "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      })[char]);
+    }
+    function mk(id, cls, html, source) {
+      const el = document.createElement("div");
+      el.className = `node ${cls}`;
+      el.dataset.id = id;
+      el.innerHTML = html;
+      world.appendChild(el);
+      const node = { id, el, kind: cls.split(" ")[0], source: source || null, x: 0, y: 0, w: 0, h: 0, visible: true };
+      nodes[id] = node;
+      return node;
+    }
+    function previewSrcDoc(html) {
+      const previewStyle = "<style data-artlu-preview>html,body{width:100%!important;height:100%!important;overflow:hidden!important;scrollbar-width:none!important;-ms-overflow-style:none!important;}body{position:relative!important;}*,*::before,*::after{scrollbar-width:none!important;-ms-overflow-style:none!important;}*::-webkit-scrollbar,html::-webkit-scrollbar,body::-webkit-scrollbar{display:none!important;width:0!important;height:0!important;}</style>";
+      const value = String(html || "");
+      if (/<\/head>/i.test(value)) return value.replace(/<\/head>/i, `${previewStyle}</head>`);
+      return `${previewStyle}${value}`;
+    }
+    function card(entry) {
+      const vertical = entry.embedType === "v";
+      const preferStaticThumbnail = entry.thumbnailMode === "static" && entry.thumbnailUrl;
+      const thumb = preferStaticThumbnail
+        ? `<img src="${esc(entry.thumbnailUrl)}" alt="" loading="lazy">`
+        : entry.artifactHtml
+        ? `<iframe class="vframe" srcdoc="${esc(previewSrcDoc(entry.artifactHtml))}" loading="lazy" tabindex="-1" scrolling="no" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>`
+        : entry.kind === "video" && entry.thumbnailUrl
+        ? `<img src="${esc(entry.thumbnailUrl)}" alt="" loading="lazy"><div class="vplay">▶</div>`
+        : entry.thumbnailUrl
+          ? `<img src="${esc(entry.thumbnailUrl)}" alt="" loading="lazy">`
+          : `<div class="vplaceholder">${esc(entry.previewKind || entry.kind || "project")}</div>`;
+      if (!thumb) return "";
+      return `<a class="vcard ${vertical ? "v" : "h"}" href="${esc(entry.route)}">
+        <div class="vthumb">${thumb}</div>
+        <div class="vmeta"><div class="vtitle">${esc(entry.title)}</div><div class="vdate">${esc(entry.date)}</div></div>
+      </a>`;
+    }
+    function projectLinks(project, className = "nlink") {
+      return [
+        project.site ? `<a class="${className}" href="${esc(project.site)}" target="_blank" rel="noreferrer">site ↗</a>` : "",
+        project.repo ? `<a class="${className}" href="${esc(project.repo)}" target="_blank" rel="noreferrer">github ↗</a>` : "",
+        project.demo ? `<a class="${className}" href="${esc(project.demo)}" target="_blank" rel="noreferrer">demo ↗</a>` : "",
+      ].filter(Boolean).join("");
+    }
+    function projectIcon(project) {
+      if (project.logoImg) return `<img class="nlogo" src="${esc(project.logoImg)}" alt="" loading="lazy">`;
+      if (project.markKey === "artlu") return `<span class="project-id mini" data-mark="artlu" aria-hidden="true"><span class="project-id-text">${esc(project.markText || "$_")}</span></span>`;
+      if (project.markKey === "research") return '<span class="emoji-mini" aria-hidden="true">🧠</span>';
+      if (project.markKey === "pipeline") return `<span class="project-id mini" data-mark="pipeline" aria-hidden="true"><span class="project-id-text">${esc(project.markText || "P")}</span></span>`;
+      return "";
+    }
+    function projectNodeHTML(project) {
+      const links = projectLinks(project);
+      const icon = projectIcon(project);
+      return `<div class="nhead" data-handle>${icon}<span class="nname">${esc(project.name)}</span><span class="ntag">project</span></div>
+        <div class="nbody"><div class="ndesc">${esc(project.desc)}</div>${links ? `<div class="nlinks">${links}</div>` : ""}<div class="nmeta">${esc(project.meta)}</div></div>`;
+    }
+    function render() {
+      data.techs.forEach((tech) => {
+        const node = mk(`t_${tech.id}`, "tech hidden-tech", `<div class="tech-row"><span class="tdot"></span><span class="tname">${esc(tech.name)}</span><span class="tcat">${esc(tech.category)}</span></div>`, tech);
+        node.visible = false;
+      });
+      data.entries.forEach((entry) => {
+        const isSeries = entry.kind === "series";
+        const glyph = isSeries ? '<span class="glyph series">◆</span>' : '<span class="sdot"></span>';
+        const tag = isSeries ? "series" : entry.kind === "line" ? "line" : entry.kind;
+        const node = mk(`w_${entry.id}`, `work${isSeries ? " series" : ""}`, `<div class="nhead" data-handle>${glyph}<span class="nname">${esc(entry.title)}</span><span class="ntag">${tag}</span></div>
+          <div class="nbody"><div class="ndesc">${esc(entry.desc)}</div><div class="nmeta"><span class="status">${esc(entry.status)}</span>${esc(entry.dateLabel || entry.date)}</div></div>`, entry);
+        node.el.classList.toggle("hidden-work", !!entry.hiddenDefault);
+      });
+      data.projects.forEach((project) => {
+        mk(`pr_${project.id}`, "project", projectNodeHTML(project), project);
+      });
+      data.rolodexes.forEach((rolo) => {
+        const singleRow = rolo.rows.length === 1;
+        const rows = rolo.rows.map((row) => `<div class="rseries">
+          ${singleRow ? "" : `<div class="rserlabel"><span class="glyph series">◆</span>${esc(row.label)}<span class="scount">· ${row.entries.length} entries</span></div>`}
+          <div class="rrail" data-focus-id="${esc(row.focusId)}">
+            <button class="rnav" type="button" data-row-scroll="-">&lt;</button>
+            <div class="rstrip">${row.entries.map(card).join("")}</div>
+            <button class="rnav" type="button" data-row-scroll="+">&gt;</button>
+          </div>
+        </div>`).join("");
+        const countLabel = singleRow ? `${rolo.count} ${rolo.count === 1 ? "entry" : "entries"}` : rolo.count;
+        mk(`ro_${rolo.id}`, "rolodex", `<div class="rhead" data-handle><span class="glyph series">▦</span><span class="nname">${esc(rolo.name)} showcase</span><span class="rcount">${esc(countLabel)}</span><button class="rall" type="button" data-open-project="${esc(rolo.id)}">all</button></div>
+          <div class="rrows">${rows}</div>`, rolo);
+      });
+      [
+        ["tech stack", TECH_X],
+        ["updates", WORK_X],
+        ["projects", PROJ_X],
+        ["showcase", ROLO_X],
+      ].forEach(([label, x]) => {
+        const el = document.createElement("div");
+        el.className = "col-head";
+        el.style.left = `${x}px`;
+        if (label === "tech stack") {
+          el.innerHTML = `<span>${esc(label)}</span><button class="stack-toggle" type="button" data-stack-toggle>expand all</button>`;
+          stackToggleBtn = el.querySelector("[data-stack-toggle]");
+        } else {
+          el.textContent = label;
+        }
+        world.appendChild(el);
+      });
+      if (data.entries.some((entry) => entry.hiddenDefault)) {
+        showMoreBtn = document.createElement("button");
+        showMoreBtn.className = "show-more";
+        showMoreBtn.type = "button";
+        showMoreBtn.textContent = "show more lines";
+        showMoreBtn.addEventListener("click", () => {
+          expanded = true;
+          refreshViewportStack(true);
+        });
+        world.appendChild(showMoreBtn);
+      }
+      data.entries.forEach((entry) => {
+        entry.techIds.forEach((techId) => {
+          if (nodes[`t_${techId}`]) edges.push([`t_${techId}`, `w_${entry.id}`]);
+        });
+        if (nodes[`pr_${entry.projectId}`]) edges.push([`w_${entry.id}`, `pr_${entry.projectId}`]);
+      });
+      data.rolodexes.forEach((rolo) => {
+        if (nodes[`pr_${rolo.id}`]) edges.push([`pr_${rolo.id}`, `ro_${rolo.id}`]);
+      });
+    }
+    function uniqueIds(ids) {
+      return [...new Set((ids || []).filter((id) => techById.has(id)))];
+    }
+    function orderTechIds(ids, focusIds = new Set()) {
+      return uniqueIds(ids).sort((a, b) => {
+        const techA = techById.get(a);
+        const techB = techById.get(b);
+        const catA = techCategoryRank.get(techA?.category) ?? 99;
+        const catB = techCategoryRank.get(techB?.category) ?? 99;
+        if (catA !== catB) return catA - catB;
+        if (Number(focusIds.has(b)) !== Number(focusIds.has(a))) return Number(focusIds.has(b)) - Number(focusIds.has(a));
+        return (techGlobalRank.get(a) ?? 999) - (techGlobalRank.get(b) ?? 999) || (techA?.name || a).localeCompare(techB?.name || b);
+      });
+    }
+    function techIdsForNode(id) {
+      const node = nodes[id];
+      if (!node) return [];
+      if (id.startsWith("t_")) return [id.slice(2)];
+      if (id.startsWith("w_")) return uniqueIds(node.source?.techIds || []);
+      if (id.startsWith("ro_")) {
+        return uniqueIds((node.source?.rows || []).flatMap((row) => row.entries || []).flatMap((entry) => entry.techIds || []));
+      }
+      if (id.startsWith("pr_")) {
+        const projectId = id.slice(3);
+        return uniqueIds(data.entries.filter((entry) => entry.projectId === projectId).flatMap((entry) => entry.techIds || []));
+      }
+      return [];
+    }
+    function focusedTechIds() {
+      if (selectionTechOrder) return new Set(selectionTechOrder);
+      return new Set(activeNodeId ? techIdsForNode(activeNodeId) : (focusWorkId ? nodes[focusWorkId]?.source?.techIds || [] : []));
+    }
+    function viewportWorldBox() {
+      const width = vp.clientWidth || window.innerWidth || 1200;
+      const height = vp.clientHeight || window.innerHeight || 760;
+      return {
+        left: (0 - pan.x) / scale,
+        top: (0 - pan.y) / scale,
+        right: (width - pan.x) / scale,
+        bottom: (height - pan.y) / scale,
+      };
+    }
+    function intersects(node, box, pad = 0) {
+      return node.x + node.w >= box.left - pad
+        && node.x <= box.right + pad
+        && node.y + node.h >= box.top - pad
+        && node.y <= box.bottom + pad;
+    }
+    function visibleWorkNodesForStack() {
+      const box = viewportWorldBox();
+      const visible = data.entries
+        .map((entry) => nodes[`w_${entry.id}`])
+        .filter((node) => node && node.visible !== false && intersects(node, box, 90));
+      if (visible.length) return visible;
+      const middle = (box.top + box.bottom) / 2;
+      return data.entries
+        .map((entry) => nodes[`w_${entry.id}`])
+        .filter((node) => node && node.visible !== false)
+        .sort((a, b) => Math.abs((a.y + a.h / 2) - middle) - Math.abs((b.y + b.h / 2) - middle))
+        .slice(0, 5);
+    }
+    function sameList(a, b) {
+      return a.length === b.length && a.every((item, index) => item === b[index]);
+    }
+    function computeViewportTech() {
+      const focusIds = focusedTechIds();
+      if (showAllTech) {
+        return {
+          ids: orderTechIds(data.techs.map((tech) => tech.id), focusIds),
+        };
+      }
+      if (selectionTechOrder?.length) {
+        return {
+          ids: selectionTechOrder,
+        };
+      }
+      if (activeNodeId && focusIds.size) {
+        return {
+          ids: orderTechIds([...focusIds], focusIds),
+        };
+      }
+      const stats = new Map();
+      visibleWorkNodesForStack().forEach((node, index) => {
+        const entry = node.source || {};
+        (entry.techIds || []).forEach((techId) => {
+          const tech = techById.get(techId);
+          if (!tech) return;
+          const item = stats.get(techId) || {
+            id: techId,
+            tech,
+            count: 0,
+            latest: 0,
+            firstSeen: index,
+            focused: false,
+          };
+          item.count += 1;
+          item.latest = Math.max(item.latest, entry.dateValue || 0);
+          item.firstSeen = Math.min(item.firstSeen, index);
+          stats.set(techId, item);
+        });
+      });
+      const focusNode = activeNodeId ? nodes[activeNodeId] : focusWorkId ? nodes[focusWorkId] : null;
+      const focusDateValue = focusNode?.source?.dateValue || focusNode?.source?.latestDateValue || 0;
+      focusIds.forEach((techId) => {
+        const tech = techById.get(techId);
+        if (!tech) return;
+        const item = stats.get(techId) || {
+          id: techId,
+          tech,
+          count: 0,
+          latest: focusDateValue,
+          firstSeen: -1,
+          focused: true,
+        };
+        item.focused = true;
+        item.count += 4;
+        item.latest = Math.max(item.latest, focusDateValue);
+        stats.set(techId, item);
+      });
+      const ranked = [...stats.values()].sort((a, b) => {
+        if (Number(b.focused) !== Number(a.focused)) return Number(b.focused) - Number(a.focused);
+        if (b.count !== a.count) return b.count - a.count;
+        if (b.latest !== a.latest) return b.latest - a.latest;
+        if (a.firstSeen !== b.firstSeen) return a.firstSeen - b.firstSeen;
+        return a.tech.name.localeCompare(b.tech.name);
+      });
+      const ordered = orderTechIds(ranked.map((item) => item.id), focusIds);
+      return {
+        ids: ordered,
+      };
+    }
+    function animateTechAppears(ids) {
+      if (!world.classList.contains("ready") || !ids.length) return;
+      ids.forEach((id, index) => {
+        const node = nodes[`t_${id}`];
+        if (!node || node.visible === false) return;
+        node.el.classList.remove("stack-appear");
+        node.el.style.setProperty("--stack-delay", `${Math.min(index, 34) * 22}ms`);
+        void node.el.offsetWidth;
+        node.el.classList.add("stack-appear");
+        window.setTimeout(() => {
+          node.el.classList.remove("stack-appear");
+          node.el.style.removeProperty("--stack-delay");
+        }, 620 + Math.min(index, 34) * 22);
+      });
+    }
+    function refreshViewportStack(force = false) {
+      const next = computeViewportTech();
+      if (!force && sameList(next.ids, viewportTechOrder)) {
+        updateStackToggle();
+        return;
+      }
+      const previousIds = new Set(viewportTechIds);
+      viewportTechOrder = next.ids;
+      viewportTechIds = new Set(next.ids);
+      layout();
+      buildAxes();
+      applyFocus();
+      updateStackToggle();
+      animateTechAppears(next.ids.filter((id) => !previousIds.has(id)));
+    }
+    function updateStackToggle() {
+      if (!stackToggleBtn) return;
+      stackToggleBtn.textContent = showAllTech ? "collapse all" : "expand all";
+    }
+    function scheduleViewportStack() {
+      window.clearTimeout(viewportStackTimer);
+      viewportStackTimer = window.setTimeout(() => refreshViewportStack(false), 90);
+    }
+    function syncVisibility() {
+      let hidden = 0;
+      data.entries.forEach((entry) => {
+        const node = nodes[`w_${entry.id}`];
+        if (!node) return;
+        const isHidden = !!entry.hiddenDefault && !expanded;
+        node.visible = !isHidden;
+        node.el.classList.toggle("hidden-work", isHidden);
+        if (isHidden) hidden += 1;
+      });
+      const focusIds = focusedTechIds();
+      data.techs.forEach((tech) => {
+        const node = nodes[`t_${tech.id}`];
+        if (!node) return;
+        const focused = focusIds.has(tech.id);
+        const visible = viewportTechIds.has(tech.id) || focused;
+        node.visible = visible;
+        node.el.classList.toggle("hidden-tech", !visible);
+        node.el.classList.toggle("focus-tech", focused);
+      });
+      if (showMoreBtn) {
+        showMoreBtn.style.display = hidden ? "block" : "none";
+        showMoreBtn.textContent = `show ${hidden} more line${hidden === 1 ? "" : "s"}`;
+      }
+    }
+    function layout() {
+      syncVisibility();
+      Object.values(nodes).forEach((node) => {
+        node.w = node.el.offsetWidth;
+        node.h = node.el.offsetHeight;
+      });
+      const techOrder = new Map(viewportTechOrder.map((id, index) => [id, index]));
+      const categoryIds = [
+        ...data.categories.map(([category]) => category),
+        ...[...new Set(data.techs.map((tech) => tech.category))].filter((category) => !techCategoryRank.has(category)),
+      ];
+      const visibleTechs = data.techs.filter((tech) => viewportTechIds.has(tech.id));
+      const placedTechIds = new Set();
+      const techGroups = categoryIds.map((cat) => visibleTechs
+        .filter((tech) => tech.category === cat)
+        .sort((a, b) => (techOrder.get(a.id) ?? 999) - (techOrder.get(b.id) ?? 999) || a.name.localeCompare(b.name))
+      ).filter((members) => members.length);
+      const ungroupedTechs = visibleTechs
+        .filter((tech) => !categoryIds.includes(tech.category))
+        .sort((a, b) => (techOrder.get(a.id) ?? 999) - (techOrder.get(b.id) ?? 999) || a.name.localeCompare(b.name));
+      if (ungroupedTechs.length) techGroups.push(ungroupedTechs);
+      const totalTechHeight = techGroups.reduce((sum, members) => (
+        sum + members.reduce((inner, tech) => inner + (nodes[`t_${tech.id}`]?.h || 42) + 10, 0) + 12
+      ), 0);
+      let ty = (() => {
+        if (!activeNodeId || showAllTech) return 192;
+        const focusNode = nodes[activeNodeId];
+        if (!focusNode) return 192;
+        return Math.max(126, Math.round(focusNode.y + focusNode.h / 2 - totalTechHeight / 2));
+      })();
+      const placeTech = (tech) => {
+        const node = nodes[`t_${tech.id}`];
+        if (!node || node.visible === false) return;
+        node.x = TECH_X;
+        node.y = ty;
+        placedTechIds.add(tech.id);
+        ty += node.h + 10;
+      };
+      techGroups.forEach((members) => {
+        members.forEach(placeTech);
+        ty += 12;
+      });
+      visibleTechs.filter((tech) => !placedTechIds.has(tech.id)).forEach(placeTech);
+      const works = [...data.entries].sort((a, b) => {
+        const byDate = b.dateValue - a.dateValue;
+        if (byDate) return byDate;
+        return a.title.localeCompare(b.title);
+      }).filter((entry) => nodes[`w_${entry.id}`]?.visible !== false);
+      let wy = 192;
+      works.forEach((entry) => {
+        const node = nodes[`w_${entry.id}`];
+        node.x = WORK_X;
+        node.y = wy;
+        wy += node.h + 26;
+      });
+      if (showMoreBtn) {
+        showMoreBtn.style.left = `${WORK_X}px`;
+        showMoreBtn.style.top = `${wy + 8}px`;
+      }
+      let py = 192;
+      data.projects.forEach((project) => {
+        const node = nodes[`pr_${project.id}`];
+        node.x = PROJ_X;
+        node.y = py;
+        py += node.h + 56;
+      });
+      let ry = 178;
+      data.rolodexes
+        .map((rolo) => nodes[`ro_${rolo.id}`])
+        .filter(Boolean)
+        .forEach((node) => {
+          node.x = ROLO_X;
+          node.y = ry;
+          ry += node.h + 56;
+        });
+      Object.values(nodes).forEach((node) => {
+        node.el.style.left = `${node.x}px`;
+        node.el.style.top = `${node.y}px`;
+      });
+      const bottom = Object.values(nodes).reduce((max, node) => Math.max(max, node.y + node.h + 240), 1400);
+      world.style.height = `${bottom}px`;
+      updateRowNavs();
+    }
+    function buildAxes() {
+      world.querySelectorAll(".axis-spine,.axis-chip,.axis-cap").forEach((el) => el.remove());
+      const spine = (x, top, bottom) => {
+        const el = document.createElement("div");
+        el.className = "axis-spine";
+        el.style.left = `${x}px`;
+        el.style.top = `${top}px`;
+        el.style.height = `${Math.max(60, bottom - top)}px`;
+        world.appendChild(el);
+      };
+      const chip = (x, y, label) => {
+        const el = document.createElement("div");
+        el.className = "axis-chip";
+        el.style.left = `${x}px`;
+        el.style.top = `${y}px`;
+        el.textContent = label;
+        world.appendChild(el);
+      };
+      const cap = (x, y, label) => {
+        const el = document.createElement("div");
+        el.className = "axis-cap";
+        el.style.left = `${x}px`;
+        el.style.top = `${y}px`;
+        el.textContent = label;
+        world.appendChild(el);
+      };
+      const techNodes = data.techs
+        .map((tech) => nodes[`t_${tech.id}`])
+        .filter((node) => node && node.visible !== false)
+        .sort((a, b) => a.y - b.y);
+      if (techNodes.length) {
+        const top = techNodes[0].y;
+        const bottom = techNodes[techNodes.length - 1].y + techNodes[techNodes.length - 1].h;
+        spine(SPEC_X, top, bottom);
+        data.categories.forEach(([cat, label]) => {
+          const members = data.techs
+            .map((tech) => tech.category === cat ? nodes[`t_${tech.id}`] : null)
+            .filter((node) => node && node.visible !== false)
+            .sort((a, b) => a.y - b.y);
+          if (!members.length) return;
+          chip(SPEC_X, members.reduce((sum, node) => sum + node.y + node.h / 2, 0) / members.length, label);
+        });
+        const firstCategory = data.categories[0]?.[1] || "front-end";
+        const lastCategory = data.categories[data.categories.length - 1]?.[1] || "back-end";
+        cap(SPEC_X, top - 22, `▲ ${firstCategory}`);
+        cap(SPEC_X, bottom + 20, `▼ ${lastCategory}`);
+      }
+      const workNodes = data.entries.map((entry) => nodes[`w_${entry.id}`]).filter(Boolean).sort((a, b) => a.y - b.y);
+      const visibleWorkNodes = workNodes.filter((node) => node.visible !== false);
+      if (visibleWorkNodes.length) {
+        const top = visibleWorkNodes[0].y;
+        const bottom = visibleWorkNodes[visibleWorkNodes.length - 1].y + visibleWorkNodes[visibleWorkNodes.length - 1].h;
+        spine(DATE_X, top, bottom);
+        cap(DATE_X, top - 22, "▲ newest");
+        cap(DATE_X, bottom + 20, "▼ older");
+      }
+    }
+    function updateRowNavs() {
+      world.querySelectorAll(".rrail").forEach((rail) => {
+        const strip = rail.querySelector(".rstrip");
+        const prev = rail.querySelector('[data-row-scroll="-"]');
+        const next = rail.querySelector('[data-row-scroll="+"]');
+        if (!strip || !prev || !next) return;
+        const overflow = strip.scrollWidth > strip.clientWidth + 2;
+        prev.disabled = !overflow || strip.scrollLeft <= 2;
+        next.disabled = !overflow || strip.scrollLeft + strip.clientWidth >= strip.scrollWidth - 2;
+      });
+    }
+    function addDirectTech(set, entry) {
+      (entry?.techIds || []).forEach((techId) => {
+        const nodeId = `t_${techId}`;
+        if (nodes[nodeId]) set.add(nodeId);
+      });
+    }
+    function directLineageSet(id) {
+      const set = new Set();
+      const node = nodes[id];
+      if (!node || node.visible === false) return set;
+      set.add(id);
+      if (id.startsWith("w_")) {
+        const entry = node.source;
+        const projectId = entry?.projectId;
+        if (projectId) {
+          if (nodes[`pr_${projectId}`]) set.add(`pr_${projectId}`);
+          if (nodes[`ro_${projectId}`]) set.add(`ro_${projectId}`);
+        }
+        addDirectTech(set, entry);
+      } else if (id.startsWith("pr_") || id.startsWith("ro_")) {
+        const projectId = id.slice(3);
+        if (nodes[`pr_${projectId}`]) set.add(`pr_${projectId}`);
+        if (nodes[`ro_${projectId}`]) set.add(`ro_${projectId}`);
+        data.entries.filter((entry) => entry.projectId === projectId).forEach((entry) => {
+          const workId = `w_${entry.id}`;
+          if (nodes[workId]?.visible !== false) {
+            set.add(workId);
+            addDirectTech(set, entry);
+          }
+        });
+      } else if (id.startsWith("t_")) {
+        set.add(id);
+        const techId = id.slice(2);
+        data.entries.filter((entry) => entry.techIds.includes(techId)).forEach((entry) => {
+          const workId = `w_${entry.id}`;
+          if (nodes[workId]?.visible !== false) {
+            set.add(workId);
+            if (nodes[`pr_${entry.projectId}`]) set.add(`pr_${entry.projectId}`);
+            if (nodes[`ro_${entry.projectId}`]) set.add(`ro_${entry.projectId}`);
+          }
+        });
+      }
+      return set;
+    }
+    function drawWires() {
+      const current = hover || active;
+      svg.innerHTML = edges.map(([a, b]) => {
+        const A = nodes[a];
+        const B = nodes[b];
+        if (!A || !B) return "";
+        if (A.visible === false || B.visible === false) return "";
+        const x1 = A.x + A.w;
+        const y1 = A.y + A.h / 2;
+        const x2 = B.x;
+        const y2 = B.y + B.h / 2;
+        const dx = Math.max(45, (x2 - x1) * 0.5);
+        const on = current && current.has(a) && current.has(b);
+        const off = current && !on;
+        return `<path d="M${x1},${y1} C${x1 + dx},${y1} ${x2 - dx},${y2} ${x2},${y2}" fill="none" stroke="${on ? "var(--wire-on)" : "var(--wire)"}" stroke-width="${on ? 2.4 : 1.8}" opacity="${off ? 0.12 : 0.9}"/>`;
+      }).join("");
+    }
+    function applyFocus() {
+      const current = hover || active;
+      Object.values(nodes).forEach((node) => node.el.classList.toggle("dimmed", !!current && !current.has(node.id)));
+      drawWires();
+    }
+    function lineRow(id, title, kind, color) {
+      return `<div class="lrow" data-panel-id="${esc(id)}"><span class="ld" style="background:${color}"></span><span class="lname">${esc(title)}</span><span class="lkind">${esc(kind)}</span><span class="arr">›</span></div>`;
+    }
+    function openPanel(id) {
+      const node = nodes[id];
+      if (!node) return;
+      const source = node.source || {};
+      activeNodeId = id;
+      focusWorkId = id.startsWith("w_") ? id : null;
+      selectionTechOrder = orderTechIds(techIdsForNode(id), new Set(techIdsForNode(id)));
+      window.clearTimeout(viewportStackTimer);
+      refreshViewportStack(true);
+      const colors = { tech: "var(--blue)", work: "var(--green)", project: "var(--green)", rolodex: "var(--amber)" };
+      let kind = node.kind;
+      let title = source.name || source.title || "selected node";
+      let sub = source.meta || "";
+      let lead = source.desc || "";
+      let sections = "";
+      let route = source.route || "#";
+      if (id.startsWith("t_")) {
+        route = "#";
+        const users = data.entries.filter((entry) => entry.techIds.includes(source.id));
+        kind = "technology";
+        sub = `${source.category} · ${users.length} entries`;
+        lead = `${source.name} appears in ${users.length} shipped entries.`;
+        sections = `<div class="p-sec"><h4>features using ${esc(source.name)}</h4>${users.slice(0, 10).map((entry) => lineRow(`w_${entry.id}`, entry.title, entry.kind, "var(--green)")).join("")}</div>`;
+      } else if (node.kind === "work") {
+        const project = data.projects.find((item) => item.id === source.projectId);
+        sub = `${source.kind} · latest ${source.dateLabel || source.date}`;
+        sections = `<div class="p-sec"><h4>stack</h4>${(source.stack || []).map((name) => `<span class="tchip">${esc(name)}</span>`).join(" ")}</div>`;
+        if (project) sections += `<div class="p-sec"><h4>rolls up to</h4>${lineRow(`pr_${project.id}`, project.name, "project", "var(--green)")}</div>`;
+        if (source.children?.length) {
+          sections += `<div class="p-sec"><h4>${source.children.length} entries in this line</h4>${source.children.slice(0, 12).map((entry) => `<a class="lrow" href="${esc(entry.route)}"><span class="ld" style="background:var(--amber)"></span><span class="lname">${esc(entry.title)}</span><span class="lkind">${esc(entry.kind)} · ${esc(entry.date)}</span><span class="arr">↗</span></a>`).join("")}</div>`;
+        }
+      } else if (node.kind === "project") {
+        route = "#";
+        const members = data.entries.filter((entry) => entry.projectId === source.id);
+        const links = projectLinks(source, "p-link");
+        kind = "project";
+        sections = `${links ? `<div class="p-links">${links}</div>` : ""}
+          <div class="p-sec"><h4>${members.length} lines in this project</h4>${members.slice(0, 12).map((entry) => lineRow(`w_${entry.id}`, entry.title, entry.kind, "var(--green)")).join("")}</div>`;
+      } else if (node.kind === "rolodex") {
+        route = "#";
+        kind = "showcase";
+        title = `${source.name} showcase`;
+        sub = `${source.count} visual entries`;
+        lead = "Latest embeddable demos and videos grouped into horizontally scrolling rows.";
+        sections = source.rows.map((row) => `<div class="p-sec"><h4>${esc(row.label)}</h4>${row.entries.map((entry) => `<a class="lrow" href="${esc(entry.route)}"><span class="ld" style="background:var(--amber)"></span><span class="lname">${esc(entry.title)}</span><span class="lkind">${esc(entry.kind)}</span><span class="arr">↗</span></a>`).join("")}</div>`).join("");
+      }
+      panelDot.style.background = colors[node.kind] || "var(--green)";
+      panelKind.textContent = kind;
+      panelTitle.textContent = title;
+      panelSub.textContent = sub;
+      panelBody.innerHTML = `<div class="p-lead">${esc(lead)}</div>${sections}`;
+      panelBody.scrollTop = 0;
+      panelOpen.href = route;
+      panelOpen.style.display = route === "#" ? "none" : "inline-flex";
+      panelSlug.href = route;
+      panelSlug.style.display = route === "#" ? "none" : "inline-block";
+      panelSlug.textContent = route === "#" ? "" : route;
+      panel.classList.toggle("no-route", route === "#");
+      panel.classList.add("open");
+      active = directLineageSet(id);
+      Object.values(nodes).forEach((item) => item.el.classList.toggle("sel", item.id === id));
+      applyFocus();
+    }
+    function closePanel() {
+      panel.classList.remove("open");
+      active = null;
+      activeNodeId = null;
+      focusWorkId = null;
+      selectionTechOrder = null;
+      Object.values(nodes).forEach((item) => item.el.classList.remove("sel"));
+      refreshViewportStack(true);
+    }
+    function contentBounds() {
+      const visible = Object.values(nodes).filter((node) => node.visible !== false);
+      if (!visible.length) return { left: 0, top: 0, right: 1800, bottom: 1200 };
+      return visible.reduce((box, node) => ({
+        left: Math.min(box.left, node.x),
+        top: Math.min(box.top, node.y),
+        right: Math.max(box.right, node.x + node.w),
+        bottom: Math.max(box.bottom, node.y + node.h),
+      }), { left: SPEC_X - 42, top: 108, right: ROLO_X + 492, bottom: 900 });
+    }
+    function clampAxis(value, start, end, viewport, before = 42, after = 42) {
+      const min = viewport - after - end * scale;
+      const max = before - start * scale;
+      if (min > max) return (viewport - (end - start) * scale) / 2 - start * scale;
+      return Math.min(max, Math.max(min, value));
+    }
+    function clampPan() {
+      if (!vp.clientWidth || !vp.clientHeight || !Object.keys(nodes).length) return;
+      const bounds = contentBounds();
+      pan.x = clampAxis(pan.x, bounds.left, bounds.right, vp.clientWidth, 42, 42);
+      pan.y = clampAxis(pan.y, Math.min(0, bounds.top), bounds.bottom, vp.clientHeight, 18, 52);
+    }
+    function clearFocusState() {
+      active = null;
+      hover = null;
+      activeNodeId = null;
+      focusWorkId = null;
+      selectionTechOrder = null;
+      viewportTechIds = new Set();
+      viewportTechOrder = [];
+      window.clearTimeout(viewportStackTimer);
+      panel.classList.remove("open");
+      Object.values(nodes).forEach((item) => item.el.classList.remove("sel"));
+    }
+    function apply(options = {}) {
+      clampPan();
+      world.style.transform = `translate(${pan.x}px,${pan.y}px) scale(${scale})`;
+      topbar.classList.toggle("stuck", pan.y < 12);
+      if (options.refresh !== false && !selectionTechOrder && !showAllTech) scheduleViewportStack();
+    }
+    function zoomAt(mx, my, nextScale) {
+      nextScale = Math.min(1.5, Math.max(0.4, nextScale));
+      pan.x = mx - (mx - pan.x) * (nextScale / scale);
+      pan.y = my - (my - pan.y) * (nextScale / scale);
+      scale = nextScale;
+      apply();
+    }
+    function resetView() {
+      world.classList.remove("ready");
+      clearFocusState();
+      layout();
+      buildAxes();
+      const bounds = contentBounds();
+      const contentWidth = Math.max(1, bounds.right - bounds.left);
+      scale = Math.min(0.92, Math.max(0.42, (vp.clientWidth - 84) / (contentWidth + 84)));
+      pan = { x: 42 - bounds.left * scale, y: 18 };
+      apply({ refresh: false });
+      refreshViewportStack(true);
+      drawWires();
+      world.classList.add("ready");
+    }
+    function resetToInitialView() {
+      const run = () => resetView();
+      window.requestAnimationFrame(run);
+      window.setTimeout(run, 80);
+      window.setTimeout(run, 240);
+    }
+    let panning = false;
+    let panStart = null;
+    let drag = null;
+    let candidate = null;
+    let moved = false;
+    let down = { x: 0, y: 0 };
+    vp.addEventListener("mousedown", (event) => {
+      if (event.target.closest(".node")) return;
+      panning = true;
+      moved = false;
+      down = { x: event.clientX, y: event.clientY };
+      vp.classList.add("grabbing");
+      panStart = { x: event.clientX - pan.x, y: event.clientY - pan.y };
+    });
+    world.addEventListener("mousedown", (event) => {
+      if (event.target.closest("a")) return;
+      const el = event.target.closest(".node");
+      if (!el) return;
+      if (event.target.closest(".rrows")) return;
+      if (event.target.closest("[data-open-project]")) return;
+      candidate = nodes[el.dataset.id];
+      moved = false;
+      down = { x: event.clientX, y: event.clientY };
+      if (event.target.closest("[data-handle]")) drag = { node: candidate, x: candidate.x, y: candidate.y };
+      event.stopPropagation();
+    });
+    window.addEventListener("mousemove", (event) => {
+      if (Math.abs(event.clientX - down.x) + Math.abs(event.clientY - down.y) > 5) moved = true;
+      if (panning) {
+        pan = { x: event.clientX - panStart.x, y: event.clientY - panStart.y };
+        apply();
+      } else if (drag && moved) {
+        drag.node.x = drag.x + (event.clientX - down.x) / scale;
+        drag.node.y = drag.y + (event.clientY - down.y) / scale;
+        drag.node.el.style.left = `${drag.node.x}px`;
+        drag.node.el.style.top = `${drag.node.y}px`;
+        drawWires();
+      }
+    });
+    window.addEventListener("mouseup", (event) => {
+      const wasPanning = panning;
+      panning = false;
+      vp.classList.remove("grabbing");
+      if (candidate && !moved && !event.target.closest("a")) openPanel(candidate.id);
+      else if (wasPanning && !moved && panel.classList.contains("open")) closePanel();
+      drag = null;
+      candidate = null;
+    });
+    vp.addEventListener("wheel", (event) => {
+      event.preventDefault();
+      const rect = vp.getBoundingClientRect();
+      zoomAt(event.clientX - rect.left, event.clientY - rect.top, scale - event.deltaY * 0.0013);
+    }, { passive:false });
+    world.addEventListener("wheel", (event) => {
+      const strip = event.target.closest(".rstrip");
+      if (!strip || strip.scrollWidth <= strip.clientWidth + 2) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const dominantDelta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+      strip.scrollLeft += dominantDelta;
+      updateRowNavs();
+    }, { passive:false });
+    world.addEventListener("mouseover", (event) => {
+      if (activeNodeId) return;
+      const row = event.target.closest("[data-focus-id]");
+      const mod = event.target.closest(".node.rolodex");
+      hover = row ? directLineageSet(row.dataset.focusId) : mod ? directLineageSet(mod.dataset.id) : null;
+      applyFocus();
+    });
+    world.addEventListener("mouseleave", () => {
+      hover = null;
+      applyFocus();
+    });
+    world.addEventListener("click", (event) => {
+      const scrollBtn = event.target.closest("[data-row-scroll]");
+      if (scrollBtn) {
+        event.preventDefault();
+        const strip = scrollBtn.closest(".rrail")?.querySelector(".rstrip");
+        if (strip) {
+          const direction = scrollBtn.dataset.rowScroll === "+" ? 1 : -1;
+          strip.scrollBy({ left: direction * Math.max(240, strip.clientWidth * 0.72), behavior: "smooth" });
+          window.setTimeout(updateRowNavs, 220);
+        }
+        return;
+      }
+      const row = event.target.closest("[data-panel-id]");
+      if (row) {
+        event.preventDefault();
+        openPanel(row.dataset.panelId);
+      }
+      const project = event.target.closest("[data-open-project]");
+      if (project) {
+        event.preventDefault();
+        openPanel(`pr_${project.dataset.openProject}`);
+      }
+    });
+    document.querySelectorAll("[data-zoom]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const value = button.dataset.zoom;
+      if (value === "fit") resetView();
+      else {
+        const rect = vp.getBoundingClientRect();
+        zoomAt(rect.width / 2, rect.height / 2, scale + (value === "+" ? 0.14 : -0.14));
+      }
+      });
+    });
+    document.getElementById("panelClose").addEventListener("click", closePanel);
+    panel.addEventListener("click", (event) => {
+      const row = event.target.closest("[data-panel-id]");
+      if (!row) return;
+      event.preventDefault();
+      openPanel(row.dataset.panelId);
+    });
+    world.addEventListener("scroll", (event) => {
+      if (event.target.classList?.contains("rstrip")) updateRowNavs();
+    }, true);
+    render();
+    if (stackToggleBtn) {
+      stackToggleBtn.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        showAllTech = !showAllTech;
+        refreshViewportStack(true);
+      });
+    }
+    resetView();
+    window.addEventListener("resize", () => {
+      resetView();
+    });
+    window.addEventListener("load", resetToInitialView);
+    window.addEventListener("pageshow", resetToInitialView);
+  </script>
+</BaseLayout>

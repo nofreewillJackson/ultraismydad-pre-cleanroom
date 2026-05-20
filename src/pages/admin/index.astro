@@ -1,0 +1,150 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+---
+<BaseLayout title="artlu.ai — admin" description="artlu.ai admin dashboard." noindex>
+  <Header active="admin" variant="admin" />
+  <main class="admin-page">
+    <div class="admin-card" id="adminGate">
+      <div class="admin-card-h">
+        <h2>$ admin access</h2>
+        <button class="mini-btn primary" type="button" id="adminSignIn">sign in with google</button>
+      </div>
+      <div class="admin-card-b">
+        <p class="meta" id="adminStatus">checking auth...</p>
+        <p class="meta">If nothing opens, use Chrome or Safari directly and allow popups for this local site.</p>
+      </div>
+    </div>
+
+    <section class="admin-app" id="adminApp" hidden>
+      <div class="admin-toolbar">
+        <div class="tl-left">
+          <span class="dash">◆ dashboard</span>
+          <span class="stats" id="dashboardStats">loading tracker data...</span>
+        </div>
+        <div class="tl-btns">
+          <button class="add-btn alt" type="button" id="reloadProjects">reload</button>
+          <button class="add-btn alt" type="button" id="newProject">+ new project</button>
+          <button class="add-btn" type="button" id="newEntry">+ add entry</button>
+        </div>
+      </div>
+
+      <section class="admin-section" data-sec="projects">
+        <div class="sec-h"><span class="sec-h-label">main projects &amp; series</span><span class="sec-caret" aria-hidden="true">▾</span></div>
+        <div class="admin-section-body">
+          <div class="proj-panel" id="projPanel">
+            <div class="empty">loading projects...</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="admin-section" data-sec="timeline">
+        <div class="sec-h"><span class="sec-h-label">the timeline</span><span class="sec-caret" aria-hidden="true">▾</span></div>
+        <div class="admin-section-body">
+          <div id="adminFeed">
+            <div class="empty">loading entries...</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="admin-section" data-sec="stack">
+        <div class="sec-h"><span class="sec-h-label">stack tags</span><span class="sec-caret" aria-hidden="true">▾</span></div>
+        <div class="admin-section-body">
+          <div class="stack-admin-panel">
+        <div class="stack-admin-left">
+          <label class="field"><span>filter</span><input id="techFilter" placeholder="filter stack tags..." /></label>
+          <div class="tech-list" id="techList"><div class="empty">loading stack tags...</div></div>
+        </div>
+        <div class="stack-admin-right">
+          <div class="form-grid tech-form-head">
+            <label class="field"><span>id</span><input id="t-id" placeholder="firestore" /></label>
+            <label class="field"><span>category</span><select id="t-category"><option>frontend</option><option>backend</option><option>data</option><option>infra</option><option>media</option><option>agents</option><option>other</option></select></label>
+          </div>
+          <label class="field"><span>name</span><input id="t-name" placeholder="Firestore" /></label>
+          <label class="field"><span>aliases</span><textarea id="t-aliases" placeholder="firebase firestore, firestore db"></textarea></label>
+          <div class="form-grid tech-form-head">
+            <label class="field"><span>sort order</span><input id="t-sort" type="number" /></label>
+            <label class="field"><span>visibility</span><select id="t-vis"><option>public</option><option>private</option></select></label>
+          </div>
+          <div class="admin-actions">
+            <button class="mini-btn" type="button" id="reloadTech">reload</button>
+            <button class="mini-btn" type="button" id="newTech">+ new</button>
+            <button class="mini-btn" type="button" id="hideTech">remove / hide</button>
+            <button class="mini-btn primary" type="button" id="saveTech">save tag</button>
+          </div>
+          <p class="meta">remove hides the tag instead of deleting it, so old tracker entries keep history.</p>
+        </div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div class="overlay" id="entryOverlay">
+    <div class="modal wide">
+      <div class="modal-title" id="modalTitle">$ edit entry</div>
+      <div class="modal-scroll">
+        <label class="field"><span>main project</span><select id="f-main"></select></label>
+        <label class="field"><span>series / subgroup</span><select id="f-series"></select></label>
+        <label class="field"><span>name</span><input id="f-name" /></label>
+        <label class="field"><span>short description</span><textarea id="f-desc"></textarea></label>
+        <label class="field"><span>long description</span><textarea id="f-long"></textarea></label>
+        <div class="form-grid entry-form-row">
+          <label class="field"><span>date</span><input id="f-date" type="date" /></label>
+          <label class="field"><span>status</span><select id="f-status"><option>idea</option><option>building</option><option>launched</option><option>abandoned</option></select></label>
+          <label class="field"><span>visibility</span><select id="f-vis"><option>public</option><option>private</option><option>gated</option></select></label>
+        </div>
+        <label class="field"><span>stack labels</span><input id="f-stack" placeholder="React, Astro, Firestore" /></label>
+        <div class="field">
+          <span>canonical stack refs</span>
+          <div class="stack-picker">
+            <input id="techSearch" placeholder="search stack tags..." />
+            <div class="chip-row" id="selectedTech"></div>
+            <div class="tech-options" id="techOptions"></div>
+          </div>
+        </div>
+        <label class="field"><span>tags</span><input id="f-tags" placeholder="ecom, dev tool" /></label>
+        <label class="field"><span>live link</span><input id="f-link" /></label>
+        <label class="field"><span>github repo</span><input id="f-repo" /></label>
+        <label class="field"><span>media</span><input id="f-media" placeholder="https://youtu.be/..." /></label>
+        <label class="field"><span>artifact html</span><textarea id="f-artifact" placeholder="<!DOCTYPE html>..."></textarea></label>
+      </div>
+      <div class="modal-btns">
+        <button class="m-cancel" type="button" id="cancelProject">cancel</button>
+        <button class="m-save" type="button" id="saveProject">save</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    import "../../scripts/admin.ts";
+  </script>
+
+  <script is:inline>
+    /* admin section collapse — UI only, state persisted to localStorage */
+    (function () {
+      const KEY = "artlu-admin-collapsed";
+      function load() {
+        try { return new Set(JSON.parse(localStorage.getItem(KEY) || "[]")); }
+        catch (e) { return new Set(); }
+      }
+      function save(set) {
+        try { localStorage.setItem(KEY, JSON.stringify([...set])); } catch (e) {}
+      }
+      const state = load();
+      document.querySelectorAll(".admin-section").forEach((sec) => {
+        const id = sec.dataset.sec;
+        if (id && state.has(id)) sec.classList.add("collapsed");
+        const h = sec.querySelector(".sec-h");
+        if (!h) return;
+        h.addEventListener("click", () => {
+          sec.classList.toggle("collapsed");
+          if (!id) return;
+          if (sec.classList.contains("collapsed")) state.add(id);
+          else state.delete(id);
+          save(state);
+        });
+      });
+    })();
+  </script>
+</BaseLayout>

@@ -1,0 +1,184 @@
+{
+  "id": "news-anime-bot-2026-05-12",
+  "format": "short",
+  "show": "news-anime-bot",
+  "title": "Nvidia invests $40B in companies that spend on Nvidia",
+  "desc": "Daily AI news satire. Nvidia pours $40B into companies whose business model is buying more Nvidia GPUs.",
+  "shippedAt": "2026-05-12",
+  "durationSec": 58,
+  "topicTier": "GREEN",
+  "video": {
+    "youtubeId": "hGTkj0kYmoo",
+    "tiktokId": "7638994693791026463",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7638994693791026463",
+    "mp4Url": null,
+    "thumbnailUrl": "https://i.ytimg.com/vi/hGTkj0kYmoo/oardefault.jpg"
+  },
+  "preRoll": {
+    "burnedText": "⚠ SATIRE — AI-GENERATED PARODY — NOT REAL",
+    "voiceTag": "FAUX7 News. Satire."
+  },
+  "characters": [],
+  "beats": [
+    {
+      "n": 1,
+      "name": "vault-doors-cold-open",
+      "durationSec": 5,
+      "narration": "Nvidia has committed more than forty billion dollars in equity bets this year.",
+      "character": "-",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-12/assets/beats/01-vault-doors-cold-open.webp"
+    },
+    {
+      "n": 2,
+      "name": "dragon-on-hoard",
+      "durationSec": 5,
+      "narration": "The money is going to companies that build artificial intelligence.",
+      "character": "-",
+      "sourceChyron": "$40B EQUITY COMMITTED - 2026",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-12/assets/beats/02-dragon-on-hoard.webp"
+    },
+    {
+      "n": 3,
+      "name": "coin-launches-into-tube",
+      "durationSec": 5,
+      "narration": "Those companies use the money to buy chips. From Nvidia.",
+      "character": "-",
+      "sourceChyron": "NVIDIA AS AI ECONOMY INVESTOR",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-12/assets/beats/03-coin-launches-into-tube.webp"
+    },
+    {
+      "n": 4,
+      "name": "tube-snakes-through-city",
+      "durationSec": 5,
+      "narration": "The largest bet is a thirty-billion-dollar check for OpenAI.",
+      "character": "-",
+      "sourceChyron": "$30B CHECK TO OPENAI",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-12/assets/beats/04-tube-snakes-through-city.webp"
+    },
+    {
+      "n": 5,
+      "name": "tower-receives-coin",
+      "durationSec": 5,
+      "narration": "Other recent deals include up to two-point-one billion for IREN.",
+      "character": "-",
+      "sourceChyron": "UP TO $2.1B - IREN",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-12/assets/beats/05-tower-receives-coin.webp"
+    },
+    {
+      "n": 6,
+      "name": "tower-sends-chipbox-back",
+      "durationSec": 5,
+      "narration": "And up to three-point-two billion for Corning, per CNBC.",
+      "character": "-",
+      "sourceChyron": "UP TO $3.2B - CORNING",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-12/assets/beats/06-tower-sends-chipbox-back.webp"
+    },
+    {
+      "n": 7,
+      "name": "hoard-grows-from-returns",
+      "durationSec": 5,
+      "narration": "Nvidia's revenue is then used to fund additional equity rounds.",
+      "character": "-",
+      "sourceChyron": "REVENUE LOOPS HOMEWARD",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-12/assets/beats/07-hoard-grows-from-returns.webp"
+    },
+    {
+      "n": 8,
+      "name": "wide-reveal-closed-ring",
+      "durationSec": 6,
+      "narration": "The cash leaves Nvidia, visits a customer, and comes back as a chip order.",
+      "character": "-",
+      "sourceChyron": "A CLOSED CIRCLE",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-12/assets/beats/08-wide-reveal-closed-ring.webp"
+    },
+    {
+      "n": 9,
+      "name": "mask-off-same-dragon",
+      "durationSec": 5,
+      "narration": "Reports describe Nvidia as the AI economy's largest equity investor.",
+      "character": "-",
+      "sourceChyron": "TWO INVESTORS ONE DRAGON",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-12/assets/beats/09-mask-off-same-dragon.webp"
+    },
+    {
+      "n": 10,
+      "name": "ledger-arrow-loops",
+      "durationSec": 5,
+      "narration": "Big Tech capital expenditure on AI is expected to top one trillion dollars in 2027.",
+      "character": "-",
+      "sourceChyron": "EQUITY OUT EQUALS REVENUE IN",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-12/assets/beats/10-ledger-arrow-loops.webp"
+    },
+    {
+      "n": 11,
+      "name": "calculator-infinity",
+      "durationSec": 4,
+      "narration": "Analysts have begun describing the pattern as circular.",
+      "character": "-",
+      "sourceChyron": "BIG TECH AI CAPEX $1T BY 2027",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-12/assets/beats/11-calculator-infinity.webp"
+    },
+    {
+      "n": 12,
+      "name": "ronin-walks-into-shadow",
+      "durationSec": 6,
+      "narration": "The cycle continues, indistinguishable from value creation.",
+      "character": "-",
+      "sourceChyron": "INDISTINGUISHABLE FROM VALUE",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-12/assets/beats/12-ronin-walks-into-shadow.webp"
+    }
+  ],
+  "sources": [
+    {
+      "fact": "",
+      "attribution": "Nvidia embraces AI investor, topping $40 billion in equity bets (CNBC)",
+      "url": "https://www.cnbc.com/2026/05/09/nvidia-embraces-ai-investor-topping-40-billion-in-equity-bets-2026.html"
+    },
+    {
+      "fact": "AI boom",
+      "attribution": "Big Tech capital expenditures now seen topping $1 trillion in 2027 (CNBC)",
+      "url": "https://www.cnbc.com/2026/04/30/ai-boom-big-tech-capital-expenditures-now-seen-topping-1-trillion-in-2027-.html"
+    }
+  ],
+  "transcript": "Nvidia has committed more than forty billion dollars in equity bets this year. The money is going to companies that build artificial intelligence. Those companies use the money to buy chips. From Nvidia. The largest bet is a thirty-billion-dollar check for OpenAI. Other recent deals include up to two-point-one billion for IREN. And up to three-point-two billion for Corning, per CNBC. Nvidia's revenue is then used to fund additional equity rounds. The cash leaves Nvidia, visits a customer, and comes back as a chip order. Reports describe Nvidia as the AI economy's largest equity investor. Big Tech capital expenditure on AI is expected to top one trillion dollars in 2027. Analysts have begun describing the pattern as circular. The cycle continues, indistinguishable from value creation.",
+  "summary": {
+    "writing": {
+      "author": "Claude",
+      "role": "script · beat plan · narration · sources audit"
+    },
+    "videoClips": {
+      "platform": "kie.ai",
+      "models": [
+        "Seedance 2.0 Fast"
+      ],
+      "clipCount": 12
+    },
+    "audio": {
+      "tts": "Google Cloud TTS",
+      "voice": "Schedar",
+      "beatCount": 12
+    },
+    "render": {
+      "engine": "ffmpeg",
+      "passed": true
+    },
+    "cost": "~$5.00."
+  },
+  "showcase": {
+    "hiddenBeatNs": [],
+    "notes": "Aninews ep 8. Tracker entry exists, guidebookStatus: pending. Ready to ship — script can build the guidebook."
+  }
+}

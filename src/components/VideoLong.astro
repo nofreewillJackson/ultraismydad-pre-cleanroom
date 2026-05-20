@@ -1,0 +1,115 @@
+---
+import { fmtDateFull, fmtDuration, renderMarkdownLite } from "../lib/format";
+
+type Props = { bundle: any };
+const { bundle } = Astro.props;
+const hidden = new Set(bundle.showcase?.hiddenChunkIds || []);
+const chunks = (bundle.chunks || []).filter((chunk: any) => !hidden.has(chunk.id));
+const summary = bundle.summary || {};
+const summaryRows = [
+  ["writing", summary.writing && `${summary.writing.author || ""} ${summary.writing.role ? `· ${summary.writing.role}` : ""}`],
+  ["images", summary.images && `${summary.images.generated || summary.images.count || ""} generated ${summary.images.model ? `· ${summary.images.model}` : ""}`],
+  ["audio", summary.audio && `${summary.audio.voice || ""} ${summary.audio.beatCount ? `· ${summary.audio.beatCount} beats` : ""}`],
+  ["render", summary.render && `${summary.render.engine || ""} ${summary.render.durationSec ? `· ${summary.render.durationSec}s` : ""}`],
+  ["audit", summary.audit && `${summary.audit.passed ?? ""} passed ${summary.audit.failed ? `· ${summary.audit.failed} flagged` : ""}`],
+].filter((row) => row[1]);
+---
+<div class="video-shell">
+  <a class="back" href="/list" data-back-to-last-index>← all projects</a>
+  <div class="meta">$ video · {bundle.id}</div>
+  <h1 class="v-title">{bundle.title}</h1>
+  <div class="meta">{fmtDateFull(bundle.shippedAt)} · {fmtDuration(bundle.durationSec)}{bundle.style?.name && <> · style: {bundle.style.name}</>}</div>
+
+  <div class="vplayer" style="margin-top:16px">
+    {bundle.video?.youtubeId
+      ? <iframe src={`https://www.youtube.com/embed/${bundle.video.youtubeId}?rel=0&modestbranding=1`} title={bundle.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      : bundle.video?.mp4Url
+        ? <video src={bundle.video.mp4Url} controls></video>
+        : <div class="empty">video embed pending</div>}
+  </div>
+
+  {bundle.coreMessage && (
+    <div class="quote">
+      <div class="quote-label">core message</div>
+      <div class="quote-text">{bundle.coreMessage}</div>
+    </div>
+  )}
+
+  {bundle.style && (
+    <section class="section">
+      <div class="section-head"><h2 class="h2">style library</h2><div class="section-meta">{bundle.style.name}</div></div>
+      <div class="style-panel">
+        {bundle.style.description && <div class="md" set:html={renderMarkdownLite(bundle.style.description)}></div>}
+        {bundle.style.anchorImageUrl && (
+          <div class="anchor-row">
+            <img src={bundle.style.anchorImageUrl} alt="style anchor" loading="lazy" />
+            <div>
+              <div class="quote-label">style anchor</div>
+              <div class="r-sub" style="white-space:normal">{bundle.style.anchorDescription}</div>
+            </div>
+          </div>
+        )}
+        {bundle.style.references?.length > 0 && (
+          <div class="ref-grid">
+            {bundle.style.references.map((ref: any) => (
+              <div class="ref-card">
+                {ref.imageUrl && <img src={ref.imageUrl} alt="" loading="lazy" />}
+                <div class="ref-card-body">
+                  <div class="ref-name">{ref.name} <span class="meta">{ref.kind}</span></div>
+                  <div class="ref-desc" title={ref.description}>{ref.description}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  )}
+
+  {summaryRows.length > 0 && (
+    <section class="section">
+      <div class="section-head"><h2 class="h2">summary</h2><div class="section-meta">how this video was made</div></div>
+      <div class="summary-panel">
+        {summaryRows.map(([label, value]) => (
+          <div class="sum-row"><div class="sum-label">{label}</div><div class="sum-value">{value}</div></div>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="section">
+    <div class="section-head"><h2 class="h2">chunks</h2><div class="section-meta">{chunks.length} scenes</div></div>
+    {chunks.map((chunk: any, index: number) => (
+      <article class="chunk">
+        <div class="chunk-thumb">
+          {chunk.sceneImageUrl ? <img src={chunk.sceneImageUrl} alt="" loading="lazy" /> : <div class="empty">title card</div>}
+        </div>
+        <div>
+          <div class="chunk-id">#{index + 1} · {chunk.id}</div>
+          <h3 class="chunk-title">{chunk.sceneTitle || chunk.title || "scene"}</h3>
+          {(chunk.beats || []).length > 0
+            ? chunk.beats.map((beat: any) => <div class="beat">{beat.narration || beat.text || beat}</div>)
+            : <div class="beat">title card</div>}
+          <div class="audit-row">
+            {chunk.audits?.narration && <span class:list={["badge", chunk.audits.narration.passed ? "pass" : "fail"]}>{chunk.audits.narration.passed ? "✓" : "!"} narration</span>}
+            {chunk.audits?.render && <span class:list={["badge", chunk.audits.render.passed ? "pass" : "fail"]}>{chunk.audits.render.passed ? "✓" : "!"} render</span>}
+            {chunk.model && <span class="badge">{chunk.model}</span>}
+          </div>
+          {chunk.prompt && (
+            <>
+              <button class="prompt-toggle" type="button" aria-controls={`prompt-${chunk.id}`}><span data-caret>▸</span> scene prompt</button>
+              <div class="prompt-box" id={`prompt-${chunk.id}`}>{chunk.prompt}</div>
+            </>
+          )}
+        </div>
+      </article>
+    ))}
+  </section>
+
+  {bundle.transcript && (
+    <section class="section">
+      <button class="tr-toggle" type="button" aria-controls="fullTranscript"><span data-caret>▸</span> full transcript</button>
+      <div class="tr-box" id="fullTranscript">{Array.isArray(bundle.transcript) ? bundle.transcript.join("\n\n") : bundle.transcript}</div>
+    </section>
+  )}
+</div>

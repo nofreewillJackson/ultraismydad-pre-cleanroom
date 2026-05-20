@@ -1,0 +1,109 @@
+---
+import "../styles/global.css";
+
+type Props = {
+  title?: string;
+  description?: string;
+  canonical?: string;
+  noindex?: boolean;
+};
+
+const {
+  title = "artlu.ai — 100 days. 100 features.",
+  description = "Just AI and an internet connection. A static archive of shipped projects, research, videos, and build notes.",
+  canonical,
+  noindex = false,
+} = Astro.props;
+
+const url = canonical || new URL(Astro.url.pathname, "https://artlu.ai").toString();
+---
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>try{var _t=localStorage.getItem('artlu-theme');if(_t)document.documentElement.dataset.theme=_t;}catch(e){}</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="icon" href="/favicon.svg" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex,nofollow" />}
+    <link rel="canonical" href={url} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="artlu.ai" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={url} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <slot name="head" />
+  </head>
+  <body>
+    <slot />
+    <script is:inline>
+      window.toggleTheme = function toggleTheme(){
+        var root = document.documentElement;
+        var next = root.dataset.theme === "light" ? "dark" : "light";
+        root.dataset.theme = next;
+        try { localStorage.setItem("artlu-theme", next); } catch(e) {}
+      };
+      try {
+        var path = window.location.pathname.replace(/\/$/, "") || "/";
+        var indexViews = { "/": true, "/map": true, "/list": true };
+        if (indexViews[path]) sessionStorage.setItem("artlu-last-index-view", path);
+        document.querySelectorAll("[data-back-to-last-index]").forEach(function(link){
+          var target = sessionStorage.getItem("artlu-last-index-view") || "/list";
+          link.setAttribute("href", target);
+        });
+      } catch(e) {}
+      window.addEventListener("scroll", function(){
+        document.querySelectorAll(".topbar[data-sticky='scroll']").forEach(function(bar){
+          bar.classList.toggle("stuck", window.scrollY > 6);
+        });
+      }, { passive:true });
+      document.querySelectorAll(".topbar[data-sticky='scroll']").forEach(function(bar){
+        bar.classList.toggle("stuck", window.scrollY > 6);
+      });
+      document.addEventListener("click", function(e){
+        var tab = e.target.closest("[data-tab-target]");
+        if (tab) {
+          var root = tab.closest("[data-tabs]");
+          if (!root) return;
+          var target = tab.getAttribute("data-tab-target");
+          root.querySelectorAll("[data-tab-target]").forEach(function(btn){ btn.classList.toggle("on", btn === tab); });
+          root.querySelectorAll("[data-tab-panel]").forEach(function(panel){ panel.classList.toggle("on", panel.getAttribute("data-tab-panel") === target); });
+        }
+        var row = e.target.closest(".item .r");
+        if (row && !e.target.closest("a,button")) {
+          var item = row.closest(".item");
+          item.classList.toggle("open");
+          item.querySelectorAll("iframe[data-src]").forEach(function(frame){
+            if (!frame.getAttribute("src")) frame.setAttribute("src", frame.dataset.src);
+          });
+        }
+        var fold = e.target.closest(".fb-fold");
+        if (fold) {
+          var dir = fold.closest(".fb-dir");
+          dir.classList.toggle("open");
+          fold.querySelector("span").textContent = dir.classList.contains("open") ? "▾" : "▸";
+        }
+        var file = e.target.closest(".fb-item");
+        if (file) {
+          var root = file.closest(".fb");
+          root.querySelectorAll(".fb-item").forEach(function(btn){ btn.classList.remove("sel"); });
+          file.classList.add("sel");
+          var viewer = root.querySelector(".fb-view");
+          viewer.textContent = file.dataset.content || "content unavailable";
+        }
+        var toggle = e.target.closest(".prompt-toggle,.tr-toggle");
+        if (toggle) {
+          var box = document.getElementById(toggle.getAttribute("aria-controls"));
+          if (!box) return;
+          var open = box.classList.toggle("open");
+          toggle.querySelector("[data-caret]").textContent = open ? "▾" : "▸";
+        }
+      });
+    </script>
+  </body>
+</html>

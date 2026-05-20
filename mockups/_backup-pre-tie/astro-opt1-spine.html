@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>artlu.ai — option 1 · spectrum spine</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:#08090a; --surface:#0e0f11; --surface-2:#16191d;
+    --border:#1a1d22; --border-strong:#2b3038; --border-hover:#4a525e;
+    --text:#c0c4cc; --text-bright:#f0f1f3; --text-sub:#9aa0aa;
+    --dim:#6b7280; --green:#4ade80; --green-bg:#062b12; --green-border:#1d4d31; --blue:#60a5fa;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; }
+  body { background:var(--bg); color:var(--text); font-family:var(--mono); font-size:13px; overflow:hidden; }
+  .topbar { height:52px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; align-items:center; gap:14px; padding:0 18px; position:relative; z-index:30; }
+  .brand { font-weight:600; font-size:15px; color:var(--text-bright); }
+  .opt { font-size:11px; color:var(--green); border:1px solid var(--green-border); background:var(--green-bg); padding:3px 9px; border-radius:4px; }
+  .tip { margin-left:auto; font-size:11.5px; color:var(--dim); }
+  .tip b { color:var(--text-sub); font-weight:500; }
+  .viewport { position:absolute; top:52px; left:0; right:0; bottom:0; overflow:hidden; cursor:grab;
+    background:radial-gradient(circle,#15181d 1.4px,transparent 1.4px); background-size:30px 30px; }
+  .viewport.grab { cursor:grabbing; }
+  .world { position:absolute; top:0; left:0; width:1200px; height:1100px; transform-origin:0 0; }
+  svg { position:absolute; top:0; left:0; width:1200px; height:1100px; overflow:visible; z-index:1; }
+
+  .spine { position:absolute; left:128px; width:1px; background:var(--border-strong); }
+  .band { position:absolute; left:0; width:118px; text-align:right; font-size:10px; letter-spacing:1.4px;
+    text-transform:uppercase; color:var(--dim); transform:translateY(-50%); }
+
+  .tech { position:absolute; width:212px; background:var(--surface); border:1px solid var(--border-strong);
+    border-radius:7px; padding:9px 12px; display:flex; align-items:center; gap:9px; z-index:2; transition:opacity .15s; }
+  .tdot { width:8px; height:8px; border-radius:2px; background:var(--blue); }
+  .tname { color:var(--text-bright); font-weight:600; font-size:13px; flex:1; }
+  .tcat { font-size:9.5px; color:var(--dim); }
+
+  .proj { position:absolute; width:288px; background:var(--surface); border:1px solid #27412f;
+    border-radius:8px; z-index:2; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,0.5); transition:opacity .15s; }
+  .proj:hover { border-color:var(--green-border); }
+  .phead { display:flex; align-items:center; gap:8px; padding:9px 12px; background:var(--green-bg); border-bottom:1px solid var(--border); border-radius:8px 8px 0 0; }
+  .pglyph { color:var(--green); font-size:10px; }
+  .pname { color:var(--text-bright); font-weight:600; font-size:13.5px; flex:1; }
+  .ptag { font-size:9.5px; color:var(--green); border:1px solid var(--green-border); border-radius:3px; padding:1px 6px; }
+  .pbody { padding:9px 12px; }
+  .psig { display:flex; gap:3px; margin-bottom:7px; }
+  .psig span { height:6px; flex:1; border-radius:2px; background:var(--border); }
+  .psig span.on { background:var(--green); }
+  .pmeta { font-size:11px; color:var(--dim); }
+  .dim { opacity:0.14; }
+  .hint { position:absolute; left:16px; bottom:14px; font-size:10.5px; color:var(--dim); background:rgba(8,9,10,0.9);
+    border:1px solid var(--border); border-radius:5px; padding:7px 11px; z-index:20; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">artlu.ai</div><span class="opt">option 1 · spectrum spine</span>
+  <div class="tip"><b>fixed tech spine — projects sit at their stack's center of gravity. 100 projects = 100 dots on one spine.</b></div>
+</div>
+<div class="viewport" id="vp"><div class="world" id="world"><svg id="svg"></svg></div></div>
+<div class="hint">click a project to highlight the tech it uses · drag to pan</div>
+
+<script>
+  const CATS=[['frontend','frontend / ui'],['api','api layer'],['data','data'],['infra','infra'],['media','ai · media']];
+  const techs=[
+    {id:'react',n:'React',c:'frontend'},{id:'tailwind',n:'Tailwind',c:'frontend'},{id:'vanilla',n:'vanilla JS',c:'frontend'},
+    {id:'trpc',n:'tRPC',c:'api'},{id:'node',n:'Node.js',c:'api'},{id:'mcp',n:'MCP',c:'api'},
+    {id:'drizzle',n:'Drizzle',c:'data'},{id:'mysql',n:'MySQL',c:'data'},{id:'postgres',n:'Postgres',c:'data'},{id:'firebase',n:'Firebase',c:'data'},
+    {id:'railway',n:'Railway',c:'infra'},{id:'playwright',n:'Playwright',c:'infra'},
+    {id:'remotion',n:'Remotion',c:'media'},{id:'ffmpeg',n:'ffmpeg',c:'media'},{id:'gtts',n:'Google Cloud TTS',c:'media'},{id:'seedance',n:'Seedance',c:'media'},
+  ];
+  const projects=[
+    {id:'adsmetri',n:'AdsMetri',t:['react','tailwind','trpc','drizzle','mysql']},
+    {id:'pipelinecpc',n:'PipelineCPC',t:['node','mcp','firebase','railway']},
+    {id:'spoolcast',n:'spoolcast',t:['remotion','ffmpeg','gtts','seedance']},
+    {id:'vibeskill',n:'VibeSkill',t:['react','tailwind','vanilla']},
+    {id:'animabot',n:'Animabot',t:['node','postgres','playwright']},
+    {id:'xqboost',n:'xqboost',t:['node','react','firebase']},
+    {id:'sitesnapshot',n:'sitesnapshot',t:['node','playwright','firebase']},
+    {id:'track',n:'TRACK',t:['react','firebase']},
+  ];
+  const world=document.getElementById('world'), svg=document.getElementById('svg');
+  const tN={}, pN={};
+
+  techs.forEach((t,i)=>{
+    const el=document.createElement('div'); el.className='tech';
+    el.style.left='160px'; el.style.top=(70+i*54)+'px';
+    el.innerHTML=`<span class="tdot"></span><span class="tname">${t.n}</span><span class="tcat">${t.c}</span>`;
+    world.appendChild(el); tN[t.id]={el,x:160,y:70+i*54,w:212,h:38};
+  });
+  // band labels
+  CATS.forEach(([id,label])=>{
+    const ys=techs.map((t,i)=>({t,i})).filter(o=>o.t.c===id).map(o=>70+o.i*54+19);
+    const mid=ys.reduce((a,b)=>a+b,0)/ys.length;
+    const b=document.createElement('div'); b.className='band'; b.style.top=mid+'px'; b.textContent=label;
+    world.appendChild(b);
+  });
+  const sp=document.createElement('div'); sp.className='spine'; sp.style.top='62px'; sp.style.height=(techs.length*54)+'px';
+  world.appendChild(sp);
+
+  // projects at center-of-gravity of their techs
+  const pl=projects.map(p=>{
+    const cog=p.t.reduce((s,id)=>s+tN[id].y+19,0)/p.t.length;
+    return {p,cog};
+  }).sort((a,b)=>a.cog-b.cog);
+  pl.forEach((o,i)=>{
+    const p=o.p;
+    const cats=[...new Set(p.t.map(id=>techs.find(t=>t.id===id).c))];
+    const sig=CATS.map(([c])=>`<span class="${cats.includes(c)?'on':''}"></span>`).join('');
+    const el=document.createElement('div'); el.className='proj';
+    el.innerHTML=`<div class="phead"><span class="pglyph">◆</span><span class="pname">${p.n}</span><span class="ptag">project</span></div>
+      <div class="pbody"><div class="psig">${sig}</div><div class="pmeta">${p.t.length} technologies</div></div>`;
+    world.appendChild(el);
+    pN[p.id]={el,p,y:o.cog,w:288,h:84};
+  });
+  // resolve overlaps
+  let last=-999;
+  pl.forEach(o=>{
+    let y=pN[o.p.id].y-42;
+    if(y<last+96) y=last+96;
+    last=y; pN[o.p.id].y=y;
+    pN[o.p.id].el.style.left='640px'; pN[o.p.id].el.style.top=y+'px';
+  });
+
+  function draw(active){
+    let out='';
+    projects.forEach(p=>{
+      const P=pN[p.id];
+      p.t.forEach(id=>{
+        const T=tN[id];
+        const x1=640, y1=P.y+42, x2=T.x+T.w, y2=T.y+19;
+        const on=!active||active===p.id;
+        out+=`<path d="M${x1},${y1} C${x1-80},${y1} ${x2+80},${y2} ${x2},${y2}" fill="none"
+          stroke="${active===p.id?'#4ade80':'#34543f'}" stroke-width="${active===p.id?2:1.6}" opacity="${active&&active!==p.id?0.06:0.8}"/>`;
+      });
+    });
+    svg.innerHTML=out;
+  }
+  draw(null);
+
+  let sel=null;
+  Object.values(pN).forEach(P=>{
+    P.el.addEventListener('click',e=>{
+      e.stopPropagation();
+      sel=sel===P.p.id?null:P.p.id;
+      const sp=sel?projects.find(x=>x.id===sel):null;
+      Object.values(pN).forEach(o=>o.el.classList.toggle('dim',!!sel&&o.p.id!==sel));
+      Object.entries(tN).forEach(([id,T])=>T.el.classList.toggle('dim',!!sel&&!sp.t.includes(id)));
+      draw(sel);
+    });
+  });
+
+  // pan/zoom
+  const vp=document.getElementById('vp');
+  let pan={x:40,y:20},sc=0.92;
+  function ap(){ world.style.transform=`translate(${pan.x}px,${pan.y}px) scale(${sc})`; }
+  ap();
+  let pg=false,ps=null;
+  vp.addEventListener('mousedown',e=>{ if(e.target.closest('.proj'))return; pg=true; vp.classList.add('grab'); ps={x:e.clientX-pan.x,y:e.clientY-pan.y}; });
+  window.addEventListener('mousemove',e=>{ if(pg){ pan.x=e.clientX-ps.x; pan.y=e.clientY-ps.y; ap(); } });
+  window.addEventListener('mouseup',()=>{ pg=false; vp.classList.remove('grab'); });
+  vp.addEventListener('wheel',e=>{ e.preventDefault(); const r=vp.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top,o=sc;
+    sc=Math.min(1.5,Math.max(0.5,sc-e.deltaY*0.0012)); pan.x=mx-(mx-pan.x)*(sc/o); pan.y=my-(my-pan.y)*(sc/o); ap(); },{passive:false});
+</script>
+</body>
+</html>

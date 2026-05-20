@@ -1,5 +1,29 @@
 [
   {
+    "id": "news-anime-bot-2026-05-18",
+    "format": "short",
+    "show": "news-anime-bot",
+    "sessionDate": "2026-05-18",
+    "title": "Google closes in on Nvidia as world's most valuable company",
+    "desc": "Daily AI news satire. Two years after Google was written off as having lost the AI race, Alphabet is closing in on Nvidia as the world's most valuable company.",
+    "youtubeId": "zsYb_mliXnc",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7641250366276832542",
+    "shippedAt": "2026-05-18",
+    "durationSec": 66,
+    "hiddenBeatNs": [],
+    "notes": "Episode 11 of news-anime-bot."
+  },
+  {
+    "id": "spoolcast-dev-log-08",
+    "title": "giving an AI agent a key to your wallet — spoolcast dev log 8",
+    "desc": "devlog about letting AI agents spend real money in PipelineCPC, and the fences that keep it from going wrong.",
+    "youtubeId": "vwqv8VIc2fA",
+    "shippedAt": "2026-05-18",
+    "durationSec": 344,
+    "notes": "Tracker entry exists. Long form. Already on YouTube — script can ship the guidebook.",
+    "hiddenChunkIds": []
+  },
+  {
     "id": "news-anime-bot-2026-05-16",
     "format": "short",
     "show": "news-anime-bot",
@@ -28,13 +52,28 @@
     "notes": "Episode 9 of news-anime-bot."
   },
   {
-    "id": "spoolcast-dev-log-06",
-    "title": "why ai makes things up about its own work — spoolcast dev log 6",
-    "youtubeId": "c1tWTNh2D1Y",
-    "shippedAt": "2026-05-08",
-    "durationSec": 248,
-    "hiddenChunkIds": [],
-    "notes": "Sixth dev-log."
+    "id": "spoolcast-dev-log-07",
+    "title": "three-ai AdsMetri build story — spoolcast dev log 7",
+    "desc": "devlog about building AdsMetri across Codex, Manus, and Claude, and why role clarity mattered more than raw AI output.",
+    "youtubeId": "21zjy7BDEI0",
+    "shippedAt": "2026-05-13",
+    "durationSec": 773,
+    "notes": "Tracker entry exists. Long form. Already on YouTube — script can ship the guidebook.",
+    "hiddenChunkIds": []
+  },
+  {
+    "id": "news-anime-bot-2026-05-12",
+    "title": "Nvidia invests $40B in companies that spend on Nvidia",
+    "desc": "Daily AI news satire. Nvidia pours $40B into companies whose business model is buying more Nvidia GPUs.",
+    "youtubeId": "hGTkj0kYmoo",
+    "shippedAt": "2026-05-12",
+    "durationSec": 58,
+    "notes": "Aninews ep 8. Tracker entry exists, guidebookStatus: pending. Ready to ship — script can build the guidebook.",
+    "format": "short",
+    "show": "news-anime-bot",
+    "sessionDate": "2026-05-12",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7638994693791026463",
+    "hiddenBeatNs": []
   },
   {
     "id": "news-anime-bot-2026-05-08",
@@ -49,6 +88,15 @@
     "durationSec": 57,
     "hiddenBeatNs": [],
     "notes": "Episode 7 of news-anime-bot."
+  },
+  {
+    "id": "spoolcast-dev-log-06",
+    "title": "why ai makes things up about its own work — spoolcast dev log 6",
+    "youtubeId": "c1tWTNh2D1Y",
+    "shippedAt": "2026-05-08",
+    "durationSec": 248,
+    "hiddenChunkIds": [],
+    "notes": "Sixth dev-log."
   },
   {
     "id": "news-anime-bot-2026-05-07",

@@ -1,0 +1,223 @@
+{
+  "id": "news-anime-bot-2026-05-18",
+  "format": "short",
+  "show": "news-anime-bot",
+  "title": "Google closes in on Nvidia as world's most valuable company",
+  "desc": "Daily AI news satire. Two years after Google was written off as having lost the AI race, Alphabet is closing in on Nvidia as the world's most valuable company.",
+  "shippedAt": "2026-05-18",
+  "durationSec": 66,
+  "topicTier": "GREEN",
+  "video": {
+    "youtubeId": "zsYb_mliXnc",
+    "tiktokId": "7641250366276832542",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7641250366276832542",
+    "mp4Url": null,
+    "thumbnailUrl": "https://i.ytimg.com/vi/zsYb_mliXnc/oardefault.jpg"
+  },
+  "preRoll": {
+    "burnedText": "⚠ SATIRE — AI-GENERATED PARODY — NOT REAL",
+    "voiceTag": "FAUX7 News. Satire."
+  },
+  "characters": [
+    {
+      "name": "pichai",
+      "kind": "character",
+      "imageUrl": "/videos/news-anime-bot-2026-05-18/assets/characters/pichai.webp",
+      "description": "",
+      "usedInBeats": [
+        3,
+        4,
+        5,
+        7,
+        8,
+        10
+      ]
+    },
+    {
+      "name": "huang",
+      "kind": "character",
+      "imageUrl": "/videos/news-anime-bot-2026-05-18/assets/characters/huang.webp",
+      "description": "",
+      "usedInBeats": [
+        2
+      ]
+    }
+  ],
+  "beats": [
+    {
+      "n": 1,
+      "name": "arena-throne-cold-open",
+      "durationSec": 6,
+      "narration": "For two years, the agreed-upon story was that Google had already lost the artificial intelligence race.",
+      "character": "-",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-18/assets/beats/01-arena-throne-cold-open.webp"
+    },
+    {
+      "n": 2,
+      "name": "champion-on-throne",
+      "durationSec": 5,
+      "narration": "A rival's chatbot had arrived, and a rival's chips were powering everything built after it.",
+      "character": "huang",
+      "sourceChyron": "NVIDIA ~$5.05T",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-18/assets/beats/02-champion-on-throne.webp"
+    },
+    {
+      "n": 3,
+      "name": "forgotten-swordsman-corner",
+      "durationSec": 6,
+      "narration": "Google reportedly declared an internal \"code red\" within weeks of ChatGPT's launch in late 2022.",
+      "character": "pichai",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-18/assets/beats/03-forgotten-swordsman-corner.webp"
+    },
+    {
+      "n": 4,
+      "name": "code-red-lantern",
+      "durationSec": 5,
+      "narration": "The press wrote the obituary for search, and much of the industry moved on.",
+      "character": "pichai",
+      "sourceChyron": "CODE RED - LATE 2022",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-18/assets/beats/04-code-red-lantern.webp"
+    },
+    {
+      "n": 5,
+      "name": "swordsman-stands",
+      "durationSec": 6,
+      "narration": "This week, that one-time A.I. afterthought is worth roughly four point eight trillion dollars.",
+      "character": "pichai",
+      "sourceChyron": "ALPHABET ~$4.8T",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-18/assets/beats/05-swordsman-stands.webp"
+    },
+    {
+      "n": 6,
+      "name": "two-columns-come-level",
+      "durationSec": 8,
+      "narration": "Per CNBC, that puts Alphabet within reach of Nvidia as the most valuable company on Earth.",
+      "character": "-",
+      "sourceChyron": "WITHIN REACH OF NO 1",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-18/assets/beats/06-two-columns-come-level.webp"
+    },
+    {
+      "n": 7,
+      "name": "cloud-spiral-surges",
+      "durationSec": 5,
+      "narration": "Google Cloud revenue grew sixty-three percent last quarter.",
+      "character": "pichai",
+      "sourceChyron": "CLOUD REV UP 63 PCT",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-18/assets/beats/07-cloud-spiral-surges.webp"
+    },
+    {
+      "n": 8,
+      "name": "blade-ignites-gemini",
+      "durationSec": 5,
+      "narration": "Its Gemini model is now widely rated among the strongest systems available.",
+      "character": "pichai",
+      "sourceChyron": "GEMINI",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-18/assets/beats/08-blade-ignites-gemini.webp"
+    },
+    {
+      "n": 9,
+      "name": "blade-is-monolith-forged",
+      "durationSec": 7,
+      "narration": "Google also designs its own A.I. chips competing directly with the company it is closing in on.",
+      "character": "pichai, huang",
+      "sourceChyron": "ITS OWN AI CHIPS",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-18/assets/beats/09-blade-is-monolith-forged.webp"
+    },
+    {
+      "n": 10,
+      "name": "dawn-gate-opens",
+      "durationSec": 5,
+      "narration": "Tomorrow, Google opens its annual developer conference.",
+      "character": "pichai",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-18/assets/beats/10-dawn-gate-opens.webp"
+    },
+    {
+      "n": 11,
+      "name": "conference-stage-rises",
+      "durationSec": 5,
+      "narration": "The keynote is expected to reveal the next version of Gemini.",
+      "character": "-",
+      "sourceChyron": "GOOGLE I-O MAY 19",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-18/assets/beats/11-conference-stage-rises.webp"
+    },
+    {
+      "n": 12,
+      "name": "swordsman-eye-level-throne",
+      "durationSec": 7,
+      "narration": "Two years ago, the story was that Google had missed the future. Tomorrow, it hosts it.",
+      "character": "pichai, huang",
+      "sourceChyron": "THE RACE THEY SAID HE LOST",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-18/assets/beats/12-swordsman-eye-level-throne.webp"
+    }
+  ],
+  "sources": [
+    {
+      "fact": "",
+      "attribution": "A major Mag 7 shift with Alphabet's market cap set to pass Nvidia's (CNBC)",
+      "url": "https://www.cnbc.com/2026/05/01/a-major-mag-7-shift-with-alphabets-market-cap-set-to-pass-nvidias.html"
+    },
+    {
+      "fact": "",
+      "attribution": "AI wins have Alphabet poised to become world's biggest company (Fortune)",
+      "url": "https://fortune.com/2026/05/10/ai-alphabet-stock-market-capitalization-nvidia-google-gemini/"
+    },
+    {
+      "fact": "",
+      "attribution": "Alphabet Is About to Overtake Nvidia as the World's Biggest Company (24/7 Wall St.)",
+      "url": "https://247wallst.com/investing/2026/05/07/alphabet-is-about-to-overtake-nvidia-as-the-worlds-biggest-company/"
+    },
+    {
+      "fact": "",
+      "attribution": "Alphabet poised to overtake Nvidia as world's most valuable company (Crypto Briefing)",
+      "url": "https://cryptobriefing.com/alphabet-nvidia-most-valuable-company/"
+    },
+    {
+      "fact": "",
+      "attribution": "Google Cloud launches two new AI chips to compete with Nvidia (TechCrunch)",
+      "url": "https://techcrunch.com/2026/04/22/google-cloud-next-new-tpu-ai-chips-compete-with-nvidia/"
+    }
+  ],
+  "transcript": "For two years, the agreed-upon story was that Google had already lost the artificial intelligence race. A rival's chatbot had arrived, and a rival's chips were powering everything built after it. Google reportedly declared an internal \"code red\" within weeks of ChatGPT's launch in late 2022. The press wrote the obituary for search, and much of the industry moved on. This week, that one-time A.I. afterthought is worth roughly four point eight trillion dollars. Per CNBC, that puts Alphabet within reach of Nvidia as the most valuable company on Earth. Google Cloud revenue grew sixty-three percent last quarter. Its Gemini model is now widely rated among the strongest systems available. Google also designs its own A.I. chips competing directly with the company it is closing in on. Tomorrow, Google opens its annual developer conference. The keynote is expected to reveal the next version of Gemini. Two years ago, the story was that Google had missed the future. Tomorrow, it hosts it.",
+  "summary": {
+    "writing": {
+      "author": "Claude",
+      "role": "script · beat plan · narration · sources audit"
+    },
+    "videoClips": {
+      "platform": "kie.ai",
+      "models": [
+        "Seedance 2.0 Fast"
+      ],
+      "clipCount": 12
+    },
+    "audio": {
+      "tts": "Google Cloud TTS",
+      "voice": "Schedar",
+      "beatCount": 12
+    },
+    "render": {
+      "engine": "ffmpeg",
+      "passed": true
+    },
+    "cost": "~$5.25."
+  },
+  "showcase": {
+    "hiddenBeatNs": [],
+    "notes": "Episode 11 of news-anime-bot."
+  }
+}

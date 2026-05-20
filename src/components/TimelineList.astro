@@ -1,0 +1,154 @@
+---
+import type { SiteEntry } from "../lib/data";
+import { fmtDate, renderMarkdownLite } from "../lib/format";
+
+type Props = {
+  entries: SiteEntry[];
+  projectFilter?: string | null;
+  typeFilter?: string;
+  showFilters?: boolean;
+};
+
+const { entries, projectFilter = null, typeFilter = "all", showFilters = true } = Astro.props;
+const filtered = entries.filter((entry) => {
+  if (projectFilter && entry.mainProjectId !== projectFilter) return false;
+  if (typeFilter === "video" && entry.kind !== "video") return false;
+  if (typeFilter === "build" && entry.kind === "video") return false;
+  return true;
+});
+const grouped = filtered.reduce((acc, entry) => {
+  const key = entry.date || "undated";
+  if (!acc.has(key)) acc.set(key, []);
+  acc.get(key).push(entry);
+  return acc;
+}, new Map<string, SiteEntry[]>());
+const groups = [...grouped.entries()];
+const currentUrl = new URL(Astro.url);
+function filterHref(key: string, value?: string) {
+  const url = new URL(currentUrl);
+  if (!value || value === "all") {
+    url.searchParams.delete(key);
+    if (key === "type") url.searchParams.delete("project");
+  }
+  else url.searchParams.set(key, value);
+  const query = url.searchParams.toString();
+  return `${url.pathname}${query ? `?${query}` : ""}`;
+}
+---
+{showFilters && (
+  <div class="filterbar" id="filterbar">
+    <span class="filter-l">filter</span>
+    <a class:list={["fchip", typeFilter === "all" && !projectFilter && "on"]} href={filterHref("type", "all")} data-type-filter="all">all projects</a>
+    <a class:list={["fchip", typeFilter === "video" && "on"]} href={filterHref("type", "video")} data-type-filter="video">videos & episodes</a>
+    <a class:list={["fchip", typeFilter === "build" && "on"]} href={filterHref("type", "build")} data-type-filter="build">builds & research</a>
+    <span class="fcount">{filtered.length} {filtered.length === 1 ? "entry" : "entries"}</span>
+  </div>
+)}
+
+<div class="tl" id="timeline">
+  {groups.length === 0 && <div class="empty">no entries match this filter.</div>}
+  <div class="empty client-empty" id="clientEmpty" hidden>no entries match this filter.</div>
+  {groups.map(([date, dayEntries]) => (
+    <section class="day-group" data-day-group>
+      <div class="day-pill-row"><div class="day-pill">{fmtDate(date)}</div></div>
+      <div class="day-rows">
+        {dayEntries.map((entry) => (
+          <article class="item" data-main-project={entry.mainProjectId} data-kind={entry.kind}>
+            <div class="r">
+              <span class="caret">▶</span>
+              <span class:list={["dot", entry.kind]}></span>
+              <div class="r-col">
+                <div class="r-title"><a href={entry.route}>{entry.title}</a></div>
+                <div class="r-sub">{entry.desc}</div>
+              </div>
+              <div class="r-stack">{(entry.stack || []).join(" · ")}</div>
+              <div class="r-status"><span class:list={["status", entry.status]}>{entry.kind === "video" ? "video" : entry.status || entry.kind}</span></div>
+              <div class="r-mic">{entry.day ? `d${entry.day}` : ""}</div>
+            </div>
+            <div class="detail">
+              {entry.embedType && entry.thumbnailUrl && (
+                <div class:list={["d-embed", entry.embedType]}>
+                  <img src={entry.thumbnailUrl} alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;" />
+                </div>
+              )}
+              {entry.embedType === "d" && entry.project?.artifactHtml && (
+                <div class="d-embed d">
+                  <iframe srcdoc={entry.project.artifactHtml} loading="lazy" title={`${entry.title} demo`}></iframe>
+                </div>
+              )}
+              {entry.long && <div class="d-long md" set:html={renderMarkdownLite(entry.long)}></div>}
+              {!entry.long && entry.desc && <div class="d-long"><p>{entry.desc}</p></div>}
+              <div class="d-sec">
+                <h4>stack</h4>
+                <div class="d-chips">
+                  {(entry.stack || []).map((item) => <span class="chip">{item}</span>)}
+                </div>
+              </div>
+              <div class="d-foot">
+                <div class="d-lineage"><b>{entry.mainProjectId}</b>{entry.seriesId && <><span class="sep">/</span><b>{entry.seriesId}</b></>}</div>
+                <a class="d-open" href={entry.route}>open ↗</a>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  ))}
+</div>
+
+<script>
+  function applyTimelineFilters() {
+    const params = new URLSearchParams(window.location.search);
+    const project = params.get("project");
+    const type = params.get("type") || "all";
+    let visibleCount = 0;
+
+    document.querySelectorAll("#timeline .item").forEach((item) => {
+      const kind = item.getAttribute("data-kind") || "";
+      const matchesProject = !project || item.getAttribute("data-main-project") === project;
+      const matchesType = type === "all" || (type === "video" ? kind === "video" : kind !== "video");
+      const visible = matchesProject && matchesType;
+      item.hidden = !visible;
+      if (visible) visibleCount += 1;
+    });
+
+    document.querySelectorAll("[data-day-group]").forEach((group) => {
+      group.hidden = !group.querySelector(".item:not([hidden])");
+    });
+
+    document.querySelectorAll("[data-project-card]").forEach((card) => {
+      card.classList.toggle("active", Boolean(project) && card.getAttribute("data-project-card") === project);
+    });
+
+    document.querySelectorAll("[data-type-filter]").forEach((chip) => {
+      const chipType = chip.getAttribute("data-type-filter");
+      chip.classList.toggle("on", chipType === type && (chipType !== "all" || !project));
+    });
+
+    const count = document.querySelector(".fcount");
+    if (count) count.textContent = `${visibleCount} ${visibleCount === 1 ? "entry" : "entries"}`;
+
+    const empty = document.getElementById("clientEmpty");
+    if (empty) empty.hidden = visibleCount !== 0;
+  }
+
+  document.querySelectorAll("[data-type-filter]").forEach((chip) => {
+    chip.addEventListener("click", (event) => {
+      event.preventDefault();
+      const type = chip.getAttribute("data-type-filter") || "all";
+      const url = new URL(window.location.href);
+      if (type === "all") {
+        url.searchParams.delete("type");
+        url.searchParams.delete("project");
+      }
+      else url.searchParams.set("type", type);
+      const query = url.searchParams.toString();
+      history.pushState({}, "", `${url.pathname}${query ? `?${query}` : ""}`);
+      applyTimelineFilters();
+    });
+  });
+
+  applyTimelineFilters();
+  window.addEventListener("popstate", applyTimelineFilters);
+  window.addEventListener("artlu:filters-changed", applyTimelineFilters);
+</script>

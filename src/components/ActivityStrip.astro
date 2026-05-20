@@ -1,0 +1,15 @@
+---
+type Cell = { date: string; count: number; level: number; tip?: string };
+type Props = { cells: Cell[]; tooltip?: boolean };
+const { cells = [], tooltip = true } = Astro.props;
+---
+<div class="pstrip" aria-label="shipping activity">
+  {cells.map((cell) => (
+    <span
+      class:list={["pcell", tooltip && "has-tip"]}
+      data-tip={tooltip ? cell.tip : undefined}
+      style={cell.level ? `background:var(--green);opacity:${0.3 + cell.level * 0.17}` : undefined}
+      aria-label={`${cell.date}: ${cell.count} shipped`}
+    />
+  ))}
+</div>

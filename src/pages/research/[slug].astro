@@ -1,0 +1,45 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import { getPublicProjects, getStats } from "../../lib/data";
+import { fmtDateFull } from "../../lib/format";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("research");
+  return posts.map((post) => ({
+    params: { slug: post.id.replace(/\.md$/, "") },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const projects = await getPublicProjects();
+const stats = getStats(projects);
+const slug = post.id.replace(/\.md$/, "");
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ScholarlyArticle",
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.date,
+  url: `https://artlu.ai/research/${slug}`,
+};
+---
+<BaseLayout title={`artlu.ai — ${post.data.title}`} description={post.data.description}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+  <Header active="research" stats={stats} />
+  <main class="page">
+    <article class="narrow">
+      <a class="backlink" href="/research">← all research</a>
+      <div class="meta">{fmtDateFull(post.data.date)} · {post.data.tags.join(" · ")}</div>
+      <h1 class="page-h1">{post.data.title}</h1>
+      <div class="pillrow">
+        {post.data.demoUrl && <a class="pill" href={post.data.demoUrl} target="_blank" rel="noreferrer">▶ demo</a>}
+        {post.data.repoUrl && <a class="pill" href={post.data.repoUrl} target="_blank" rel="noreferrer">github ↗</a>}
+      </div>
+      <div class="md"><Content /></div>
+    </article>
+  </main>
+</BaseLayout>

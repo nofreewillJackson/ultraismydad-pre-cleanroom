@@ -1,0 +1,1193 @@
+{
+  "id": "spoolcast-dev-log-08",
+  "format": "long",
+  "title": "giving an AI agent a key to your wallet — spoolcast dev log 8",
+  "desc": "devlog about letting AI agents spend real money in PipelineCPC, and the fences that keep it from going wrong.",
+  "shippedAt": "2026-05-18",
+  "durationSec": 344,
+  "coreMessage": "PipelineCPC needed to let AI agents research keywords on a user's behalf, but every lookup spends real money. The session was not about building the integration; the endpoints already existed. The real work was building fences: naming what an agent must never be able to do, defaulting every control to fail closed, and then fixing the things that only break when a real person uses the feature instead of a test.",
+  "video": {
+    "youtubeId": "vwqv8VIc2fA",
+    "mp4Url": null,
+    "thumbnailUrl": "https://img.youtube.com/vi/vwqv8VIc2fA/maxresdefault.jpg"
+  },
+  "style": {
+    "name": "wojak-gpt2",
+    "description": "Modern wojak / doomer-chad meme comic style, built natively on GPT Image 2 (text-to-image + image-to-image). Sister library to wojak-comic (which was built on nano-banana-2). Use this when the session's preferred_model is the GPT Image 2 family.",
+    "anchorImageUrl": "/videos/spoolcast-dev-log-08/assets/style/anchor.webp",
+    "anchorDescription": "Modern wojak / doomer-chad meme comic style, built natively on GPT Image 2 (text-to-image + image-to-image). Sister library to wojak-comic (which was built on nano-banana-2). Use this when the session's preferred_model is the GPT Image 2 family.",
+    "references": [
+      {
+        "name": "builder",
+        "kind": "character",
+        "imageUrl": "/videos/spoolcast-dev-log-08/assets/style/references/builder.webp",
+        "description": "the main hooded figure — mid-register wojak (not fully doomer, not fully chad). Alias for the style anchor; serves double-duty as both the style anchor and the builder character reference."
+      },
+      {
+        "name": "ai-figure",
+        "kind": "character",
+        "imageUrl": "/videos/spoolcast-dev-log-08/assets/style/references/ai-figure.webp",
+        "description": "a wojak-universe AI figure that is slowly breaking down from overuse. Full-body standing. EMOTIONAL REGISTER: flat-affect, NO displayed emotion, NO smile, NO frown — a dead expressionless stare. Depression is the absence of emotion, not the display of sadness. FACE LINEWORK: brows, nose, mouth drawn in the classic rough / jagged / slightly-disjointed wojak linework (uneven strokes, hand-drawn imperfections). EYES: replaced with hollow loading-spinner icons (dashed rings) set in dark-shadowed sockets. CRACKS: visible hairline cracks spider across the face and forehead as if the outer shell is fracturing from overuse. At least one crack wide enough to reveal a glimpse of AI circuitry underneath — thin circuit-trace lines, a small exposed chip pattern. Fractures read as structural fatigue, not injury. FOREHEAD: a crooked rectangular ink-stamp reading 'AI' in bold capital letters, partially crossed by a crack. HOODIE: pale cream / off-white hoodie, hood down, noticeably lighter than the weary narrator's gray hoodie. POSTURE: slight slouch, arms hanging at sides. PLAIN background, no environment, no other characters, no other text. Single clear readable subject."
+      },
+      {
+        "name": "meme-chad",
+        "kind": "character",
+        "imageUrl": "/videos/spoolcast-dev-log-08/assets/style/references/meme-chad.webp",
+        "description": "the exact meme-Chad identity used by earlier Spoolcast devlogs: clean-shaven confident Chad with signature yellow pointed mohawk-spike hair, strong jawline, pronounced cheekbones, smug half-smile, muscular arms, and a red ripped-sleeve OUCH! shirt. He is comedic contrast by default: confident, slightly too pleased with himself, and visually brighter than the weary builder. Do not turn him into a bearded worker, lumberjack, security guard, producer, stagehand, engineer, inspector, or generic muscular man."
+      }
+    ]
+  },
+  "chunks": [
+    {
+      "id": "C1",
+      "order": 1,
+      "sceneTitle": "Cold Open",
+      "summary": "Hand over the card",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C1.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A tired human wojak handing a blank credit card across to a faceless boxy software-robot wojak, hesitant expression.",
+      "beats": [
+        {
+          "id": "01A",
+          "narration": "Picture handing someone your credit card and telling them to go do some research for you."
+        },
+        {
+          "id": "01B",
+          "narration": "Not a person. A piece of software. An AI agent."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": false,
+          "notes": "Beat N introduces the concept of an AI agent, and the viewer is likely curious about its capabilities. Beat N+1 introduces those capabilities but does so without a smooth transition, requiring a bridge to maintain the flow of information."
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C2",
+      "order": 2,
+      "sceneTitle": "Cold Open",
+      "summary": "No flinch",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C2.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. Split mood: a blank unbothered software-agent wojak working calmly at a terminal on one side, a human wojak mid-flinch with tight eyes on the other.",
+      "beats": [
+        {
+          "id": "01C",
+          "narration": "It is fast, it is tireless, and it does not get bored."
+        },
+        {
+          "id": "01D",
+          "narration": "It also does not feel the little flinch you feel right before you spend money."
+        },
+        {
+          "id": "01E",
+          "narration": "That flinch quietly does a lot of work in your life, and the agent does not have it."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C3",
+      "order": 3,
+      "sceneTitle": "Cold Open",
+      "summary": "Stand in for the flinch",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C3.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A sturdy wooden fence post being planted firmly into the ground by a determined wojak.",
+      "beats": [
+        {
+          "id": "01F",
+          "narration": "This is a devlog about building the thing that has to stand in for that missing flinch."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C4",
+      "order": 4,
+      "sceneTitle": "What Spoolcast Is",
+      "summary": "Spoolcast",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C4.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A simple conveyor belt carrying a film reel, one wojak watching it move calmly.",
+      "beats": [
+        {
+          "id": "02A",
+          "narration": "Quick context before the real story."
+        },
+        {
+          "id": "02B",
+          "narration": "Spoolcast is my AI video pipeline."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C5",
+      "order": 5,
+      "sceneTitle": "What Spoolcast Is",
+      "summary": "Agents do the steps",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C5.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A line of small agent wojaks passing one object down the line, each doing a single step, with mixed source objects feeding in at the start.",
+      "beats": [
+        {
+          "id": "02C",
+          "narration": "It can start from almost any source material: a chat, a transcript, a repo, notes, or a story idea."
+        },
+        {
+          "id": "02D",
+          "narration": "Agents read the material, find the angle, write the script, build the shot list, generate the visuals, narrate it, and render the video."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C6",
+      "order": 6,
+      "sceneTitle": "What Spoolcast Is",
+      "summary": "Still directed",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C6.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A director wojak relaxed in a chair giving a calm thumbs up to an agent wojak standing across a low wooden fence.",
+      "beats": [
+        {
+          "id": "02E",
+          "narration": "I am still directing it with feedback and approvals. I am just not editing clips on a timeline."
+        },
+        {
+          "id": "02F",
+          "narration": "Which is a little on the nose today, because this episode is about giving agents room to act, and the limits you put around it."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": false,
+          "notes": "Beat N+1 introduces the product name without explaining its relevance to the previous beat, which might leave the viewer wondering about the connection. A bridge is needed to link the concept of giving agents room to act with the specific product being discussed."
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C7",
+      "order": 7,
+      "sceneTitle": "The Premise",
+      "summary": "Keyword research tool",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C7.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A wojak panning for gold in a stream of small keyword pebbles, hunting for the few good ones.",
+      "beats": [
+        {
+          "id": "03A",
+          "narration": "The product is called PipelineCPC."
+        },
+        {
+          "id": "03B",
+          "narration": "It is a tool for paid-search keyword research. It helps you find which ad niches are actually worth bidding on."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": false,
+          "notes": "The viewer is likely curious about how the tool works after hearing its purpose. Introducing credits without a bridge can create a disconnect, so a bridge that links the tool's purpose to the credit system is necessary."
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C8",
+      "order": 8,
+      "sceneTitle": "The Premise",
+      "summary": "Runs on real money",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C8.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A wojak feeding actual cash into a slot while glowing credit coins tumble out onto a desk.",
+      "beats": [
+        {
+          "id": "03C",
+          "narration": "It runs on credits."
+        },
+        {
+          "id": "03D",
+          "narration": "Every keyword the research tool returns costs one credit."
+        },
+        {
+          "id": "03E",
+          "narration": "Credits are bought with real money."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": false,
+          "notes": "The viewer is likely curious about the security and control measures after understanding the financial stakes. The proposed bridge sets up the problem that the next beat aims to solve."
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C9",
+      "order": 9,
+      "sceneTitle": "The Premise",
+      "summary": "Hand the key to an agent",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C9.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A wojak passing a single ornate key to a waiting agent wojak, who is sketching a simple campaign plan on paper.",
+      "beats": [
+        {
+          "id": "03F",
+          "narration": "The task this session was to let AI agents use that tool on your behalf."
+        },
+        {
+          "id": "03G",
+          "narration": "You would create what is basically a long secret password, an API key, and hand it to an agent like Claude or Codex."
+        },
+        {
+          "id": "03H",
+          "narration": "The agent could then research keywords and draft ad campaign plans for you."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": false,
+          "notes": "Beat N+1 introduces a new idea (the endpoints already existing) that doesn't directly follow from the viewer's natural curiosity about how the agent performs the task. A bridge is needed to transition from the capability of the agent to the practical constraints of the integration."
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C10",
+      "order": 10,
+      "sceneTitle": "The Premise",
+      "summary": "Not a small job",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C10.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A deceptively tiny gift box on a desk, now open and overflowing far past its size, a wojak leaning back with raised eyebrows.",
+      "beats": [
+        {
+          "id": "03I",
+          "narration": "The endpoints to do this already existed, so in theory this was a small job."
+        },
+        {
+          "id": "03J",
+          "narration": "It was not a small job."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C11",
+      "order": 11,
+      "sceneTitle": "Threat Model",
+      "summary": "One question",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C11.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A wojak pausing at a desk, one finger raised, a single question mark hanging over the ornate key.",
+      "beats": [
+        {
+          "id": "04A",
+          "narration": "Before writing any UI, I stopped and asked one question."
+        },
+        {
+          "id": "04B",
+          "narration": "What is the worst thing this key can actually do?"
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C12",
+      "order": 12,
+      "sceneTitle": "Threat Model",
+      "summary": "The whole risk",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C12.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A wojak holding a pencil over a blank notepad showing only a few wavy horizontal squiggle lines, no words, no letters, no characters of any kind — the page is purely abstract wavy lines. A single credit coin with a small downward arrow sits beside it.",
+      "beats": [
+        {
+          "id": "04C",
+          "narration": "Not in a dramatic way. Literally: list the damage."
+        },
+        {
+          "id": "04D",
+          "narration": "A key can spend credits by fetching keywords. That is the entire risk."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": false,
+          "notes": "Beat N+1 introduces a solution (what the key cannot do) without a clear transition from the problem statement in Beat N. Adding a bridge helps the viewer understand the shift from risk to mitigation."
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C13",
+      "order": 13,
+      "sceneTitle": "Threat Model",
+      "summary": "What it cannot do",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C13.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. An agent wojak's hand stopped flat against a large padlocked drawer, with a faded grayed-out megaphone lying unusable on the floor beside it — the agent is plainly blocked.",
+      "beats": [
+        {
+          "id": "04E",
+          "narration": "It cannot launch ads."
+        },
+        {
+          "id": "04F",
+          "narration": "It cannot change billing or cancel the subscription."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": false,
+          "notes": "The viewer is left wondering how defining that boundary influenced the subsequent work, which the proposed bridge explicitly addresses."
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C14",
+      "order": 14,
+      "sceneTitle": "Threat Model",
+      "summary": "Aim at spending",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C14.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. Several small fence posts all angled toward one single coin in the center of the frame, a wojak standing on a clear painted line.",
+      "beats": [
+        {
+          "id": "04G",
+          "narration": "Naming that boundary out loud decided everything that came after it."
+        },
+        {
+          "id": "04H",
+          "narration": "If the only real risk is spending, then every control I build should be aimed at spending."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C15",
+      "order": 15,
+      "sceneTitle": "Fail Closed",
+      "summary": "The rule",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C15.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A heavy vault-like door swinging firmly and decisively shut on its own, a wojak watching it close with a small approving nod.",
+      "beats": [
+        {
+          "id": "05A",
+          "narration": "The guiding rule was simple: fail closed."
+        },
+        {
+          "id": "05B",
+          "narration": "If a setting is unclear, it should default to the safe option, not the convenient one."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": false,
+          "notes": "Beat N+1 introduces a specific control without clearly connecting it to the principle just stated in beat N, which could confuse the viewer. A bridge is needed to make the transition from the general principle to the specific example more natural."
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C16",
+      "order": 16,
+      "sceneTitle": "Fail Closed",
+      "summary": "Fresh-fetch off by default",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C16.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A single large toggle switch resting clearly in the off position, an agent wojak beside it reading from an existing bound notebook.",
+      "beats": [
+        {
+          "id": "05C",
+          "narration": "Control one: a key can read your already-saved lists, which is free,"
+        },
+        {
+          "id": "05D",
+          "narration": "or it can fetch fresh keywords, which costs credits."
+        },
+        {
+          "id": "05E",
+          "narration": "That fresh-fetch switch defaults to off."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": false,
+          "notes": "The viewer is likely to wonder what the default setting implies for the user. Beat N+1 answers this but jumps to the implication without explicitly connecting the dots, which can be jarring."
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C17",
+      "order": 17,
+      "sceneTitle": "Fail Closed",
+      "summary": "Cannot cost you",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C17.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A relaxed wojak walking away from a harmless dormant key sitting quietly on a desk.",
+      "beats": [
+        {
+          "id": "05F",
+          "narration": "A key you create without thinking carefully simply cannot cost you anything."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": false,
+          "notes": "The viewer is left thinking that careful creation of a key is sufficient to avoid costs, but the next beat jumps to a new control without explaining why this control is necessary. A bridge is needed to connect the idea that careful creation alone is not enough to prevent unintended costs, which leads logically into the need for spending limits."
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C18",
+      "order": 18,
+      "sceneTitle": "Fail Closed",
+      "summary": "Three time ranges",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C18.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. Three nested fences of increasing size around one small coin, a wojak setting three labeled dials.",
+      "beats": [
+        {
+          "id": "05G",
+          "narration": "Control two: spending limits at three different time ranges."
+        },
+        {
+          "id": "05H",
+          "narration": "A limit on each single request, a limit for each day, and a limit for each month."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": false,
+          "notes": "The viewer's implicit thought after hearing beat N is that multiple limits are in place. Beat N+1 needs to explicitly state why a single limit is not enough to maintain a coherent flow."
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C19",
+      "order": 19,
+      "sceneTitle": "Fail Closed",
+      "summary": "Different fences",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C19.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. Two clearly different fence shapes side by side: one boxing in a sprinting wojak, one boxing in a wojak slowly draining a bucket.",
+      "beats": [
+        {
+          "id": "05I",
+          "narration": "One number is not enough."
+        },
+        {
+          "id": "05J",
+          "narration": "A single runaway request and a slow bad afternoon are different kinds of failure."
+        },
+        {
+          "id": "05K",
+          "narration": "They need different fences."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": false,
+          "notes": "The viewer is likely curious about what specific fences are needed after hearing 'They need different fences.' The proposed bridge provides a smooth transition by specifying one of those fences, which is directly addressed in the next beat."
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C20",
+      "order": 20,
+      "sceneTitle": "Fail Closed",
+      "summary": "Shown once",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C20.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A key glowing briefly inside a window with a small hourglass beside it, a wojak hurriedly copying it onto a scrap of paper before it fades. No readable text anywhere in the image.",
+      "beats": [
+        {
+          "id": "05L",
+          "narration": "Control three: the key itself is shown exactly once."
+        },
+        {
+          "id": "05M",
+          "narration": "When you create it, you see the full secret one time, and the screen warns you plainly."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": false,
+          "notes": "Beat N+1 directly answers the viewer's implicit question about what happens to the key after it is shown, but it does so abruptly. Inserting a bridge ensures the transition is smooth and the viewer's thought is addressed naturally."
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C21",
+      "order": 21,
+      "sceneTitle": "Fail Closed",
+      "summary": "Only a hash",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C21.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A clean key transformed into an unreadable scrambled smear inside a vault, a thief wojak holding the stolen vault and looking disappointed.",
+      "beats": [
+        {
+          "id": "05N",
+          "narration": "The server only stores a scrambled fingerprint of it, a hash, never the real key."
+        },
+        {
+          "id": "05O",
+          "narration": "So even if someone steals the database, the real keys are not inside it."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": false,
+          "notes": "The viewer is left wondering what the implications are if a key is lost, and the next beat introduces a new problem without acknowledging this natural follow-up thought."
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C22",
+      "order": 22,
+      "sceneTitle": "Fail Closed",
+      "summary": "Lose it remake it",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C22.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A wojak calmly tearing an old ornate key in half while holding up a freshly drawn replacement key — both objects are clearly keys, not coins.",
+      "beats": [
+        {
+          "id": "05P",
+          "narration": "Lose your key, and the only option is to revoke it and make a new one."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": false,
+          "notes": "The viewer is likely thinking about the implications of losing a key after beat N. Beat N+1 introduces a new topic (building a mockup) that requires a bridge to transition smoothly from the key revocation problem to the setup of the mockup."
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C23",
+      "order": 23,
+      "sceneTitle": "The Second Opinion",
+      "summary": "Sent to Codex",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C23.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A wojak handing a flat cardboard cutout of an app screen to a skeptical agent wojak inspecting it through a magnifying glass.",
+      "beats": [
+        {
+          "id": "06A",
+          "narration": "Before writing the real code, I built a fake version of the screen, a mockup."
+        },
+        {
+          "id": "06B",
+          "narration": "Then I sent it to a second AI model, Codex, for review."
+        },
+        {
+          "id": "06C",
+          "narration": "Not to write code. Just to look hard at the plan and try to break it."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": false,
+          "notes": "Beat N sets up the intention to scrutinize and test the plan, but Beat N+1 jumps to the results of a Codex review without showing the step of actually running the review, which causes a disconnect."
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C24",
+      "order": 24,
+      "sceneTitle": "The Second Opinion",
+      "summary": "Three fixes",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C24.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. The skeptical agent wojak holding up three fingers, plain and matter of fact.",
+      "beats": [
+        {
+          "id": "06D",
+          "narration": "Codex came back with three required fixes."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C25",
+      "order": 25,
+      "sceneTitle": "The Second Opinion",
+      "summary": "Default in the server",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C25.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A toggle shown clearly off on a screen, but a hidden switch behind it flipping itself to on inside a server box.",
+      "beats": [
+        {
+          "id": "06E",
+          "narration": "One: the fresh-fetch setting defaulted to off in the screen, but not in the server underneath."
+        },
+        {
+          "id": "06F",
+          "narration": "If a request just left that field blank, the server quietly treated it as on."
+        },
+        {
+          "id": "06G",
+          "narration": "The safe default has to live in the server, not just the screen. Fixed."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C26",
+      "order": 26,
+      "sceneTitle": "The Second Opinion",
+      "summary": "Make names safe",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C26.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A small blank rectangular label tag with a tiny mischievous gremlin peeking out from behind it, passing through a cleaning filter that strips the gremlin away. The tag stays completely blank — no readable text anywhere.",
+      "beats": [
+        {
+          "id": "06H",
+          "narration": "Two: a key's name is typed by a user, and user-typed text can smuggle in code."
+        },
+        {
+          "id": "06I",
+          "narration": "Every name has to be made safe before it is ever shown on a page. Fixed."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C27",
+      "order": 27,
+      "sceneTitle": "The Second Opinion",
+      "summary": "Cap at five",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C27.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. Five keys on a rack with a clear full marker, a sixth slot blocked off.",
+      "beats": [
+        {
+          "id": "06J",
+          "narration": "Three: put a ceiling on how many keys one account can have. I picked five."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": false,
+          "notes": "Beat N+1 introduces a new topic (Codex catching a small issue) that doesn't naturally follow from setting a key limit, requiring a bridge to maintain the flow."
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C28",
+      "order": 28,
+      "sceneTitle": "The Second Opinion",
+      "summary": "The quiet waster",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C28.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A wojak pasting a label that silently does not fit its slot, with a blank confused stare and an almost invisible banana peel nearby.",
+      "beats": [
+        {
+          "id": "06K",
+          "narration": "Codex also caught a small thing that would have quietly wasted everyone's afternoon."
+        },
+        {
+          "id": "06L",
+          "narration": "The setup instructions named the wrong setting. Copy it exactly, and nothing works, with no error at all. Fixed."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": false,
+          "notes": "The viewer is likely expecting to hear about the next step after fixing the setup issue, and a bridge is needed to smoothly transition from the setup fix to the code writing and testing phase."
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C29",
+      "order": 29,
+      "sceneTitle": "Then A Human Clicked",
+      "summary": "A human clicked",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C29.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A row of small green check marks, with a large human finger descending toward a small app button.",
+      "beats": [
+        {
+          "id": "07A",
+          "narration": "Then the code was written, and it passed every automatic check."
+        },
+        {
+          "id": "07B",
+          "narration": "And then a human clicked the buttons."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C30",
+      "order": 30,
+      "sceneTitle": "Then A Human Clicked",
+      "summary": "A key per click",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C30.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. Keys multiplying rapidly out of a jabbed button like a small overflow, an impatient wojak staring flatly at the pile.",
+      "beats": [
+        {
+          "id": "07C",
+          "narration": "Clicking Generate Key once felt slow, so I clicked it a few more times."
+        },
+        {
+          "id": "07D",
+          "narration": "It made a brand new key for every single click."
+        },
+        {
+          "id": "07E",
+          "narration": "I watched five nearly identical keys scroll past before the screen settled down."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": false,
+          "notes": "Beat N+1 introduces a new problem that is not directly related to the viewer's likely thought after Beat N. A bridge is needed to draw the viewer's attention to the new issue and make the transition feel natural."
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C31",
+      "order": 31,
+      "sceneTitle": "Then A Human Clicked",
+      "summary": "No lock",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C31.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. The button now grayed out and visibly locked after a single press.",
+      "beats": [
+        {
+          "id": "07F",
+          "narration": "The button had no lock on it. Fixed: one click, then it disables itself."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C32",
+      "order": 32,
+      "sceneTitle": "Then A Human Clicked",
+      "summary": "Ate the minus sign",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C32.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A small filter machine swallowing a minus sign along with stray commas, a confused wojak beside a warning card showing the wrong sign.",
+      "beats": [
+        {
+          "id": "07G",
+          "narration": "Next: my account balance was negative. I had overused the service myself."
+        },
+        {
+          "id": "07H",
+          "narration": "But the warning showed my balance as a positive number."
+        },
+        {
+          "id": "07I",
+          "narration": "A pattern meant to strip out commas was also quietly eating the minus sign."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C33",
+      "order": 33,
+      "sceneTitle": "Then A Human Clicked",
+      "summary": "Minus flipped",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C33.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. One bold thick horizontal line across the middle of the frame as the centerpiece. A small round token sits clearly above that line, while a wojak hand firmly pushes it back down below the line. The horizontal line is the dominant visual element. No legible digits, numbers, or text anywhere.",
+      "beats": [
+        {
+          "id": "07J",
+          "narration": "Minus five hundred became five hundred. Fixed."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": false,
+          "notes": "The viewer is likely thinking the issue is resolved after hearing beat N, so beat N+1 introduces a new, unexpected problem without a clear transition. A bridge is needed to signal that another issue arose."
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C34",
+      "order": 34,
+      "sceneTitle": "Then A Human Clicked",
+      "summary": "Unreachable buttons",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C34.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A settings panel stretching far past the top and bottom of the frame, a wojak reaching down toward buttons that sit just off the bottom edge.",
+      "beats": [
+        {
+          "id": "07K",
+          "narration": "Then the whole settings window grew taller than the screen, with no way to scroll."
+        },
+        {
+          "id": "07L",
+          "narration": "The buttons at the bottom were simply unreachable."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": false,
+          "notes": "The viewer is focused on the issue of unreachable buttons. Introducing a new problem about the final screen without a bridge creates a cognitive jump that can disrupt the flow."
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C35",
+      "order": 35,
+      "sceneTitle": "Then A Human Clicked",
+      "summary": "None survived a person",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C35.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. Three near-identical buttons in a row, a green check mark and a tired unimpressed human wojak standing on opposite sides.",
+      "beats": [
+        {
+          "id": "07M",
+          "narration": "And the final screen had three different buttons that all basically said done."
+        },
+        {
+          "id": "07N",
+          "narration": "Every one of these passed the tests. Not one of them survived a real person."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": false,
+          "notes": "Beat N introduces a problem (tests passed but real people broke it), and beat N+1 jumps to a solution without explaining the gap. A bridge is needed to connect the problem to the part worth keeping, which is the solution or the key insight."
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C36",
+      "order": 36,
+      "sceneTitle": "The Fences",
+      "summary": "The easy half",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C36.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. Two boxes joined by a short simple cable, plugged in without effort, a wojak setting one clean object down on a plain table.",
+      "beats": [
+        {
+          "id": "08A",
+          "narration": "Here is the part worth keeping."
+        },
+        {
+          "id": "08B",
+          "narration": "The integration, the actual connection, was the easy half. The endpoints already existed."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C37",
+      "order": 37,
+      "sceneTitle": "The Fences",
+      "summary": "The real work was fences",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C37.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A wojak standing back to view a neat finished fence around a single coin, calmly closing the last gate.",
+      "beats": [
+        {
+          "id": "08C",
+          "narration": "The real work was the fences."
+        },
+        {
+          "id": "08D",
+          "narration": "Deciding what the agent must never do, and defaulting everything to the safe side."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C38",
+      "order": 38,
+      "sceneTitle": "The Fences",
+      "summary": "Only break for people",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C38.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. A human wojak gently testing a fence panel, finding and fixing a loose board.",
+      "beats": [
+        {
+          "id": "08E",
+          "narration": "And fixing the things that only break when a real person, not a test, touches them."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": false,
+          "notes": "Beat N+1 introduces a new problem (AI agents spending money) that requires a bridge to connect it to the solution context from Beat N, ensuring the viewer understands the transition from human testing to AI agent responsibility."
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C39",
+      "order": 39,
+      "sceneTitle": "The Fences",
+      "summary": "It was the limits",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-08/assets/scenes/C39.webp",
+      "imageSource": "generated",
+      "model": "gpt-image-2-text-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy and emotional register: pale gray or muted skin, weary hollow eyes, rough hand-drawn facial linework, simple expressive faces, slouched doomer posture unless the prompt explicitly asks for a confident chad contrast. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use muted colors, soft cel shading, and simple readable staging. Backgrounds may show desks, monitors, paperwork, and props, but they should stay secondary to the wojak figure and the beat. Composition is a single readable comic-style frame with one focal subject, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Wojak2 / wojak-gpt2 style: tired expressive wojak faces, flat shaded comic lighting, rough hand-drawn linework, muted colors, readable staging. One focal idea only. Do not create a multi-panel comic page, role grid, triptych, storyboard, or dense poster. Avoid dense readable text, speech bubbles, checklist boards, and tiny dashboard labels. An agent wojak holding a credit card with no hesitation, beside a single sturdy fence standing alone at the center of the frame.",
+      "beats": [
+        {
+          "id": "08F",
+          "narration": "As AI agents start doing more for us, let the agent handle it quietly turns into let the agent spend."
+        },
+        {
+          "id": "08G",
+          "narration": "The interesting design problem was never the connection. It was always the limits."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    }
+  ],
+  "transcript": "Picture handing someone your credit card and telling them to go do some research for you. Not a person. A piece of software. An AI agent. It is fast, it is tireless, and it does not get bored. It also does not feel the little flinch you feel right before you spend money. That flinch quietly does a lot of work in your life, and the agent does not have it. This is a devlog about building the thing that has to stand in for that missing flinch. Quick context before the real story. Spoolcast is my AI video pipeline. It can start from almost any source material: a chat, a transcript, a repo, notes, or a story idea. Agents read the material, find the angle, write the script, build the shot list, generate the visuals, narrate it, and render the video. I am still directing it with feedback and approvals. I am just not editing clips on a timeline. Which is a little on the nose today, because this episode is about giving agents room to act, and the limits you put around it. The product is called PipelineCPC. It is a tool for paid-search keyword research. It helps you find which ad niches are actually worth bidding on. It runs on credits. Every keyword the research tool returns costs one credit. Credits are bought with real money. The task this session was to let AI agents use that tool on your behalf. You would create what is basically a long secret password, an API key, and hand it to an agent like Claude or Codex. The agent could then research keywords and draft ad campaign plans for you. The endpoints to do this already existed, so in theory this was a small job. It was not a small job. Before writing any UI, I stopped and asked one question. What is the worst thing this key can actually do? Not in a dramatic way. Literally: list the damage. A key can spend credits by fetching keywords. That is the entire risk. It cannot launch ads. It cannot change billing or cancel the subscription. Naming that boundary out loud decided everything that came after it. If the only real risk is spending, then every control I build should be aimed at spending. The guiding rule was simple: fail closed. If a setting is unclear, it should default to the safe option, not the convenient one. Control one: a key can read your already-saved lists, which is free, or it can fetch fresh keywords, which costs credits. That fresh-fetch switch defaults to off. A key you create without thinking carefully simply cannot cost you anything. Control two: spending limits at three different time ranges. A limit on each single request, a limit for each day, and a limit for each month. One number is not enough. A single runaway request and a slow bad afternoon are different kinds of failure. They need different fences. Control three: the key itself is shown exactly once. When you create it, you see the full secret one time, and the screen warns you plainly. The server only stores a scrambled fingerprint of it, a hash, never the real key. So even if someone steals the database, the real keys are not inside it. Lose your key, and the only option is to revoke it and make a new one. Before writing the real code, I built a fake version of the screen, a mockup. Then I sent it to a second AI model, Codex, for review. Not to write code. Just to look hard at the plan and try to break it. Codex came back with three required fixes. One: the fresh-fetch setting defaulted to off in the screen, but not in the server underneath. If a request just left that field blank, the server quietly treated it as on. The safe default has to live in the server, not just the screen. Fixed. Two: a key's name is typed by a user, and user-typed text can smuggle in code. Every name has to be made safe before it is ever shown on a page. Fixed. Three: put a ceiling on how many keys one account can have. I picked five. Codex also caught a small thing that would have quietly wasted everyone's afternoon. The setup instructions named the wrong setting. Copy it exactly, and nothing works, with no error at all. Fixed. Then the code was written, and it passed every automatic check. And then a human clicked the buttons. Clicking Generate Key once felt slow, so I clicked it a few more times. It made a brand new key for every single click. I watched five nearly identical keys scroll past before the screen settled down. The button had no lock on it. Fixed: one click, then it disables itself. Next: my account balance was negative. I had overused the service myself. But the warning showed my balance as a positive number. A pattern meant to strip out commas was also quietly eating the minus sign. Minus five hundred became five hundred. Fixed. Then the whole settings window grew taller than the screen, with no way to scroll. The buttons at the bottom were simply unreachable. And the final screen had three different buttons that all basically said done. Every one of these passed the tests. Not one of them survived a real person. Here is the part worth keeping. The integration, the actual connection, was the easy half. The endpoints already existed. The real work was the fences. Deciding what the agent must never do, and defaulting everything to the safe side. And fixing the things that only break when a real person, not a test, touches them. As AI agents start doing more for us, let the agent handle it quietly turns into let the agent spend. The interesting design problem was never the connection. It was always the limits.",
+  "summary": {
+    "writing": {
+      "author": "Claude",
+      "role": "screenplay, shot-list, scene prompts"
+    },
+    "images": {
+      "platform": "kie.ai",
+      "models": [
+        "gpt-image-2-text-to-image"
+      ],
+      "sceneCount": 39
+    },
+    "audio": {
+      "tts": "Google Cloud TTS",
+      "voice": "Puck",
+      "playbackRate": 1.1,
+      "beatCount": 79
+    },
+    "render": {
+      "engine": "Remotion",
+      "passed": true
+    },
+    "audit": {
+      "narrationModel": "qwen/qwen-2.5-72b-instruct",
+      "narrationFlags": 23
+    }
+  },
+  "showcase": {
+    "hiddenChunkIds": [],
+    "notes": "Tracker entry exists. Long form. Already on YouTube — script can ship the guidebook."
+  }
+}

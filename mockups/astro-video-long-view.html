@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>artlu.ai — why ai makes things up about its own work — spoolcast dev log 6</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  html[data-theme="dark"] {
+    --bg:#08090a; --surface:#0e0f11; --surface-2:#16191d;
+    --border:#1a1d22; --border-strong:#2b3038; --border-hover:#4a525e;
+    --text:#c0c4cc; --text-bright:#f0f1f3; --text-sub:#9aa0aa;
+    --dim:#6b7280; --dimmer:#3a3f48;
+    --green:#4ade80; --green-bg:#062b12; --green-border:#1d4d31;
+    --blue:#60a5fa; --amber:#d8a657; --amber-bg:#1c1a12;
+    --node-shadow:0 8px 26px rgba(0,0,0,0.6);
+    --font:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  html[data-theme="light"] {
+    --bg:#e9eaec; --surface:#ffffff; --surface-2:#f2f3f5;
+    --border:#dcdfe2; --border-strong:#b7bcc3; --border-hover:#9ba0a8;
+    --text:#34373c; --text-bright:#15171a; --text-sub:#50545a;
+    --dim:#676c74; --dimmer:#9298a0;
+    --green:#0a7d5e; --green-bg:#e6f4ee; --green-border:#a9ddc9;
+    --blue:#2563eb; --amber:#8a6300; --amber-bg:#f3e9d2;
+    --node-shadow:0 1px 2px rgba(22,24,27,0.07), 0 4px 14px rgba(22,24,27,0.06);
+    --font:'Inter',system-ui,sans-serif;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { height:100%; }
+  body { background:var(--bg); color:var(--text); font-family:var(--font); font-size:14px;
+    -webkit-font-smoothing:antialiased; min-height:100%; }
+
+  /* ---------- header — shared with list / map / stack ---------- */
+  .topbar { height:72px; border-bottom:1px solid transparent; background:var(--bg);
+    display:flex; align-items:center; gap:24px; padding:0 18px; position:sticky; top:0; z-index:40;
+    transition:background .16s, border-color .16s, box-shadow .16s; }
+  .topbar.stuck { background:var(--surface); border-bottom-color:var(--border); box-shadow:var(--node-shadow); }
+  .brandwrap { display:flex; align-items:center; gap:18px; }
+  .identity { display:flex; flex-direction:column; gap:3px; }
+  .htitle { font-size:13px; font-weight:600; color:var(--text-bright); white-space:nowrap; }
+  .hbio { font-size:11.5px; color:var(--text-sub); white-space:nowrap; }
+  .hright { margin-left:auto; display:flex; align-items:center; gap:14px; }
+  .brand { font-weight:600; font-size:29px; letter-spacing:-0.02em; color:var(--text-bright); display:flex; align-items:center; gap:3px; }
+  .cursor-bl { width:10px; height:26px; background:var(--green); display:inline-block; animation:blink 1s step-end infinite; }
+  @keyframes blink { 50% { opacity:0; } }
+  .seg { display:flex; border:1px solid var(--border); border-radius:4px; overflow:hidden; }
+  .seg button { font-family:var(--mono); font-size:12px; background:transparent; color:var(--dim); border:none; padding:6px 15px; cursor:pointer; }
+  .seg button.on { background:var(--green-bg); color:var(--green); }
+  .seg .seg-theme { padding:6px 11px; font-size:13px; border-left:1px solid var(--border); }
+  .navgroup { display:flex; align-items:center; gap:8px; margin-left:22px; }
+  .progress { display:flex; flex-direction:column; align-items:flex-start; gap:5px; }
+  .pcount { font-family:var(--mono); font-size:11.5px; color:var(--text-sub); white-space:nowrap; }
+  .pcount b { color:var(--text-bright); }
+  .pstrip { display:flex; gap:3px; }
+  .pcell { width:9px; height:9px; border-radius:2px; background:var(--border); position:relative; }
+  .pcell:hover { outline:1.5px solid var(--text-sub); outline-offset:1px; }
+  .pcell:hover::after { content:attr(data-tip); position:absolute; top:17px; left:50%; transform:translateX(-50%);
+    background:var(--surface-2); border:1px solid var(--border-strong); border-radius:5px; padding:5px 9px;
+    font-size:11px; color:var(--text-bright); white-space:nowrap; z-index:60; box-shadow:var(--node-shadow); pointer-events:none; }
+
+  /* ---------- page — centered reading column ---------- */
+  .page { padding:26px 24px 120px; }
+  .col { max-width:920px; margin:0 auto; }
+
+  .back { font-family:var(--mono); font-size:11.5px; color:var(--text-sub); text-decoration:none;
+    border:1px solid var(--border); border-radius:6px; padding:5px 11px; display:inline-block; }
+  .back:hover { color:var(--text-bright); border-color:var(--border-hover); }
+
+  /* ---------- title block ---------- */
+  .vhead { margin:20px 0 22px; }
+  .v-eyebrow { display:flex; align-items:center; gap:6px; font-family:var(--mono); font-size:11px;
+    color:var(--green); margin-bottom:9px; }
+  .v-eyebrow .vd { font-weight:600; }
+  .v-eyebrow .sep { color:var(--dimmer); }
+  .v-eyebrow .vid { color:var(--text-sub); font-weight:500; }
+  .v-title { font-size:26px; font-weight:600; color:var(--text-bright); line-height:1.3; letter-spacing:-0.01em; }
+  .v-meta { margin-top:10px; font-family:var(--mono); font-size:11.5px; color:var(--text-sub);
+    display:flex; flex-wrap:wrap; gap:6px; }
+  .v-meta .sep { color:var(--dimmer); }
+
+  /* ---------- video embed ---------- */
+  .vplayer { aspect-ratio:16/9; background:#000; border:1px solid var(--border-strong);
+    border-radius:9px; overflow:hidden; box-shadow:var(--node-shadow); margin-bottom:26px; }
+  .vplayer iframe { width:100%; height:100%; border:0; display:block; }
+
+  /* ---------- core message quote ---------- */
+  .quote { border-left:3px solid var(--green); background:var(--green-bg); border-radius:0 8px 8px 0;
+    padding:14px 18px; margin-bottom:34px; }
+  .q-label { font-family:var(--mono); font-size:10px; letter-spacing:0.8px; text-transform:uppercase;
+    color:var(--green); margin-bottom:7px; }
+  .q-text { font-size:14px; line-height:1.6; color:var(--text); }
+
+  /* ---------- sections ---------- */
+  .sec { margin-bottom:42px; }
+  .sec-h { font-size:11px; letter-spacing:1.8px; text-transform:uppercase; color:var(--dim);
+    margin:0 0 14px; display:flex; align-items:center; gap:9px; }
+  .sec-h::after { content:''; flex:1; height:1px; background:var(--border); }
+  .sec-h .sm { letter-spacing:0.4px; text-transform:none; color:var(--text-sub); font-size:11px; }
+
+  .panel { background:var(--surface); border:1px solid var(--border-strong); border-radius:9px;
+    box-shadow:var(--node-shadow); }
+
+  /* ---------- style library ---------- */
+  .style-panel { padding:16px; }
+  .style-name { font-family:var(--mono); font-size:13px; font-weight:600; color:var(--text-bright);
+    margin-bottom:8px; }
+  .style-desc { font-size:13px; line-height:1.6; color:var(--text-sub); margin-bottom:16px; }
+  .anchor-row { display:flex; gap:14px; margin-bottom:18px; padding-bottom:16px;
+    border-bottom:1px solid var(--border); }
+  .anchor-img { width:140px; height:140px; object-fit:cover; border-radius:6px;
+    border:1px solid var(--border); flex-shrink:0; background:var(--surface-2); }
+  .anchor-meta { flex:1; min-width:0; }
+  .anchor-label { font-family:var(--mono); font-size:10px; letter-spacing:0.8px; text-transform:uppercase;
+    color:var(--green); margin-bottom:6px; }
+  .anchor-desc { font-size:12px; line-height:1.6; color:var(--text-sub); }
+  .ref-label { font-family:var(--mono); font-size:11px; color:var(--text-sub); margin-bottom:11px; }
+  .ref-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .ref-card { background:var(--surface-2); border:1px solid var(--border); border-radius:6px;
+    overflow:hidden; }
+  .ref-img { width:100%; aspect-ratio:1/1; object-fit:cover; display:block;
+    border-bottom:1px solid var(--border); background:var(--surface-2); }
+  .ref-body { padding:9px 11px 11px; }
+  .ref-name { font-family:var(--mono); font-size:11px; font-weight:600; color:var(--text-bright);
+    margin-bottom:5px; }
+  .ref-kind { font-weight:400; color:var(--dim); margin-left:4px; }
+  .ref-desc { font-size:11px; line-height:1.5; color:var(--text-sub);
+    display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden; }
+
+  /* ---------- summary ---------- */
+  .sum { padding:3px 16px; }
+  .sum-row { display:grid; grid-template-columns:140px 1fr; gap:16px; padding:10px 0;
+    border-bottom:1px solid var(--border); align-items:baseline; }
+  .sum-row:last-child { border-bottom:none; }
+  .sum-k { font-family:var(--mono); font-size:10px; letter-spacing:0.6px; text-transform:uppercase; color:var(--dim); }
+  .sum-v { font-family:var(--mono); font-size:12px; color:var(--text); line-height:1.5; }
+  .sum-v b { color:var(--text-bright); font-weight:600; }
+  .sum-v .d { color:var(--dim); }
+  .sum-v .ok { color:var(--green); }
+
+  /* ---------- chunks ---------- */
+  .chunk-list { display:flex; flex-direction:column; gap:14px; }
+  .chunk { background:var(--surface); border:1px solid var(--border-strong); border-radius:9px;
+    box-shadow:var(--node-shadow); padding:14px; display:grid; grid-template-columns:240px 1fr; gap:16px; }
+  .chunk-thumb { aspect-ratio:16/9; background:var(--surface-2); border:1px solid var(--border);
+    border-radius:6px; overflow:hidden; }
+  .chunk-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+  .chunk-body { display:flex; flex-direction:column; gap:9px; min-width:0; }
+  .chunk-head { display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; }
+  .chunk-id { font-family:var(--mono); font-size:11px; font-weight:600; color:var(--green); }
+  .chunk-scene { font-family:var(--mono); font-size:11px; color:var(--text-sub); }
+  .beat { font-size:14px; line-height:1.55; color:var(--text); font-style:italic; }
+  .beat-empty { font-family:var(--mono); font-size:11.5px; color:var(--dim); font-style:normal; }
+  .audit-row { display:flex; gap:6px; flex-wrap:wrap; margin-top:2px; align-items:center; }
+  .badge { font-family:var(--mono); font-size:10px; padding:2px 8px; border-radius:3px; }
+  .badge.pass { color:var(--green); background:var(--green-bg); border:1px solid var(--green-border); }
+  .badge.fail { color:var(--amber); background:var(--amber-bg); border:1px solid var(--border-strong); }
+  .badge.model { color:var(--text-sub); background:var(--surface-2); border:1px solid var(--border); }
+  .prompt-toggle { font-family:var(--mono); font-size:11px; color:var(--text-sub);
+    background:transparent; border:0; padding:0; cursor:pointer; text-align:left; align-self:flex-start; }
+  .prompt-toggle:hover { color:var(--text-bright); }
+  .prompt-box { display:none; font-family:var(--mono); font-size:11px; line-height:1.6;
+    color:var(--text-sub); background:var(--surface-2); border:1px solid var(--border);
+    border-radius:5px; padding:11px; white-space:pre-wrap; }
+  .prompt-box.open { display:block; }
+
+  /* ---------- transcript ---------- */
+  .tr-toggle { font-family:var(--mono); font-size:12px; color:var(--text);
+    background:transparent; border:1px solid var(--border-strong); border-radius:7px;
+    padding:10px 14px; cursor:pointer; text-align:left; width:100%; }
+  .tr-toggle:hover { border-color:var(--border-hover); }
+  .tr-box { display:none; margin-top:11px; }
+  .tr-box.open { display:block; }
+  .tr-inner { padding:10px 20px 16px; }
+  .tr-inner p { font-size:14px; line-height:1.75; color:var(--text); margin:8px 0; }
+
+  /* ---------- mobile ---------- */
+  @media (max-width:720px) {
+    body { font-size:13px; }
+    .topbar { height:auto; min-height:54px; gap:10px 14px; padding:9px 13px; flex-wrap:wrap; }
+    .brandwrap { gap:12px; }
+    .brand { font-size:22px; }
+    .cursor-bl { width:7px; height:19px; }
+    .identity { display:none; }
+    .progress { display:none; }
+    .hright { margin-left:auto; gap:10px; }
+    .navgroup { margin-left:0; gap:6px; }
+    .seg button { padding:6px 11px; font-size:11px; }
+    .seg .seg-theme { padding:6px 9px; }
+    .page { padding:14px 13px 88px; }
+    .v-title { font-size:21px; }
+    .ref-grid { grid-template-columns:1fr; }
+    .anchor-row { flex-direction:column; }
+    .chunk { grid-template-columns:1fr; }
+    .chunk-thumb { max-width:100%; }
+    .sum-row { grid-template-columns:100px 1fr; gap:10px; }
+  }
+</style>
+<script>try{var _t=localStorage.getItem('artlu-theme');if(_t)document.documentElement.dataset.theme=_t;}catch(e){}</script>
+</head>
+<body>
+
+<div class="topbar" id="topbar">
+  <div class="brandwrap">
+    <div class="brand">artlu.ai<span class="cursor-bl"></span></div>
+    <div class="identity">
+      <div class="htitle">100 days. 100 features.</div>
+      <div class="hbio">one person. no coding experience. just AI and an internet connection.</div>
+    </div>
+  </div>
+  <div class="hright">
+    <div class="progress">
+      <span class="pcount">day <b>63</b>/100 · <b>79</b> shipped · <b>21</b> to go</span>
+      <div class="pstrip" id="actStrip"></div>
+    </div>
+    <div class="navgroup">
+      <div class="seg"><button onclick="location.href='astro-list-view.html'">list</button><button onclick="location.href='astro-map-view.html'">map</button><button onclick="location.href='astro-stack-view.html'">stack</button><button class="seg-theme" onclick="toggleTheme()" title="toggle theme">◐</button></div>
+      <div class="seg"><button onclick="location.href='astro-log-view.html'">log</button><button onclick="location.href='astro-research-view.html'">research</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="col">
+    <a class="back" href="astro-list-view.html">← back</a>
+
+    <div class="vhead">
+      <div class="v-eyebrow"><span class="vd">$</span><span>video</span><span class="sep">·</span><span class="vid">spoolcast-dev-log-06</span></div>
+      <div class="v-title">why ai makes things up about its own work — spoolcast dev log 6</div>
+      <div class="v-meta">
+        <span>may 8, 2026</span><span class="sep">·</span><span>4m 8s</span><span class="sep">·</span>
+        <span>style: wojak-gpt2</span><span class="sep">·</span><span>100 beats</span>
+      </div>
+    </div>
+
+    <div class="vplayer">
+      <iframe src="https://www.youtube.com/embed/c1tWTNh2D1Y"
+        title="why ai makes things up about its own work — spoolcast dev log 6"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen></iframe>
+    </div>
+
+    <div class="quote">
+      <div class="q-label">core message</div>
+      <div class="q-text">AI agents handling long-running work need a mechanical job tracker as the source of truth. Without one, the agent guesses from logs, partial files, and stale shells — and the guesses sound confident even when they're wrong.</div>
+    </div>
+
+    <section class="sec">
+      <h2 class="sec-h">style library</h2>
+      <div class="panel style-panel">
+        <div class="style-name">wojak-gpt2</div>
+        <div class="style-desc">Modern wojak / doomer-chad meme comic style, built natively on GPT Image 2 (text-to-image + image-to-image). Sister library to wojak-comic (which was built on nano-banana-2). Use this when the session's preferred_model is the GPT Image 2 family.</div>
+        <div class="anchor-row">
+          <img class="anchor-img" src="/videos/spoolcast-dev-log-06/assets/style/anchor.webp" alt="style anchor" loading="lazy" />
+          <div class="anchor-meta">
+            <div class="anchor-label">style anchor</div>
+            <div class="anchor-desc">Modern wojak / doomer-chad meme comic style, built natively on GPT Image 2 (text-to-image + image-to-image). Sister library to wojak-comic (which was built on nano-banana-2). Use this when the session's preferred_model is the GPT Image 2 family.</div>
+          </div>
+        </div>
+        <div class="ref-label">references (2)</div>
+        <div class="ref-grid" id="refGrid"></div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2 class="sec-h">summary <span class="sm">— how this video was made</span></h2>
+      <div class="panel sum" id="sumPanel"></div>
+    </section>
+
+    <section class="sec">
+      <h2 class="sec-h">chunks <span class="sm">— showing 6 of 47</span></h2>
+      <div class="chunk-list" id="chunkList"></div>
+    </section>
+
+    <section class="sec" style="margin-bottom:0;">
+      <h2 class="sec-h">full transcript</h2>
+      <button class="tr-toggle" id="trToggle">▸ full transcript</button>
+      <div class="tr-box panel" id="trBox"><div class="tr-inner" id="trInner"></div></div>
+    </section>
+  </div>
+</div>
+
+<script>
+  /* ===== real video bundle — public/videos/spoolcast-dev-log-06/bundle.json ===== */
+  const bundle = {
+    style: {
+      references: [
+        { name:'builder', kind:'character',
+          imageUrl:'/videos/spoolcast-dev-log-06/assets/style/references/builder.webp',
+          description:"the main hooded figure — mid-register wojak (not fully doomer, not fully chad). Alias for the style anchor; serves double-duty as both the style anchor and the builder character reference." },
+        { name:'ai-figure', kind:'character',
+          imageUrl:'/videos/spoolcast-dev-log-06/assets/style/references/ai-figure.webp',
+          description:"a wojak-universe AI figure that is slowly breaking down from overuse. Full-body standing. EMOTIONAL REGISTER: flat-affect, NO displayed emotion, NO smile, NO frown — a dead expressionless stare. Depression is the absence of emotion, not the display of sadness. FACE LINEWORK: brows, nose, mouth drawn in the classic rough / jagged / slightly-disjointed wojak linework (uneven strokes, hand-drawn imperfections). EYES: replaced with hollow loading-spinner icons (dashed rings) set in dark-shadowed sockets. CRACKS: visible hairline cracks spider across the face and forehead as if the outer shell is fracturing from overuse. At least one crack wide enough to reveal a glimpse of AI circuitry underneath — thin circuit-trace lines, a small exposed chip pattern. Fractures read as structural fatigue, not injury. FOREHEAD: a crooked rectangular ink-stamp reading 'AI' in bold capital letters, partially crossed by a crack. HOODIE: pale cream / off-white hoodie, hood down, noticeably lighter than the weary narrator's gray hoodie. POSTURE: slight slouch, arms hanging at sides. PLAIN background, no environment, no other characters, no other text. Single clear readable subject." },
+      ],
+    },
+    summary: {
+      writing: { author:'Claude', role:'screenplay, shot-list, scene prompts' },
+      images:  { platform:'kie.ai', models:['gpt-image-2-text-to-image','gpt-image-2-image-to-image'], sceneCount:90 },
+      audio:   { tts:'Google Cloud TTS', voice:'Puck', playbackRate:1.2, beatCount:100 },
+      render:  { engine:'Remotion', passed:true },
+      audit:   { narrationModel:'qwen/qwen-2.5-72b-instruct', narrationFlags:33 },
+    },
+    chunks: [
+      { id:'C1', sceneTitle:'Cold open — hook',
+        sceneImageUrl:'/videos/spoolcast-dev-log-06/assets/scenes/C1.webp',
+        model:'gpt-image-2-image-to-image',
+        prompt:'Flat-shaded cartoon illustration in the modern wojak-comic style. Characters drawn with exaggerated archetypal features — weary/defeated faces (hollow eyes, gray tones, slouched posture) vs. confident/heroic faces. Subtle soft cel-shading, not bold inked outlines. Muted color palette with deliberate contrast between desolate and triumphant scenes. Composition is comic-strip: one clear subject, readable at small sizes. Scene: Late-night grind feel. The viewer should feel the exhaustion in the narrator’s posture and the dim lighting before the AI’s three answers land. The 3:30 clock and dark window are the time anchors. Render exactly this text on the frame, hand-lettered in the session style: "STILL GOING" | "ALMOST DONE" | "12 LEFT".',
+        beats:[
+          { id:'01A', narration:"It's 3:30 in the morning. I've been up all night trying to finish this video." },
+          { id:'01B', narration:'Desperate, I ask my agent one more time — how much is left?' },
+          { id:'01C', narration:'I get three different answers.' },
+        ],
+        audits:{ narration:{passed:true}, render:{passed:true} } },
+      { id:'C2', sceneTitle:'Cold open — objection 1',
+        sceneImageUrl:'/videos/spoolcast-dev-log-06/assets/scenes/C2.webp',
+        model:'gpt-image-2-image-to-image',
+        prompt:'Flat-shaded cartoon illustration in the modern wojak-comic style. Characters drawn with exaggerated archetypal features. Subtle soft cel-shading, not bold inked outlines. Muted color palette. Composition is comic-strip: one clear subject, readable at small sizes. Scene: Reframe the AI from ‘lying’ to ‘guessing.’ The note in the AI’s hand is the word GUESS, not the answer. Render exactly this text on the frame, hand-lettered in the session style: "GUESS".',
+        beats:[
+          { id:'02A', narration:"Agents don't lie on purpose." },
+          { id:'02B', narration:'It was guessing — and each guess sounded as confident as the last.' },
+        ],
+        audits:{ narration:{passed:true}, render:{passed:true} } },
+      { id:'C3', sceneTitle:'Cold open — objection 2',
+        sceneImageUrl:'/videos/spoolcast-dev-log-06/assets/scenes/C3.webp',
+        model:'gpt-image-2-image-to-image',
+        prompt:'Flat-shaded cartoon illustration in the modern wojak-comic style. Characters drawn with exaggerated archetypal features. Subtle soft cel-shading, not bold inked outlines. Muted color palette. Composition is comic-strip: one clear subject, readable at small sizes. Scene: Compositional contrast: the AI looks at the note (the wrong source); the door (the right source) is behind, ignored.',
+        beats:[
+          { id:'03A', narration:'Why was it guessing? Because it had nothing real to check.' },
+          { id:'03B', narration:'It was reading scraps of half-finished work and making up the rest.' },
+        ],
+        audits:{ narration:{passed:false}, render:{passed:true} } },
+      { id:'C4', sceneTitle:'Cold open — objection 3',
+        sceneImageUrl:'/videos/spoolcast-dev-log-06/assets/scenes/C4.webp',
+        model:'gpt-image-2-text-to-image',
+        prompt:'Flat-shaded cartoon illustration in the modern wojak-comic style. Characters drawn with exaggerated archetypal features. Subtle soft cel-shading, not bold inked outlines. Muted color palette. Composition is comic-strip: one clear subject, readable at small sizes. Scene: The status board is the visual fix. Hung on the wall — the AI can now check it instead of guessing. Render exactly this text on the frame, hand-lettered in the session style: "FINISHED".',
+        beats:[
+          { id:'04A', narration:'You can fix this.' },
+          { id:'04B', narration:'Not by writing better instructions —' },
+          { id:'04C', narration:'by giving the agent somewhere to look up the answer.' },
+        ],
+        audits:{ narration:{passed:false}, render:{passed:true} } },
+      { id:'C5', sceneTitle:'Cold open — context',
+        sceneImageUrl:'/videos/spoolcast-dev-log-06/assets/scenes/C5.webp',
+        model:'gpt-image-2-text-to-image',
+        prompt:'Flat-shaded cartoon illustration in the modern wojak-comic style. Characters drawn with exaggerated archetypal features. Subtle soft cel-shading, not bold inked outlines. Muted color palette. Composition is comic-strip: one clear subject, readable at small sizes. Scene: Establish the channel/project context in one frame without a feature tour. The SPOOLCAST sign + the studio = the show. Render exactly this text on the frame, hand-lettered in the session style: "SPOOLCAST".',
+        beats:[
+          { id:'05A', narration:'Before I get to the fix — quick context.' },
+          { id:'05B', narration:"I'm building a video maker called Spoolcast that's run by agents, and this video came out of it." },
+          { id:'05C', narration:'And this is the day my agent kept making things up about what was finished — and what I built so it can’t anymore.' },
+        ],
+        audits:{ narration:{passed:false}, render:{passed:true} } },
+      { id:'B1', sceneTitle:'Bumper — THE SYMPTOM',
+        sceneImageUrl:'/videos/spoolcast-dev-log-06/assets/scenes/B1.webp',
+        model:'gpt-image-2-text-to-image',
+        prompt:'Flat-shaded cartoon illustration in the modern wojak-comic style. Composition is comic-strip: one clear subject, readable at small sizes. Scene: Full-screen title card in wojak-gpt2 hand-lettered style. Hand-lettered text: THE SYMPTOM. Render exactly this text on the frame, hand-lettered in the session style: "THE SYMPTOM".',
+        beats:[],
+        audits:{ narration:{passed:true}, render:{passed:true} } },
+    ],
+    transcript: "It's 3:30 in the morning. I've been up all night trying to finish this video. Desperate, I ask my agent one more time — how much is left? I get three different answers. Agents don't lie on purpose. It was guessing — and each guess sounded as confident as the last. Why was it guessing? Because it had nothing real to check. It was reading scraps of half-finished work and making up the rest. You can fix this. Not by writing better instructions — by giving the agent somewhere to look up the answer.\n\nBefore I get to the fix — quick context. I'm building a video maker called Spoolcast that's run by agents, and this video came out of it. And this is the day my agent kept making things up about what was finished — and what I built so it can't anymore.\n\nThe first time I noticed, the agent was checking the script for this video. Same script. Same check. Three times in a row. Three different times back: a minute, ten minutes, an hour. The agent was reading scraps of half-finished work and putting a guess together. None of the scraps were the actual answer. Then it happened a different way. I'd ask the agent to do something slow — like putting a piece of the video together — and walk away. Ten minutes later, the agent had forgotten the task started. Then it happened with the voiceover for this video. The agent made the first few lines, then stopped. I couldn't tell if it was broken, paused, or about to start again. A few finished pieces don't tell you where the rest of the work is. Then with the pictures. The agent told me twelve pictures were still being drawn. I went and counted. It was four. Twelve was not a count. Twelve was a guess.\n\nFour different moments. Same shape every time. The agent wasn't breaking. It was guessing. Before I figured out the real problem, I almost believed a few wrong explanations. First, I thought: maybe the agent is just being careless. It wasn't careless — it was reading the only signals it had, and they were thin. Then I thought: maybe my computer is bad at this. Partly true — but a better computer wouldn't fix it. Then I thought: maybe the cloud service it uses is slow. Partly true — but the speed wasn't the bug. The not-knowing was. Then: maybe the outside services are just weird. Each one was a right answer to the wrong question. The right question was: when the agent told me it was done, what was it actually looking at?\n\nEvery time I asked the agent \"is it done?\" — it had to make the answer up. It looked at scraps of half-finished work. It looked at things it remembered doing earlier. And put together a guess. And this isn't just an agent problem. Same thing happens to a delivery you can't track — you guess from the time of day. Same thing in a hospital floor with no board on the wall. Same thing in a kitchen with something in the oven and no timer set. Same shape every time. Work is happening, there's no way to check it, and whoever is watching fills in the rest with guesses.\n\nSo I built a small tracker. One place where every long task is recorded — what it is, whether it's running, whether it finished. Every long task gets a name when it starts. Like a delivery getting a tracking number. While it's running, the tracker says it's running. When it finishes, the tracker says it finished. Now me, the agent, even me coming back tomorrow — we all check the same place. The agent stops guessing. It just reads the board.\n\nHere's what the tracker said about the last video I made. And here's everything else the agent did that day, as a checklist. Every long task. Every result. In one place. And the rule that guides all of it, as a note on the wall. Same shape outside this. A delivery tracker on your phone, a status board at a counter, a timer on an oven. Status is something you check. Not something you guess.\n\nIf your agent keeps making things up about whether work is done, don't try to make it more careful. Make the work impossible to misread. The thing you build for your own peace of mind is also what the agent can read. A lot of building with agents is sitting there wondering if the agent is being careless. A lot of the time, the agent is being as careful as the room allows. The fix wasn't teaching the agent to be more careful. It was making the work impossible to misread.",
+  };
+
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  /* ---- style references ---- */
+  document.getElementById('refGrid').innerHTML = bundle.style.references.map(r=>`
+    <div class="ref-card">
+      <img class="ref-img" src="${r.imageUrl}" alt="" loading="lazy" />
+      <div class="ref-body">
+        <div class="ref-name">${esc(r.name)}<span class="ref-kind">${esc(r.kind)}</span></div>
+        <div class="ref-desc">${esc(r.description)}</div>
+      </div>
+    </div>`).join('');
+
+  /* ---- summary — mirrors VideoPage.jsx SummaryRow composition ---- */
+  const s = bundle.summary;
+  const sumRows = [];
+  if (s.writing) sumRows.push(['writing',
+    `<b>${esc(s.writing.author)}</b><span class="d"> · ${esc(s.writing.role)}</span>`]);
+  if (s.images) sumRows.push(['images',
+    `<b>${esc(s.images.platform)}</b><span class="d"> · </span>${esc(s.images.models.join(', '))}<span class="d"> · ${s.images.sceneCount} scenes</span>`]);
+  if (s.audio) sumRows.push(['audio',
+    `<b>${esc(s.audio.tts)}</b><span class="d"> · voice: </span>${esc(s.audio.voice)}<span class="d"> · ${s.audio.playbackRate}×</span><span class="d"> · ${s.audio.beatCount} beats</span>`]);
+  if (s.render) sumRows.push(['render',
+    `<b>${esc(s.render.engine)}</b><span class="d"> · </span><span class="ok">${s.render.passed?'✓ passed':'! failed'}</span>`]);
+  if (s.audit) sumRows.push(['narration audit',
+    `<b>${esc(s.audit.narrationModel)}</b><span class="d"> · ${s.audit.narrationFlags} flag${s.audit.narrationFlags===1?'':'s'}</span>`]);
+  document.getElementById('sumPanel').innerHTML = sumRows.map(([k,v])=>
+    `<div class="sum-row"><div class="sum-k">${k}</div><div class="sum-v">${v}</div></div>`).join('');
+
+  /* ---- chunks (first 6) ---- */
+  document.getElementById('chunkList').innerHTML = bundle.chunks.map((c,i)=>{
+    const beats = c.beats.length
+      ? c.beats.map(b=>`<div class="beat">"${esc(b.narration)}"</div>`).join('')
+      : '<div class="beat beat-empty">title card — no narration beats</div>';
+    const nA = c.audits.narration, rA = c.audits.render;
+    return `<div class="chunk">
+      <div class="chunk-thumb"><img src="${c.sceneImageUrl}" alt="" loading="lazy" /></div>
+      <div class="chunk-body">
+        <div class="chunk-head">
+          <span class="chunk-id">${esc(c.id)}</span>
+          <span class="chunk-scene">${esc(c.sceneTitle)}</span>
+        </div>
+        ${beats}
+        <div class="audit-row">
+          <span class="badge ${nA.passed?'pass':'fail'}">${nA.passed?'✓':'!'} narration</span>
+          <span class="badge ${rA.passed?'pass':'fail'}">${rA.passed?'✓':'!'} render</span>
+          <span class="badge model">${esc(c.model)}</span>
+        </div>
+        <button class="prompt-toggle" data-i="${i}">▸ scene prompt</button>
+        <div class="prompt-box" id="prompt-${i}">${esc(c.prompt)}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('chunkList').addEventListener('click', e=>{
+    const btn = e.target.closest('.prompt-toggle'); if(!btn) return;
+    const box = document.getElementById('prompt-'+btn.dataset.i);
+    const open = box.classList.toggle('open');
+    btn.textContent = (open?'▾':'▸') + ' scene prompt';
+  });
+
+  /* ---- transcript ---- */
+  document.getElementById('trInner').innerHTML =
+    bundle.transcript.split(/\n\n+/).map(p=>`<p>${esc(p)}</p>`).join('');
+  const trToggle = document.getElementById('trToggle'), trBox = document.getElementById('trBox');
+  trToggle.addEventListener('click', ()=>{
+    const open = trBox.classList.toggle('open');
+    trToggle.textContent = (open?'▾':'▸') + ' full transcript';
+  });
+
+  /* ---- activity strip ---- */
+  (function(){
+    const act=[1,0,2,1,3,2,0,1,4,2,1,3,2,0,2,1,3,2,4,1];
+    const h=document.getElementById('actStrip'); if(!h) return;
+    const end=new Date(2026,4,18);
+    act.forEach((lv,i)=>{
+      const c=document.createElement('div'); c.className='pcell';
+      const d=new Date(end); d.setDate(d.getDate()-7*(act.length-1-i));
+      const lbl=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      c.dataset.tip='week of '+lbl+' · '+lv+' shipped';
+      if(lv){ c.style.background='var(--green)'; c.style.opacity=(0.3+lv*0.17); }
+      h.appendChild(c);
+    });
+  })();
+
+  /* ---- frozen header on scroll ---- */
+  const topbar=document.getElementById('topbar');
+  function onScroll(){ topbar.classList.toggle('stuck',(window.scrollY||document.documentElement.scrollTop)>6); }
+  window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+
+  function toggleTheme(){ const h=document.documentElement; const t=h.dataset.theme==='light'?'dark':'light';
+    h.dataset.theme=t; try{ localStorage.setItem('artlu-theme',t); }catch(e){} }
+  window.toggleTheme=toggleTheme;
+</script>
+</body>
+</html>

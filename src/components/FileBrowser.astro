@@ -1,0 +1,78 @@
+---
+type Props = { repo?: string };
+const { repo = "" } = Astro.props;
+let api = "";
+try {
+  const url = new URL(repo);
+  const parts = url.pathname.split("/").filter(Boolean);
+  if (url.hostname.includes("github.com") && parts.length >= 2) {
+    api = `https://api.github.com/repos/${parts[0]}/${parts[1]}/contents`;
+  }
+} catch {}
+---
+<div class="fb" data-file-browser data-api={api}>
+  <div class="fb-tree">
+    {api ? <div class="meta">loading repository tree...</div> : <div class="meta">github repository required</div>}
+  </div>
+  <pre class="fb-view">← select a file to view</pre>
+</div>
+
+<script>
+  async function fetchJson(url) {
+    const response = await fetch(url, { headers: { Accept: "application/vnd.github+json" } });
+    if (!response.ok) throw new Error(`GitHub API ${response.status}`);
+    return response.json();
+  }
+  async function loadTree(root, api) {
+    const tree = root.querySelector(".fb-tree");
+    const viewer = root.querySelector(".fb-view");
+    async function renderDir(url, container) {
+      const items = await fetchJson(url);
+      container.innerHTML = "";
+      for (const item of items.sort((a, b) => (a.type === b.type ? a.name.localeCompare(b.name) : a.type === "dir" ? -1 : 1))) {
+        if (item.type === "dir") {
+          const wrap = document.createElement("div");
+          wrap.className = "fb-dir";
+          const btn = document.createElement("button");
+          btn.className = "fb-fold";
+          btn.type = "button";
+          btn.innerHTML = `<span>▸</span>${item.name}`;
+          const child = document.createElement("div");
+          child.className = "fb-children";
+          btn.addEventListener("click", async () => {
+            wrap.classList.toggle("open");
+            btn.querySelector("span").textContent = wrap.classList.contains("open") ? "▾" : "▸";
+            if (child.childElementCount === 0) {
+              child.innerHTML = '<div class="meta" style="padding:6px">loading...</div>';
+              try { await renderDir(item.url, child); } catch (error) { child.textContent = error.message; }
+            }
+          });
+          wrap.append(btn, child);
+          container.append(wrap);
+        } else {
+          const btn = document.createElement("button");
+          btn.className = "fb-item";
+          btn.type = "button";
+          btn.textContent = item.name;
+          btn.addEventListener("click", async () => {
+            root.querySelectorAll(".fb-item").forEach((el) => el.classList.remove("sel"));
+            btn.classList.add("sel");
+            viewer.textContent = "loading...";
+            try {
+              const file = await fetchJson(item.url);
+              viewer.textContent = file.content ? atob(file.content.replace(/\n/g, "")) : item.download_url || "content unavailable";
+            } catch (error) {
+              viewer.textContent = error.message;
+            }
+          });
+          container.append(btn);
+        }
+      }
+    }
+    try { await renderDir(api, tree); } catch (error) { tree.textContent = error.message; }
+  }
+  document.querySelectorAll("[data-file-browser]").forEach((root) => {
+    const api = root.getAttribute("data-api");
+    if (api) loadTree(root, api);
+  });
+</script>

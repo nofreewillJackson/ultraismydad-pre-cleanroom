@@ -1,0 +1,33 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import ProjectDetail from "../../components/ProjectDetail.astro";
+import { getPublicProjects, getStats } from "../../lib/data";
+
+export async function getStaticPaths() {
+  const projects = await getPublicProjects();
+  return projects.map((project) => ({ params: { slug: project.slug }, props: { project } }));
+}
+
+const { project } = Astro.props;
+const projects = await getPublicProjects();
+const stats = getStats(projects);
+const description = project.desc || project.longDesc?.slice(0, 155) || project.name;
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "CreativeWork",
+  name: project.name,
+  description,
+  datePublished: project.date,
+  url: `https://artlu.ai/project/${project.slug}`,
+};
+---
+<BaseLayout title={`artlu.ai — ${project.name}`} description={description}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+  <Header active="list" stats={stats} />
+  <main class="page">
+    <div class="col" style="max-width:980px">
+      <ProjectDetail project={project} />
+    </div>
+  </main>
+</BaseLayout>

@@ -1,0 +1,36 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import ProjectStrip from "../components/ProjectStrip.astro";
+import TimelineList from "../components/TimelineList.astro";
+import { getMainProjects, getPublicProjects, getSiteEntries, getStats } from "../lib/data";
+import { dateValue } from "../lib/format";
+
+const [projects, entries] = await Promise.all([getPublicProjects(), getSiteEntries()]);
+const stats = getStats(projects);
+const mainProjects = await getMainProjects(projects);
+const projectFilter = Astro.url.searchParams.get("project");
+const typeFilter = Astro.url.searchParams.get("type") || "all";
+const latestByProject = entries.reduce((acc, entry) => {
+  const current = acc.get(entry.mainProjectId) || 0;
+  const next = dateValue(entry.date);
+  if (next > current) acc.set(entry.mainProjectId, next);
+  return acc;
+}, new Map<string, number>());
+const orderedMainProjects = [...mainProjects].sort((a, b) => {
+  const byLatest = (latestByProject.get(b.id) || 0) - (latestByProject.get(a.id) || 0);
+  if (byLatest) return byLatest;
+  return (a.sortOrder ?? 0) - (b.sortOrder ?? 0) || a.name.localeCompare(b.name);
+});
+---
+<BaseLayout title="artlu.ai — the list" description="A crawlable list of shipped artlu.ai projects, videos, experiments, and research entries.">
+  <Header active="list" stats={stats} />
+  <main class="page">
+    <div class="col">
+      <h2 class="sec-h">projects</h2>
+      <ProjectStrip projects={orderedMainProjects} active={projectFilter} />
+      <h2 class="sec-h mt" id="timeline">the timeline</h2>
+      <TimelineList entries={entries} projectFilter={projectFilter} typeFilter={typeFilter} />
+    </div>
+  </main>
+</BaseLayout>

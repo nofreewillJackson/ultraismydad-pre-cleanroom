@@ -1,0 +1,41 @@
+[
+  {
+    "videoId": "spoolcast-dev-log-07",
+    "trackerDocId": "5wKVNWOCn7B5DvXNs5ID",
+    "format": "long",
+    "title": "three-ai AdsMetri build story — spoolcast dev log 7",
+    "desc": "devlog about building AdsMetri across Codex, Manus, and Claude, and why role clarity mattered more than raw AI output.",
+    "youtubeId": "21zjy7BDEI0",
+    "shippedAt": "2026-05-13",
+    "durationSec": 773,
+    "hiddenChunkIds": [],
+    "notes": "Tracker entry exists. Long form. Already on YouTube — script can ship the guidebook."
+  },
+  {
+    "videoId": "spoolcast-dev-log-08",
+    "trackerDocId": "WZ8xT1ZbxRxNceMNTxFd",
+    "format": "long",
+    "title": "giving an AI agent a key to your wallet — spoolcast dev log 8",
+    "desc": "devlog about letting AI agents spend real money in PipelineCPC, and the fences that keep it from going wrong.",
+    "youtubeId": "vwqv8VIc2fA",
+    "shippedAt": "2026-05-18",
+    "durationSec": 344,
+    "hiddenChunkIds": [],
+    "notes": "Tracker entry exists. Long form. Already on YouTube — script can ship the guidebook."
+  },
+  {
+    "videoId": "news-anime-bot-2026-05-12",
+    "trackerDocId": "ecIt5YvNs46GNOxNCjCj",
+    "format": "short",
+    "show": "news-anime-bot",
+    "sessionDate": "2026-05-12",
+    "title": "Nvidia invests $40B in companies that spend on Nvidia",
+    "desc": "Daily AI news satire. Nvidia pours $40B into companies whose business model is buying more Nvidia GPUs.",
+    "youtubeId": "hGTkj0kYmoo",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7638994693791026463",
+    "shippedAt": "2026-05-12",
+    "durationSec": 58,
+    "hiddenBeatNs": [],
+    "notes": "Aninews ep 8. Tracker entry exists, guidebookStatus: pending. Ready to ship — script can build the guidebook."
+  }
+]

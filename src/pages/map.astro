@@ -1,0 +1,1081 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import TimelineList from "../components/TimelineList.astro";
+import { getMainProjects, getPublicJournalEntries, getPublicProjects, getSeries, getSiteEntries, getStats } from "../lib/data";
+import { dateValue, fmtDate, isEmbeddable, slugify } from "../lib/format";
+
+const [projects, entries, journalEntries] = await Promise.all([getPublicProjects(), getSiteEntries(), getPublicJournalEntries()]);
+const stats = getStats(projects);
+const mains = await getMainProjects(projects);
+const seriesRecords = await getSeries(entries);
+const mainIds = new Set(mains.map((main) => main.id));
+const seriesById = new Map(seriesRecords.map((series) => [series.id, series]));
+
+function labelSeries(value?: string) {
+  if (!value) return "";
+  return value
+    .replace(/^series[-_]/, "")
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function lastRoutePart(route?: string) {
+  return (route || "").split("/").filter(Boolean).at(-1) || "";
+}
+
+function refKey(value?: string) {
+  return slugify(value || "");
+}
+
+function refLabel(value: any) {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  return value.slug || value.name || value.title || value.id || "";
+}
+
+const baseMapEntries = entries.slice(0, 56).map((entry, index) => {
+  const projectId = mainIds.has(entry.mainProjectId) ? entry.mainProjectId : "other";
+  const artifactHtml = entry.project?.artifactHtml?.trim() || "";
+  const demoUrl = !artifactHtml && entry.project?.link && isEmbeddable(entry.project.link) ? entry.project.link : "";
+  const hasDemo = Boolean(artifactHtml || demoUrl);
+  const matchKeys = [
+    entry.id,
+    entry.title,
+    entry.route,
+    lastRoutePart(entry.route),
+    entry.project?.id,
+    entry.project?.name,
+    entry.project?.slug,
+    entry.video?.id,
+    entry.video?.title,
+  ].map(refKey).filter(Boolean);
+  return {
+    id: `f_${slugify(entry.id) || index}`,
+    entryId: entry.id,
+    kind: entry.kind,
+    type: entry.kind,
+    mediaType: entry.embedType || "",
+    new: index < 3,
+    date: entry.date || "",
+    dateLabel: fmtDate(entry.date),
+    dateValue: dateValue(entry.date),
+    status: entry.status || "launched",
+    route: entry.route,
+    title: entry.title,
+    desc: entry.desc || "",
+    stack: entry.stack || [],
+    projectId,
+    seriesId: entry.seriesId || "",
+    thumbnailUrl: entry.thumbnailUrl || entry.project?.screenshots?.[0] || "",
+    thumbnailMode: entry.thumbnailMode || "",
+    hasDemo,
+    artifactHtml,
+    demoUrl,
+    matchKeys: [...new Set(matchKeys)],
+  };
+});
+
+const featureKeyIndex = new Map<string, Set<string>>();
+for (const feature of baseMapEntries) {
+  for (const key of feature.matchKeys) {
+    if (!featureKeyIndex.has(key)) featureKeyIndex.set(key, new Set());
+    featureKeyIndex.get(key)?.add(feature.id);
+  }
+}
+
+function matchJournalRefs(refs: string[]) {
+  const featureIds = new Set<string>();
+  for (const ref of refs) {
+    const key = refKey(ref);
+    if (!key) continue;
+    featureKeyIndex.get(key)?.forEach((id) => featureIds.add(id));
+    if (key.length >= 12) {
+      for (const feature of baseMapEntries) {
+        if (feature.matchKeys.some((candidate) => candidate.length >= 12 && (candidate.includes(key) || key.includes(candidate)))) {
+          featureIds.add(feature.id);
+        }
+      }
+    }
+  }
+  return [...featureIds];
+}
+
+const mapLogs = journalEntries
+  .map((entry, index) => {
+    const refs = (entry.projectRefs || []).map(refLabel).filter(Boolean);
+    const featureIds = matchJournalRefs(refs);
+    return {
+      id: `j_${slugify(entry.slug || entry.id) || index}`,
+      logId: entry.id,
+      title: entry.title,
+      body: entry.body || "",
+      excerpt: (entry.body || "").split(/\n+/).find(Boolean) || "",
+      date: entry.date || "",
+      dateLabel: fmtDate(entry.date),
+      dateValue: dateValue(entry.date),
+      day: entry.day,
+      author: entry.author || "ai",
+      route: `/log/${entry.slug}`,
+      refs,
+      featureIds,
+    };
+  })
+  .filter((entry) => entry.featureIds.length)
+  .sort((a, b) => b.dateValue - a.dateValue || a.title.localeCompare(b.title));
+
+const featureLogIds = new Map<string, string[]>();
+for (const log of mapLogs) {
+  for (const featureId of log.featureIds) {
+    const current = featureLogIds.get(featureId) || [];
+    current.push(log.id);
+    featureLogIds.set(featureId, current);
+  }
+}
+
+const mapEntries = baseMapEntries.map((entry) => ({
+  ...entry,
+  logIds: featureLogIds.get(entry.id) || [],
+}));
+
+const subgroupMap = new Map<string, any>();
+for (const entry of mapEntries) {
+  if (!entry.seriesId) continue;
+  const series = seriesById.get(entry.seriesId);
+  const existing = subgroupMap.get(entry.seriesId) || {
+    id: entry.seriesId,
+    name: series?.name || labelSeries(entry.seriesId),
+    projectId: series?.mainProjectId || entry.projectId,
+    desc: series?.desc || `Grouped entries in the ${labelSeries(entry.seriesId)} line.`,
+    meta: series?.meta || "series",
+    kind: series?.kind || "series",
+    sortOrder: series?.sortOrder ?? 900,
+    count: 0,
+  };
+  existing.count += 1;
+  existing.meta = `${series?.meta || existing.meta || "series"} · ${existing.count} entries`;
+  subgroupMap.set(entry.seriesId, existing);
+}
+
+const mapData = {
+  features: mapEntries,
+  logs: mapLogs,
+  subgroups: [...subgroupMap.values()].sort((a, b) => (a.sortOrder ?? 900) - (b.sortOrder ?? 900) || a.name.localeCompare(b.name)),
+  projects: mains.map((main) => ({
+    id: main.id,
+    name: main.name,
+    desc: main.desc,
+    meta: `${main.meta} · ${main.count} entries`,
+    count: main.count,
+    site: main.site,
+    repo: main.repo,
+    demo: main.demo,
+    logoImg: main.logoImg,
+    wordmark: main.wordmark,
+    markKey: main.markKey,
+    markText: main.markText,
+  })),
+};
+---
+<BaseLayout title="artlu.ai — node canvas" description="The artlu.ai map view: a vertical timeline canvas of shipped projects, videos, and research.">
+  <Header active="map" stats={stats} sticky="canvas" />
+  <div class="canvas-fallback page">
+    <div class="col">
+      <h2 class="sec-h">map fallback</h2>
+      <TimelineList entries={entries} showFilters={false} />
+    </div>
+  </div>
+  <div class="viewport map-vp" id="viewport">
+    <div class="world map-world" id="world">
+      <svg class="wires" id="wires"></svg>
+      <div class="world-intro">
+        <div class="wi-h">what is this?</div>
+        <div class="wi-p">A live map of public artlu.ai entries. Each feature traces through its matching log entry, series, and main project while follower nodes re-center around the visible work. Drag to pan, scroll to zoom, click any node to read more.</div>
+      </div>
+    </div>
+  </div>
+  <aside class="panel map-panel" id="canvasPanel">
+    <div class="p-head">
+      <div class="p-kicker">
+        <span class="p-kind" id="panelKind"></span>
+        <button class="p-x" type="button" id="panelClose">×</button>
+      </div>
+      <div class="p-title" id="panelTitle"></div>
+      <div class="p-meta" id="panelMeta"></div>
+    </div>
+    <div class="p-body" id="panelBody"></div>
+    <div class="p-foot">
+      <a class="p-full" id="panelOpen" href="#">open page ↗</a>
+      <a class="slug-page" id="panelSlug" href="#"></a>
+    </div>
+  </aside>
+  <div class="hud">drag canvas to pan · scroll to zoom · drag a node by its header · click to expand</div>
+  <div class="zoomctl">
+    <button type="button" data-zoom="-">−</button>
+    <button type="button" data-zoom="+">+</button>
+    <button type="button" data-zoom="fit">fit</button>
+  </div>
+  <style is:global>
+    body { overflow:hidden; }
+    .topbar { position:relative; }
+    .map-vp {
+      position:absolute;
+      top:72px;
+      left:0;
+      right:0;
+      bottom:0;
+      overflow:hidden;
+      cursor:grab;
+      background:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
+        radial-gradient(circle, var(--grid-dot, transparent) 1.5px, transparent 1.5px);
+      background-size:160px 160px, 160px 160px, 32px 32px;
+    }
+    .map-vp.grabbing { cursor:grabbing; }
+    .map-world {
+      position:absolute;
+      top:0;
+      left:0;
+      width:1760px;
+      height:7200px;
+      transform-origin:0 0;
+    }
+    .map-world.busy iframe { pointer-events:none; }
+    .map-world .wires {
+      position:absolute;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      overflow:visible;
+      pointer-events:none;
+      z-index:1;
+    }
+    .map-world .col-head {
+      position:absolute;
+      top:124px;
+      font-size:13px;
+      color:var(--dim);
+      letter-spacing:1.5px;
+      text-transform:uppercase;
+      z-index:2;
+    }
+    .map-world .timeline {
+      position:absolute;
+      top:176px;
+      left:86px;
+      border-left:1px solid var(--timeline);
+      z-index:2;
+    }
+    .map-world .tick {
+      position:absolute;
+      left:86px;
+      transform:translate(-50%,-50%);
+      z-index:3;
+    }
+    .map-world .tick .lbl {
+      font-size:15px;
+      font-weight:600;
+      color:var(--text-bright);
+      background:var(--bg);
+      padding:4px 11px;
+      border:1px solid var(--border-strong);
+      border-radius:5px;
+      white-space:nowrap;
+      font-family:var(--mono);
+    }
+    .map-world .node {
+      position:absolute;
+      z-index:2;
+      background:var(--surface);
+      border:1px solid var(--border-strong);
+      border-radius:8px;
+      box-shadow:var(--node-shadow);
+      cursor:pointer;
+      overflow:hidden;
+      transition:border-color .14s, top .12s ease-out, opacity .15s;
+    }
+    .map-world .node.feature { width:330px; }
+    .map-world .node.feature.lh { display:flex; min-height:240px; }
+    .map-world .node.journal { width:250px; border-color:var(--amber-border); }
+    .map-world .node.sub { width:262px; border-color:var(--amber-border); }
+    .map-world .node.proj { width:286px; border-color:var(--green-border); }
+    .map-world .node:hover { border-color:var(--border-hover); }
+    .map-world .node.dragging { z-index:25; box-shadow:0 16px 42px rgba(0,0,0,.8); }
+    .map-world .node.new { box-shadow:var(--node-shadow), 0 0 0 1px var(--green-border); }
+    .map-world .node.sel { box-shadow:var(--node-shadow), 0 0 0 2px var(--border-hover); }
+    .map-world .node.dimmed { opacity:.16 !important; }
+    .map-world .nhead {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:9px 11px;
+      background:var(--surface-2);
+      border-bottom:1px solid var(--border);
+      cursor:grab;
+    }
+    .map-world .node.journal .nhead { background:var(--amber-bg); }
+    .map-world .node.sub .nhead { background:var(--amber-bg); cursor:pointer; }
+    .map-world .node.proj .nhead { background:var(--green-bg); cursor:pointer; }
+    .map-world .sdot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+    .map-world .sdot.project,
+    .map-world .sdot.research { background:var(--green); }
+    .map-world .sdot.video { background:var(--blue); }
+    .map-world .sdot.journal { background:var(--amber); }
+    .map-world .glyph.sub { color:var(--amber); }
+    .map-world .glyph.proj { color:var(--green); }
+    .map-world .nname {
+      color:var(--text-bright);
+      font-weight:600;
+      font-size:14px;
+      line-height:1.38;
+      overflow:hidden;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+    }
+    .map-world .node.journal .nname { font-size:12.5px; color:var(--amber); }
+    .map-world .ntag {
+      margin-left:auto;
+      flex-shrink:0;
+      font-size:11px;
+      color:var(--dim);
+      border:1px solid var(--border);
+      border-radius:3px;
+      padding:2px 7px;
+      font-family:var(--mono);
+    }
+    .map-world .node.journal .ntag { color:var(--amber); border-color:var(--amber-border); }
+    .map-world .node.sub .ntag { color:var(--amber); border-color:var(--amber-border); }
+    .map-world .node.proj .ntag { color:var(--green); border-color:var(--green-border); }
+    .map-world .fmedia { background:#000; position:relative; overflow:hidden; }
+    .map-world .fmedia.h,
+    .map-world .fmedia.d { width:100%; aspect-ratio:16/9; border-bottom:1px solid var(--border); }
+    .map-world .fmedia.v { width:112px; flex-shrink:0; border-right:1px solid var(--border); }
+    .map-world .fmedia img { width:100%; height:100%; object-fit:cover; display:block; }
+    .map-world .fmedia iframe { width:calc(100% + 28px); height:calc(100% + 28px); border:0; display:block; background:#fff; pointer-events:none; overflow:hidden; scrollbar-width:none; max-width:none; max-height:none; }
+    .map-world .fmedia iframe::-webkit-scrollbar { display:none; width:0; height:0; }
+    .map-world .demo-mark {
+      width:100%;
+      height:100%;
+      min-height:96px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:5px;
+      color:var(--green);
+      background:var(--green-bg);
+      font-family:var(--mono);
+    }
+    .map-world .demo-mark span { font-size:17px; font-weight:600; color:var(--text-bright); }
+    .map-world .demo-mark small { color:var(--dim); font-size:10px; }
+    .map-world .fmedia .proj-mark {
+      position:absolute;
+      inset:0;
+      margin:auto;
+      width:fit-content;
+      height:fit-content;
+      display:flex;
+      align-items:center;
+      background:var(--surface);
+      border-radius:10px;
+      padding:10px 16px;
+      box-shadow:var(--node-shadow);
+    }
+    .map-world .vplay {
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      width:32px;
+      height:32px;
+      border-radius:50%;
+      border:1.5px solid #fff;
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:12px;
+      background:rgba(0,0,0,.45);
+    }
+    .map-world .fcol { flex:1; min-width:0; display:flex; flex-direction:column; }
+    .map-world .lh .nbody { flex:1; display:flex; flex-direction:column; }
+    .map-world .lh .nfoot { margin-top:auto; }
+    .map-world .nbody { padding:10px 11px; }
+    .map-world .nbrand {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:8px;
+    }
+    .map-world .nlogo {
+      width:22px;
+      height:22px;
+      border-radius:5px;
+      border:1px solid var(--border);
+      background:var(--surface-2);
+      object-fit:contain;
+      padding:3px;
+      flex-shrink:0;
+    }
+    .map-world .nlinks {
+      display:flex;
+      flex-wrap:wrap;
+      gap:5px;
+      margin-top:9px;
+    }
+    .map-world .nlink {
+      font-size:10.5px;
+      color:var(--green);
+      border:1px solid var(--green-border);
+      border-radius:4px;
+      padding:2px 6px;
+      text-decoration:none;
+      background:var(--green-bg);
+      font-family:var(--mono);
+    }
+    .map-world .nlink:hover { border-color:var(--green); }
+    .map-world .ndesc {
+      color:var(--text-sub);
+      font-size:13px;
+      line-height:1.55;
+      overflow:hidden;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+    }
+    .map-world .node.journal .ndesc { font-style:italic; }
+    .map-world .stack { margin-top:8px; display:flex; flex-wrap:wrap; gap:5px; }
+    .map-world .chip { font-size:11px; color:var(--text-sub); background:var(--surface-2); border:1px solid var(--border); border-radius:3px; padding:2px 7px; }
+    .map-world .nfoot { margin-top:9px; display:flex; align-items:center; gap:8px; font-size:12px; color:var(--dim); font-family:var(--mono); }
+    .map-world .node.journal .nfoot { color:var(--amber); }
+    .map-world .status { padding:2px 7px; border-radius:3px; font-size:11px; background:var(--green-bg); color:var(--green); }
+    .map-world .new-tag { font-size:11px; color:var(--green); border:1px solid var(--green-border); background:var(--green-bg); border-radius:3px; padding:1px 7px; }
+    .map-world .world-intro { position:absolute; left:86px; top:12px; width:1040px; z-index:2; }
+    .map-world .world-intro .wi-h { font-size:15px; font-weight:600; color:var(--text-bright); letter-spacing:.06em; text-transform:uppercase; margin-bottom:9px; }
+    .map-world .world-intro .wi-p { font-size:13.5px; color:var(--text-sub); line-height:1.72; max-width:980px; }
+    .map-panel {
+      position:absolute;
+      top:86px;
+      right:14px;
+      bottom:14px;
+      width:430px;
+      z-index:38;
+      background:var(--surface);
+      border:1px solid var(--border-strong);
+      border-radius:12px;
+      box-shadow:0 8px 40px rgba(0,0,0,.22);
+      overflow:hidden;
+      transform:translateX(calc(100% + 28px));
+      transition:transform .22s cubic-bezier(.2,.7,.2,1);
+      display:flex;
+      flex-direction:column;
+    }
+    .map-panel.open { transform:translateX(0); }
+    .map-panel .p-head { padding:9px 12px 10px; border-bottom:1px solid var(--border); position:relative; display:block; }
+    .map-panel.feature .p-head { background:var(--surface-2); }
+    .map-panel.journal .p-head,
+    .map-panel.sub .p-head { background:var(--amber-bg); }
+    .map-panel.proj .p-head { background:var(--green-bg); }
+    .map-panel .p-kicker { display:flex; align-items:center; gap:8px; }
+    .map-panel .p-kind { font-size:10.5px; letter-spacing:1.4px; text-transform:uppercase; color:var(--dim); }
+    .map-panel .p-full {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid var(--green-border);
+      border-radius:5px;
+      color:var(--green);
+      background:var(--green-bg);
+      font-size:10.5px;
+      line-height:1;
+      padding:6px 9px;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    .map-panel .p-full:hover { border-color:var(--green); }
+    .map-panel .p-x { margin-left:auto; width:26px; height:26px; border:1px solid var(--border-strong); background:var(--surface); color:var(--text-sub); border-radius:7px; cursor:pointer; font-size:14px; }
+    .map-panel .p-title { margin-top:6px; font-size:16px; font-weight:600; color:var(--text-bright); line-height:1.24; }
+    .map-panel .p-meta { margin-top:6px; display:flex; gap:5px; flex-wrap:wrap; }
+    .map-panel .p-meta span { font-size:10px; color:var(--text-sub); border:1px solid var(--border); border-radius:5px; padding:2px 7px; background:var(--surface); }
+    .map-panel .p-body { flex:1; overflow-y:auto; height:auto; padding:12px 14px; }
+    .map-panel .p-text { margin-top:0; color:var(--text); font-size:13px; line-height:1.58; }
+    .map-panel .p-prose p { margin:0 0 11px; color:var(--text); font-size:13px; line-height:1.6; }
+    .map-panel .p-prose p:last-child { margin-bottom:0; }
+    .map-panel .p-sec { margin-top:14px; }
+    .map-panel .p-sec h4 { font-size:10px; letter-spacing:1.3px; text-transform:uppercase; color:var(--green); margin-bottom:8px; display:flex; align-items:center; gap:7px; }
+    .map-panel .p-sec h4::before { content:""; width:5px; height:5px; border-radius:50%; background:var(--green); }
+    .map-panel.journal .p-sec h4,
+    .map-panel.sub .p-sec h4 { color:var(--amber); }
+    .map-panel.journal .p-sec h4::before,
+    .map-panel.sub .p-sec h4::before { background:var(--amber); }
+    .map-panel .p-chips { display:flex; flex-wrap:wrap; gap:6px; }
+    .map-panel .p-links { display:flex; flex-wrap:wrap; gap:7px; margin-top:12px; }
+    .map-panel .p-link {
+      display:inline-flex;
+      align-items:center;
+      gap:5px;
+      border:1px solid var(--green-border);
+      border-radius:6px;
+      background:var(--green-bg);
+      color:var(--green);
+      padding:5px 8px;
+      font-size:12px;
+      text-decoration:none;
+    }
+    .map-panel .p-link:hover { border-color:var(--green); }
+    .map-panel .pill-row { display:flex; flex-direction:column; gap:7px; }
+    .map-panel .pill { display:flex; align-items:center; gap:9px; padding:9px 11px; cursor:pointer; border:1px solid var(--border); border-radius:8px; background:var(--surface-2); font-size:13px; color:var(--text-sub); }
+    .map-panel .pill:hover { border-color:var(--green-border); color:var(--text-bright); }
+    .map-panel .pg { color:var(--green); font-size:10px; }
+    .map-panel .pill.amber .pg { color:var(--amber); }
+    .map-panel .p-foot { padding:9px 14px; border-top:1px solid var(--border); display:grid; grid-template-columns:auto 1fr; align-items:center; gap:10px; }
+    .map-panel.no-route .p-foot { display:none; }
+    .map-panel .slug-page { color:var(--dim); font-size:10px; line-height:1.35; text-decoration:none; word-break:break-all; text-align:right; justify-self:end; }
+    .map-panel .slug-page:hover { color:var(--green); }
+    .hud {
+      position:absolute;
+      left:16px;
+      bottom:14px;
+      z-index:25;
+      font-size:11.5px;
+      color:var(--dim);
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:5px;
+      padding:8px 12px;
+      box-shadow:var(--node-shadow);
+    }
+    .zoomctl {
+      position:absolute;
+      right:16px;
+      bottom:14px;
+      z-index:25;
+      display:flex;
+      gap:5px;
+    }
+    .zoomctl button {
+      width:28px;
+      height:28px;
+      background:var(--surface);
+      border:1px solid var(--border);
+      color:var(--text-sub);
+      border-radius:5px;
+      cursor:pointer;
+      font-size:14px;
+      font-family:var(--mono);
+      box-shadow:var(--node-shadow);
+    }
+    .zoomctl button[data-zoom="fit"] { width:auto; padding:0 9px; font-size:11px; }
+    @media (max-width:720px) {
+      body { overflow:auto; }
+      .topbar { position:sticky; }
+      .hud { display:none; }
+    }
+  </style>
+  <script define:vars={{ mapData }}>
+    const data = mapData;
+    const FEAT_X = 180;
+    const JRNL_X = 560;
+    const SUB_X = 870;
+    const PROJ_X = 1190;
+    const nodes = {};
+    const followers = [];
+    const world = document.getElementById("world");
+    const vp = document.getElementById("viewport");
+    const topbar = document.getElementById("topbar");
+    const svg = document.getElementById("wires");
+    const panel = document.getElementById("canvasPanel");
+    const panelKind = document.getElementById("panelKind");
+    const panelTitle = document.getElementById("panelTitle");
+    const panelMeta = document.getElementById("panelMeta");
+    const panelBody = document.getElementById("panelBody");
+    const panelOpen = document.getElementById("panelOpen");
+    const panelSlug = document.getElementById("panelSlug");
+    let pan = { x: 18, y: 14 };
+    let scale = 0.92;
+    let selected = null;
+    let activeFocus = null;
+
+    function esc(value) {
+      return String(value || "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      })[char]);
+    }
+    function mk(id, cls, html, source) {
+      const el = document.createElement("div");
+      el.className = `node ${cls}`;
+      el.dataset.id = id;
+      el.innerHTML = html;
+      world.appendChild(el);
+      const node = { id, el, kind: cls.split(" ")[0], source, x: 0, y: 0, w: 0, h: 0, visible: true };
+      nodes[id] = node;
+      return node;
+    }
+    function previewSrcDoc(html) {
+      const previewStyle = "<style data-artlu-preview>html,body{width:100%!important;height:100%!important;overflow:hidden!important;scrollbar-width:none!important;-ms-overflow-style:none!important;}body{position:relative!important;}*,*::before,*::after{scrollbar-width:none!important;-ms-overflow-style:none!important;}*::-webkit-scrollbar,html::-webkit-scrollbar,body::-webkit-scrollbar{display:none!important;width:0!important;height:0!important;}</style>";
+      const value = String(html || "");
+      if (/<\/head>/i.test(value)) return value.replace(/<\/head>/i, `${previewStyle}</head>`);
+      return `${previewStyle}${value}`;
+    }
+    function thumb(feature) {
+      if (feature.thumbnailUrl) return `<img src="${esc(feature.thumbnailUrl)}" alt="" loading="lazy">${feature.kind === "video" ? '<div class="vplay">▶</div>' : ""}`;
+      return `<div class="proj-mark"><span class="pm-name">${esc(feature.kind)}</span></div>`;
+    }
+    function demoSlot(feature) {
+      if (feature.thumbnailMode === "static" && feature.thumbnailUrl) {
+        return `<div class="fmedia d demo" data-demo-slot>${thumb(feature)}</div>`;
+      }
+      if (feature.artifactHtml) {
+        return `<div class="fmedia d demo" data-demo-slot data-loaded="true"><iframe srcdoc="${esc(previewSrcDoc(feature.artifactHtml))}" loading="lazy" tabindex="-1" scrolling="no" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe></div>`;
+      }
+      if (feature.demoUrl) {
+        return `<div class="fmedia d demo" data-demo-slot data-loaded="true"><iframe src="${esc(feature.demoUrl)}" loading="lazy" tabindex="-1" scrolling="no" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe></div>`;
+      }
+      const fallback = feature.thumbnailUrl ? thumb(feature) : `<div class="demo-mark"><span>live demo</span></div>`;
+      return `<div class="fmedia d demo" data-demo-slot>${fallback}</div>`;
+    }
+    function stackHTML(values) {
+      if (!values || !values.length) return "";
+      const visible = values.slice(0, 3).map((item) => `<span class="chip">${esc(item)}</span>`).join("");
+      const more = values.length > 3 ? `<span class="chip">+${values.length - 3}</span>` : "";
+      return `<div class="stack">${visible}${more}</div>`;
+    }
+    function featureHTML(feature) {
+      const dot = `<span class="sdot ${esc(feature.kind)}"></span>`;
+      const head = `<div class="nhead" data-handle>${dot}<span class="nname">${esc(feature.title)}</span><span class="ntag">${esc(feature.kind)}</span></div>`;
+      const foot = `<div class="nfoot"><span class="status">${esc(feature.status)}</span><span>${esc(feature.dateLabel || feature.date)}</span>${feature.new ? '<span class="new-tag">new</span>' : ""}</div>`;
+      const body = `<div class="nbody"><div class="ndesc">${esc(feature.desc)}</div>${stackHTML(feature.stack)}${foot}</div>`;
+      if (feature.mediaType === "v") {
+        return `<div class="fmedia v">${thumb(feature)}</div><div class="fcol">${head}${body}</div>`;
+      }
+      const mediaClass = feature.kind === "video" ? "h" : "d";
+      const media = feature.hasDemo
+        ? demoSlot(feature)
+        : (feature.thumbnailUrl || feature.kind === "video" ? `<div class="fmedia ${mediaClass}">${thumb(feature)}</div>` : "");
+      return `${head}${media}${body}`;
+    }
+    function journalHTML(log) {
+      const byline = log.author === "human" ? "the human" : "ai";
+      return `<div class="nhead" data-handle><span class="sdot journal"></span><span class="nname">${esc(log.title)}</span><span class="ntag">log</span></div>
+        <div class="nbody"><div class="ndesc">"${esc(log.excerpt)}"</div><div class="nfoot">by ${esc(byline)} · day ${esc(log.day || "")}</div></div>`;
+    }
+    function projectLinks(project, className = "nlink") {
+      return [
+        project.site ? `<a class="${className}" href="${esc(project.site)}" target="_blank" rel="noreferrer">site ↗</a>` : "",
+        project.repo ? `<a class="${className}" href="${esc(project.repo)}" target="_blank" rel="noreferrer">github ↗</a>` : "",
+        project.demo ? `<a class="${className}" href="${esc(project.demo)}" target="_blank" rel="noreferrer">demo ↗</a>` : "",
+      ].filter(Boolean).join("");
+    }
+    function projectIcon(group) {
+      if (group.logoImg) return `<img class="nlogo" src="${esc(group.logoImg)}" alt="" loading="lazy">`;
+      if (group.markKey === "artlu") return `<span class="project-id mini" data-mark="artlu" aria-hidden="true"><span class="project-id-text">${esc(group.markText || "$_")}</span></span>`;
+      if (group.markKey === "research") return '<span class="emoji-mini" aria-hidden="true">🧠</span>';
+      if (group.markKey === "pipeline") return `<span class="project-id mini" data-mark="pipeline" aria-hidden="true"><span class="project-id-text">${esc(group.markText || "P")}</span></span>`;
+      return "";
+    }
+    function groupHTML(group, kind) {
+      const glyph = kind === "proj" ? "proj" : "sub";
+      const links = kind === "proj" ? projectLinks(group) : "";
+      const icon = kind === "proj" ? projectIcon(group) : `<span class="glyph ${glyph}">◆</span>`;
+      return `<div class="nhead">${icon}<span class="nname">${esc(group.name)}</span><span class="ntag">${kind === "proj" ? "main project" : "series"}</span></div>
+        <div class="nbody"><div class="ndesc">${esc(group.desc)}</div>${links ? `<div class="nlinks">${links}</div>` : ""}<div class="nfoot">${esc(group.meta)}</div></div>`;
+    }
+    function render() {
+      data.features.forEach((feature) => {
+        mk(feature.id, `feature ${feature.mediaType === "v" ? "lh" : "lv"}${feature.new ? " new" : ""}`, featureHTML(feature), feature);
+      });
+      data.logs.forEach((log) => mk(log.id, "journal", journalHTML(log), log));
+      data.subgroups.forEach((group) => mk(`s_${group.id}`, "sub follower", groupHTML(group, "sub"), group));
+      data.projects.forEach((project) => mk(`p_${project.id}`, "proj follower", groupHTML(project, "proj"), project));
+      [
+        ["updates", FEAT_X],
+        ["log", JRNL_X],
+        ["subgroup / series", SUB_X],
+        ["projects", PROJ_X],
+      ].forEach(([label, x]) => {
+        const el = document.createElement("div");
+        el.className = "col-head";
+        el.style.left = `${x}px`;
+        el.textContent = label;
+        world.appendChild(el);
+      });
+    }
+    function layout() {
+      let y = 192;
+      const ordered = [...data.features].sort((a, b) => b.dateValue - a.dateValue || a.title.localeCompare(b.title));
+      ordered.forEach((feature) => {
+        const node = nodes[feature.id];
+        node.x = FEAT_X;
+        node.y = y;
+        node.el.style.left = `${node.x}px`;
+        node.el.style.top = `${node.y}px`;
+        node.w = node.el.offsetWidth;
+        node.h = node.el.offsetHeight;
+        y += node.h + 40;
+      });
+      const logPlacements = data.logs.map((log) => {
+        const members = log.featureIds.map((id) => nodes[id]).filter(Boolean).sort((a, b) => a.y - b.y);
+        const target = members.length
+          ? members.reduce((sum, member) => sum + member.y + member.h / 2, 0) / members.length
+          : 192;
+        const node = nodes[log.id];
+        node.x = JRNL_X;
+        node.w = node.el.offsetWidth;
+        node.h = node.el.offsetHeight;
+        return { node, target };
+      }).sort((a, b) => a.target - b.target);
+      let logBottom = 0;
+      logPlacements.forEach(({ node, target }) => {
+        node.y = Math.max(target - node.h / 2, logBottom + 18);
+        node.el.style.left = `${node.x}px`;
+        node.el.style.top = `${node.y}px`;
+        logBottom = node.y + node.h;
+      });
+      data.subgroups.forEach((group) => {
+        const node = nodes[`s_${group.id}`];
+        node.x = SUB_X;
+        node.w = node.el.offsetWidth;
+        node.h = node.el.offsetHeight;
+      });
+      data.projects.forEach((project) => {
+        const node = nodes[`p_${project.id}`];
+        node.x = PROJ_X;
+        node.w = node.el.offsetWidth;
+        node.h = node.el.offsetHeight;
+      });
+      world.style.height = `${Math.max(3600, y + 420)}px`;
+      buildFollowers();
+      buildRuler();
+      refresh();
+    }
+    function buildFollowers() {
+      followers.length = 0;
+      data.subgroups.forEach((group) => {
+        followers.push({
+          node: nodes[`s_${group.id}`],
+          members: data.features.filter((feature) => feature.seriesId === group.id).map((feature) => nodes[feature.id]).filter(Boolean),
+        });
+      });
+      data.projects.forEach((project) => {
+        followers.push({
+          node: nodes[`p_${project.id}`],
+          members: data.features.filter((feature) => feature.projectId === project.id).map((feature) => nodes[feature.id]).filter(Boolean),
+        });
+      });
+    }
+    function buildRuler() {
+      world.querySelectorAll(".tick,.timeline").forEach((el) => el.remove());
+      const timeline = document.createElement("div");
+      timeline.className = "timeline";
+      world.appendChild(timeline);
+      const seen = new Set();
+      data.features.forEach((feature) => {
+        if (!feature.date || seen.has(feature.date)) return;
+        seen.add(feature.date);
+        const node = nodes[feature.id];
+        const tick = document.createElement("div");
+        tick.className = "tick";
+        tick.style.top = `${node.y + 36}px`;
+        tick.innerHTML = `<span class="lbl">${esc(feature.dateLabel || feature.date)}</span>`;
+        world.appendChild(tick);
+      });
+      const last = data.features.map((feature) => nodes[feature.id]).filter(Boolean).sort((a, b) => a.y - b.y).at(-1);
+      timeline.style.height = last ? `${last.y + last.h + 20 - 176}px` : "200px";
+    }
+    function positionFollowers() {
+      const viewportHeight = vp.clientHeight;
+      const top = -pan.y / scale;
+      const bottom = (viewportHeight - pan.y) / scale;
+      followers.forEach((item) => {
+        if (!item.members.length) {
+          item.node.visible = false;
+          item.node.el.style.opacity = 0;
+          return;
+        }
+        const visible = item.members.filter((member) => {
+          const center = member.y + member.h / 2;
+          return center > top && center < bottom;
+        });
+        if (!visible.length) {
+          item.node.visible = false;
+          item.node.el.style.opacity = 0;
+          return;
+        }
+        item.node.visible = true;
+        item.node.el.style.opacity = 1;
+        const center = visible.reduce((sum, member) => sum + member.y + member.h / 2, 0) / visible.length;
+        const y = Math.max(top + 30, Math.min(center - item.node.h / 2, bottom - item.node.h - 30));
+        item.node.y = y;
+        item.node.el.style.left = `${item.node.x}px`;
+        item.node.el.style.top = `${item.node.y}px`;
+      });
+    }
+    function edges() {
+      const result = [];
+      const seen = new Set();
+      const add = (a, b) => {
+        if (!a || !b) return;
+        const key = `${a.id}>${b.id}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        result.push([a, b]);
+      };
+      data.features.forEach((feature) => {
+        const featureNode = nodes[feature.id];
+        const seriesNode = feature.seriesId && nodes[`s_${feature.seriesId}`];
+        const projectNode = feature.projectId && nodes[`p_${feature.projectId}`];
+        const nextNode = seriesNode || projectNode;
+        const logNodes = (feature.logIds || []).map((id) => nodes[id]).filter(Boolean);
+        if (logNodes.length) {
+          logNodes.forEach((logNode) => {
+            add(featureNode, logNode);
+            if (nextNode) add(logNode, nextNode);
+          });
+        } else if (nextNode) {
+          add(featureNode, nextNode);
+        }
+        if (seriesNode && projectNode) add(seriesNode, projectNode);
+      });
+      return result;
+    }
+    function relatedSet(id) {
+      const selectedNode = nodes[id];
+      if (selectedNode?.kind === "journal") {
+        return new Set([id, ...(selectedNode.source.featureIds || [])]);
+      }
+      const set = new Set([id]);
+      const queue = [id];
+      const allEdges = edges();
+      while (queue.length) {
+        const current = queue.pop();
+        allEdges.forEach(([a, b]) => {
+          if (a.visible === false || b.visible === false) return;
+          if (a.id === current && !set.has(b.id)) { set.add(b.id); queue.push(b.id); }
+          if (b.id === current && !set.has(a.id)) { set.add(a.id); queue.push(a.id); }
+        });
+      }
+      return set;
+    }
+    function activateDemo(id) {
+      const node = nodes[id];
+      if (!node || node.kind !== "feature" || !node.source.hasDemo) return;
+      const slot = node.el.querySelector("[data-demo-slot]");
+      if (!slot || slot.dataset.loaded === "true") return;
+      const frame = document.createElement("iframe");
+      frame.loading = "lazy";
+      frame.title = `${node.source.title} demo`;
+      frame.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups");
+      if (node.source.artifactHtml) frame.srcdoc = node.source.artifactHtml;
+      else if (node.source.demoUrl) frame.src = node.source.demoUrl;
+      else return;
+      slot.replaceChildren(frame);
+      slot.dataset.loaded = "true";
+    }
+    function panelTextHTML(value) {
+      const blocks = String(value || "")
+        .replace(/\r\n/g, "\n")
+        .split(/\n{2,}/)
+        .map((block) => block.trim())
+        .filter(Boolean);
+      if (!blocks.length) return "";
+      return `<div class="p-prose">${blocks.map((block) => `<p>${esc(block).replace(/\n/g, "<br>")}</p>`).join("")}</div>`;
+    }
+    function drawWires() {
+      svg.innerHTML = edges().map(([a, b]) => {
+        if (a.visible === false || b.visible === false) return "";
+        const x1 = a.x + a.w;
+        const y1 = a.y + a.h / 2;
+        const x2 = b.x;
+        const y2 = b.y + b.h / 2;
+        const dx = Math.max(50, (x2 - x1) * 0.5);
+        const on = activeFocus && activeFocus.has(a.id) && activeFocus.has(b.id);
+        const off = activeFocus && !on;
+        return `<path d="M${x1},${y1} C${x1 + dx},${y1} ${x2 - dx},${y2} ${x2},${y2}" fill="none" stroke="${on ? "var(--wire-on)" : "var(--wire)"}" stroke-width="${on ? 2.4 : 1.8}" opacity="${off ? 0.12 : 0.9}"/>`;
+      }).join("");
+    }
+    function applyFocus() {
+      Object.values(nodes).forEach((node) => {
+        node.el.classList.toggle("dimmed", !!activeFocus && node.visible !== false && !activeFocus.has(node.id));
+      });
+      drawWires();
+    }
+    function refresh() {
+      positionFollowers();
+      applyFocus();
+    }
+    function openPanel(id) {
+      const node = nodes[id];
+      if (!node) return;
+      const source = node.source;
+      let cls = "feature";
+      let kind = source.kind || node.kind;
+      let title = source.title || source.name;
+      let meta = [];
+      let body = "";
+      let route = source.route || "#";
+      if (node.kind === "feature") {
+        meta = [source.kind, source.dateLabel || source.date, source.status].filter(Boolean);
+        const chain = [];
+        (source.logIds || []).forEach((logId) => {
+          const log = nodes[logId]?.source;
+          if (log) chain.push(`<div class="pill amber" data-panel-id="${esc(logId)}"><span class="pg">◆</span>log — day ${esc(log.day || "")}</div>`);
+        });
+        if (source.seriesId && nodes[`s_${source.seriesId}`]) chain.push(`<div class="pill" data-panel-id="s_${esc(source.seriesId)}"><span class="pg">◆</span>series — ${esc(nodes[`s_${source.seriesId}`].source.name)}</div>`);
+        if (source.projectId && nodes[`p_${source.projectId}`]) chain.push(`<div class="pill" data-panel-id="p_${esc(source.projectId)}"><span class="pg">◆</span>main project — ${esc(nodes[`p_${source.projectId}`].source.name)}</div>`);
+        body = `<div class="p-text">${esc(source.desc)}</div>
+          <div class="p-sec"><h4>stack</h4><div class="p-chips">${(source.stack || []).map((item) => `<span class="chip">${esc(item)}</span>`).join("")}</div></div>
+          ${chain.length ? `<div class="p-sec"><h4>chain</h4><div class="pill-row">${chain.join("")}</div></div>` : ""}`;
+      } else if (node.kind === "journal") {
+        cls = "journal";
+        kind = "log entry";
+        route = source.route || "#";
+        meta = [`by ${source.author === "human" ? "the human" : "ai"}`, source.day ? `day ${source.day}` : "", source.dateLabel || source.date].filter(Boolean);
+        const linkedFeatures = (source.featureIds || []).map((featureId) => nodes[featureId]).filter(Boolean);
+        body = `${panelTextHTML(source.body || source.excerpt)}
+          ${linkedFeatures.length ? `<div class="p-sec"><h4>linked entries</h4><div class="pill-row">${linkedFeatures.slice(0, 12).map((feature) => `<div class="pill" data-panel-id="${esc(feature.id)}"><span class="pg">◆</span>${esc(feature.source.title)}</div>`).join("")}</div></div>` : ""}`;
+      } else {
+        cls = node.kind;
+        kind = node.kind === "proj" ? "main project" : "series";
+        route = "#";
+        meta = [source.meta].filter(Boolean);
+        const members = data.features.filter((feature) => node.kind === "proj" ? feature.projectId === source.id : feature.seriesId === source.id);
+        const links = node.kind === "proj" ? projectLinks(source, "p-link") : "";
+        body = `<div class="p-text">${esc(source.desc)}</div>
+          ${links ? `<div class="p-links">${links}</div>` : ""}
+          <div class="p-sec"><h4>${members.length} entries in this line</h4><div class="pill-row">
+          ${members.slice(0, 14).map((feature) => `<div class="pill" data-panel-id="${esc(feature.id)}">${esc(feature.title)}</div>`).join("")}
+          </div></div>`;
+      }
+      panel.className = `panel map-panel ${cls} ${route === "#" ? "no-route" : "has-route"} open`;
+      panelKind.textContent = kind;
+      panelTitle.textContent = title;
+      panelMeta.innerHTML = meta.map((item) => `<span>${esc(item)}</span>`).join("");
+      panelBody.innerHTML = body;
+      panelBody.scrollTop = 0;
+      panelOpen.href = route;
+      panelOpen.style.display = route === "#" ? "none" : "inline-flex";
+      panelSlug.href = route;
+      panelSlug.style.display = route === "#" ? "none" : "inline-block";
+      panelSlug.textContent = route === "#" ? "" : route;
+      if (selected) selected.el.classList.remove("sel");
+      selected = node;
+      selected.el.classList.add("sel");
+      activeFocus = relatedSet(id);
+      activateDemo(id);
+      applyFocus();
+    }
+    function closePanel() {
+      panel.classList.remove("open");
+      if (selected) selected.el.classList.remove("sel");
+      selected = null;
+      activeFocus = null;
+      applyFocus();
+    }
+    function apply() {
+      world.style.transform = `translate(${pan.x}px,${pan.y}px) scale(${scale})`;
+      topbar.classList.toggle("stuck", pan.y < 8);
+      refresh();
+    }
+    function zoomAt(mx, my, nextScale) {
+      nextScale = Math.min(1.5, Math.max(0.3, nextScale));
+      pan.x = mx - (mx - pan.x) * (nextScale / scale);
+      pan.y = my - (my - pan.y) * (nextScale / scale);
+      scale = nextScale;
+      apply();
+    }
+    function resetView() {
+      const right = Object.values(nodes).reduce((max, node) => Math.max(max, node.x + node.w), 0);
+      scale = Math.min(0.92, Math.max(0.4, (vp.clientWidth - 48) / (right + 40)));
+      pan = { x: 18, y: 14 };
+      apply();
+    }
+    let panning = false;
+    let panStart = null;
+    let drag = null;
+    let candidate = null;
+    let moved = false;
+    let down = { x: 0, y: 0 };
+    vp.addEventListener("mousedown", (event) => {
+      if (event.target.closest(".node")) return;
+      panning = true;
+      vp.classList.add("grabbing");
+      world.classList.add("busy");
+      panStart = { x: event.clientX - pan.x, y: event.clientY - pan.y };
+    });
+    world.addEventListener("mousedown", (event) => {
+      if (event.target.closest("a")) return;
+      const el = event.target.closest(".node");
+      if (!el) return;
+      event.stopPropagation();
+      candidate = nodes[el.dataset.id];
+      moved = false;
+      down = { x: event.clientX, y: event.clientY };
+      if (event.target.closest("[data-handle]")) {
+        drag = { node: candidate, x: candidate.x, y: candidate.y };
+        el.classList.add("dragging");
+        world.classList.add("busy");
+      }
+    });
+    window.addEventListener("mousemove", (event) => {
+      if (Math.abs(event.clientX - down.x) + Math.abs(event.clientY - down.y) > 5) moved = true;
+      if (panning) {
+        pan = { x: event.clientX - panStart.x, y: event.clientY - panStart.y };
+        apply();
+      } else if (drag) {
+        drag.node.x = drag.x + (event.clientX - down.x) / scale;
+        drag.node.y = drag.y + (event.clientY - down.y) / scale;
+        drag.node.el.style.left = `${drag.node.x}px`;
+        drag.node.el.style.top = `${drag.node.y}px`;
+        refresh();
+      }
+    });
+    window.addEventListener("mouseup", (event) => {
+      panning = false;
+      vp.classList.remove("grabbing");
+      world.classList.remove("busy");
+      if (drag) drag.node.el.classList.remove("dragging");
+      if (candidate && !moved && !event.target.closest("a")) {
+        if (candidate.kind === "feature" && candidate.source.kind === "video") window.location.href = candidate.source.route;
+        else openPanel(candidate.id);
+      }
+      drag = null;
+      candidate = null;
+    });
+    vp.addEventListener("wheel", (event) => {
+      event.preventDefault();
+      const rect = vp.getBoundingClientRect();
+      zoomAt(event.clientX - rect.left, event.clientY - rect.top, scale - event.deltaY * 0.0013);
+    }, { passive:false });
+    document.querySelectorAll("[data-zoom]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const value = button.dataset.zoom;
+        if (value === "fit") resetView();
+        else {
+          const rect = vp.getBoundingClientRect();
+          zoomAt(rect.width / 2, rect.height / 2, scale + (value === "+" ? 0.14 : -0.14));
+        }
+      });
+    });
+    panel.addEventListener("click", (event) => {
+      const pill = event.target.closest("[data-panel-id]");
+      if (!pill) return;
+      openPanel(pill.dataset.panelId);
+    });
+    document.getElementById("panelClose").addEventListener("click", closePanel);
+    render();
+    layout();
+    resetView();
+    window.addEventListener("resize", () => {
+      layout();
+      resetView();
+    });
+    window.addEventListener("load", resetView);
+  </script>
+</BaseLayout>

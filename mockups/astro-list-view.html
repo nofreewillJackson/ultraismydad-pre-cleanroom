@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>artlu.ai — the list</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  html[data-theme="dark"] {
+    --bg:#08090a; --surface:#0e0f11; --surface-2:#16191d;
+    --border:#1a1d22; --border-strong:#2b3038; --border-hover:#4a525e;
+    --text:#c0c4cc; --text-bright:#f0f1f3; --text-sub:#9aa0aa;
+    --dim:#6b7280; --dimmer:#3a3f48;
+    --green:#4ade80; --green-bg:#062b12; --green-border:#1d4d31;
+    --blue:#60a5fa; --amber:#d8a657; --amber-bg:#1c1a12;
+    --node-shadow:0 8px 26px rgba(0,0,0,0.6);
+    --font:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  html[data-theme="light"] {
+    --bg:#e9eaec; --surface:#ffffff; --surface-2:#f2f3f5;
+    --border:#dcdfe2; --border-strong:#b7bcc3; --border-hover:#9ba0a8;
+    --text:#34373c; --text-bright:#15171a; --text-sub:#50545a;
+    --dim:#676c74; --dimmer:#9298a0;
+    --green:#0a7d5e; --green-bg:#e6f4ee; --green-border:#a9ddc9;
+    --blue:#2563eb; --amber:#8a6300; --amber-bg:#f3e9d2;
+    --node-shadow:0 1px 2px rgba(22,24,27,0.07), 0 4px 14px rgba(22,24,27,0.06);
+    --font:'Inter',system-ui,sans-serif;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { height:100%; }
+  body { background:var(--bg); color:var(--text); font-family:var(--font); font-size:14px;
+    -webkit-font-smoothing:antialiased; min-height:100%; }
+
+  /* ---------- header — shared with map / stack ---------- */
+  .topbar { height:72px; border-bottom:1px solid transparent; background:var(--bg);
+    display:flex; align-items:center; gap:24px; padding:0 18px; position:sticky; top:0; z-index:40;
+    transition:background .16s, border-color .16s, box-shadow .16s; }
+  .topbar.stuck { background:var(--surface); border-bottom-color:var(--border); box-shadow:var(--node-shadow); }
+  .brandwrap { display:flex; align-items:center; gap:18px; }
+  .identity { display:flex; flex-direction:column; gap:3px; }
+  .htitle { font-size:13px; font-weight:600; color:var(--text-bright); white-space:nowrap; }
+  .hbio { font-size:11.5px; color:var(--text-sub); white-space:nowrap; }
+  .hright { margin-left:auto; display:flex; align-items:center; gap:14px; }
+  .brand { font-weight:600; font-size:29px; letter-spacing:-0.02em; color:var(--text-bright); display:flex; align-items:center; gap:3px; }
+  .cursor-bl { width:10px; height:26px; background:var(--green); display:inline-block; animation:blink 1s step-end infinite; }
+  @keyframes blink { 50% { opacity:0; } }
+  .seg { display:flex; border:1px solid var(--border); border-radius:4px; overflow:hidden; }
+  .seg button { font-family:var(--mono); font-size:12px; background:transparent; color:var(--dim); border:none; padding:6px 15px; cursor:pointer; }
+  .seg button.on { background:var(--green-bg); color:var(--green); }
+  .seg .seg-theme { padding:6px 11px; font-size:13px; border-left:1px solid var(--border); }
+  .navgroup { display:flex; align-items:center; gap:8px; margin-left:22px; }
+  .theme-tog { width:30px; height:28px; border:1px solid var(--border); background:transparent; color:var(--text-sub); border-radius:5px; cursor:pointer; font-size:13px; }
+
+  .progress { display:flex; flex-direction:column; align-items:flex-start; gap:5px; }
+  .pcount { font-family:var(--mono); font-size:11.5px; color:var(--text-sub); white-space:nowrap; }
+  .pcount b { color:var(--text-bright); }
+  .pstrip { display:flex; gap:3px; }
+  .pcell { width:9px; height:9px; border-radius:2px; background:var(--border); position:relative; }
+  .pcell:hover { outline:1.5px solid var(--text-sub); outline-offset:1px; }
+  .pcell:hover::after { content:attr(data-tip); position:absolute; top:17px; left:50%; transform:translateX(-50%);
+    background:var(--surface-2); border:1px solid var(--border-strong); border-radius:5px; padding:5px 9px;
+    font-size:11px; color:var(--text-bright); white-space:nowrap; z-index:60; box-shadow:var(--node-shadow); pointer-events:none; }
+
+  /* ---------- page — centered ---------- */
+  .page { padding:16px 30px 110px; }
+  .col { max-width:1240px; margin:0 auto; }
+  .sec-h { font-size:11px; letter-spacing:1.8px; text-transform:uppercase; color:var(--dim);
+    margin:0 0 14px; display:flex; align-items:center; gap:9px; }
+  .sec-h.mt { margin-top:20px; }
+  .sec-h::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  /* ---------- major projects — horizontal scroll, side arrows ---------- */
+  .strip-wrap { position:relative; }
+  .proj-strip { display:flex; gap:16px; overflow-x:auto; padding:3px;
+    scroll-behavior:smooth; scrollbar-width:none; }
+  .proj-strip::-webkit-scrollbar { display:none; }
+  .strip-fade { position:absolute; top:3px; bottom:9px; width:54px; z-index:4; pointer-events:none;
+    transition:opacity .18s; }
+  .strip-fade.l { left:0; background:linear-gradient(to right,var(--bg),transparent); }
+  .strip-fade.r { right:0; background:linear-gradient(to left,var(--bg),transparent); }
+  /* scroll buttons sit OUTSIDE the strip, in the page margin */
+  .strip-btn { position:absolute; top:50%; transform:translateY(-50%); z-index:6;
+    font-family:var(--mono); font-size:10px; letter-spacing:1px; text-transform:uppercase;
+    background:transparent; border:none; box-shadow:none;
+    color:var(--dim); cursor:pointer; padding:9px 8px; white-space:nowrap; transition:color .12s; }
+  .strip-btn:hover { color:var(--text-bright); }
+  .strip-btn.l { right:100%; margin-right:10px; display:none; }
+  .strip-btn.l.show { display:block; }
+  .strip-btn.r { left:100%; margin-left:10px; }
+  .strip-btn.r.off { display:none; }
+  .pmod { flex:0 0 322px; border:1px solid var(--border-strong);
+    border-radius:11px; overflow:hidden; background:var(--surface); box-shadow:var(--node-shadow);
+    cursor:pointer; transition:border-color .14s, transform .14s, box-shadow .14s; }
+  .pmod:hover { border-color:var(--border-hover); transform:translateY(-2px); }
+  .pmod.active { border-color:var(--green-border); box-shadow:0 0 0 2px var(--green-border), var(--node-shadow); }
+  .pvis { height:150px; position:relative; background:#000; border-bottom:1px solid var(--border); overflow:hidden; }
+  .pvis .thumb { width:100%; height:100%; background-size:cover; background-position:center; }
+  .pvis iframe { position:absolute; top:0; left:0; border:0; pointer-events:none; }
+  .pname-tag { position:absolute; top:9px; left:9px; font-family:var(--mono); font-size:11px;
+    background:rgba(0,0,0,0.6); color:#fff; padding:3px 8px; border-radius:4px; }
+  .plogo { height:150px; position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:11px;
+    border-bottom:1px solid var(--border); background:linear-gradient(150deg,var(--green-bg),var(--surface-2)); }
+  .plogo img { width:66px; height:66px; border-radius:15px; object-fit:contain; }
+  .plogo .pw { font-family:var(--mono); font-size:23px; font-weight:600; letter-spacing:-0.01em; color:var(--text-bright); }
+  .pvis-links { position:absolute; top:9px; right:9px; display:flex; gap:6px; z-index:3; }
+  .plink { font-family:var(--mono); font-size:9.5px; letter-spacing:0.5px; text-transform:uppercase;
+    background:rgba(0,0,0,0.62); color:#fff; padding:4px 8px; border-radius:4px; text-decoration:none; white-space:nowrap; }
+  .plink:hover { background:rgba(0,0,0,0.85); }
+  .proj-mark { position:absolute; inset:0; margin:auto; width:fit-content; height:fit-content;
+    display:flex; align-items:center; gap:5px; background:var(--surface);
+    border-radius:10px; padding:13px 20px; box-shadow:var(--node-shadow); }
+  .pm-name { font-family:var(--mono); font-size:21px; font-weight:600; letter-spacing:-0.01em; color:var(--text-bright); }
+  .pm-cursor { width:8px; height:20px; background:var(--green); display:inline-block; animation:blink 1s step-end infinite; }
+  .pmod-body { padding:11px 14px 13px; }
+  .pmod-desc { font-size:12px; color:var(--text-sub); line-height:1.58;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .pmod-meta { margin-top:8px; font-size:10.5px; letter-spacing:0.5px; color:var(--dim); }
+
+  /* ---------- timeline — left date spectrum + rows ---------- */
+  .filterbar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+  .filter-l { font-size:11px; letter-spacing:1.2px; text-transform:uppercase; color:var(--dim); margin-right:2px; }
+  .fchip { font-family:var(--mono); font-size:11.5px; background:transparent; color:var(--text-sub);
+    border:1px solid var(--border); border-radius:20px; padding:5px 13px; cursor:pointer; transition:all .12s; }
+  .fchip:hover { border-color:var(--border-hover); }
+  .fchip.on { background:var(--green-bg); color:var(--green); border-color:var(--green-border); }
+  .fcount { margin-left:auto; font-size:11.5px; color:var(--dim); font-family:var(--mono); }
+
+  /* date spectrum — vertical spine + date pills, copied from the map view */
+  .tl { position:relative; }
+  .tl::before { content:''; position:absolute; left:66px; top:6px; bottom:6px;
+    width:1px; background:var(--border-strong); }
+  .day-pill-row { height:40px; position:relative; }
+  .day-pill { position:absolute; left:66px; top:50%; transform:translate(-50%,-50%);
+    font-family:var(--mono); font-size:11px; font-weight:500; color:var(--text-sub);
+    background:var(--bg); border:1px solid var(--border-strong); border-radius:5px;
+    padding:3px 9px; white-space:nowrap; z-index:2; }
+  .day-rows { margin-left:106px; }
+
+  .item { border-bottom:1px solid var(--border); }
+  .day-group:last-child .day-rows .item:last-child { border-bottom:none; }
+  .r { display:flex; align-items:flex-start; gap:11px; padding:7px 14px 8px; cursor:pointer;
+    transition:background .1s; }
+  .r:hover { background:var(--surface-2); }
+  .item.open .r { background:var(--surface-2); }
+  .caret { font-size:8px; color:var(--dimmer); transition:transform .14s; flex-shrink:0; width:8px; margin-top:4px; }
+  .item.open .caret { transform:rotate(90deg); }
+  .dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+  .dot.video { background:var(--blue); } .dot.build { background:var(--green); }
+  .r-col { flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
+  .r-title { color:var(--text-bright); font-weight:500; font-size:13px; line-height:1.4;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .r-sub { font-size:11.5px; color:var(--text-sub); line-height:1.4;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  /* aligned right-side columns — stack · status · marker */
+  .r-stack { width:248px; flex-shrink:0; font-size:10.5px; color:var(--dim); line-height:1.45; padding-top:3px;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .r-status { width:74px; flex-shrink:0; padding-top:1px; }
+  .new-tag { font-size:9.5px; color:var(--green); border:1px solid var(--green-border);
+    background:var(--green-bg); border-radius:3px; padding:0 5px; }
+  .status { font-size:10px; padding:1px 6px; border-radius:3px; background:var(--green-bg); color:var(--green); }
+  .r-mic { width:14px; text-align:center; font-size:9px; color:var(--dim); flex-shrink:0; padding-top:3px; }
+
+  /* ---------- expandable detail ---------- */
+  .detail { display:none; padding:4px 22px 20px 25px; background:var(--surface-2);
+    border-top:1px solid var(--border); }
+  .item.open .detail { display:block; }
+  .d-long { padding-top:14px; max-width:680px; }
+  .d-long p { font-size:13px; color:var(--text); line-height:1.68; margin-bottom:11px; }
+  .d-long p:last-child { margin-bottom:0; }
+  .d-long strong { color:var(--text-bright); font-weight:600; }
+  .d-long em { color:var(--text-bright); font-style:italic; }
+  .d-long a { color:var(--green); text-decoration:none; }
+  .d-long a:hover { text-decoration:underline; }
+  .d-long code { font-family:var(--mono); font-size:0.9em; background:var(--surface);
+    border:1px solid var(--border); border-radius:3px; padding:0 4px; }
+  .d-long ul { margin:0 0 11px 4px; list-style:none; }
+  .d-long li { font-size:12.5px; color:var(--text-sub); line-height:1.6; padding-left:14px; position:relative; }
+  .d-long li::before { content:'·'; position:absolute; left:2px; color:var(--dim); }
+  .d-embed { margin-top:15px; border:1px solid var(--border-strong); border-radius:8px;
+    overflow:hidden; background:#000; box-shadow:var(--node-shadow); }
+  .d-embed.h { aspect-ratio:16/9; max-width:440px; }
+  .d-embed.v { width:248px; height:440px; }
+  .d-embed.d { width:340px; height:468px; background:var(--surface-2); }
+  .d-embed iframe { width:100%; height:100%; border:0; display:block; }
+  .d-sec { margin-top:17px; }
+  .d-sec h4 { font-size:10px; letter-spacing:1.4px; text-transform:uppercase; color:var(--dim); margin-bottom:8px; }
+  .d-chips { display:flex; flex-wrap:wrap; gap:5px; }
+  .chip { font-size:11px; color:var(--text-sub); background:var(--surface); border:1px solid var(--border); border-radius:3px; padding:2px 7px; }
+  .d-journal { margin-top:17px; border-left:2px solid var(--amber); background:var(--amber-bg);
+    border-radius:0 6px 6px 0; padding:11px 14px; max-width:680px; }
+  .dj-h { font-size:10px; letter-spacing:1.3px; text-transform:uppercase; color:var(--amber); margin-bottom:5px; }
+  .dj-title { font-size:12.5px; font-weight:600; color:var(--text-bright); margin-bottom:5px; }
+  .dj-body { font-size:12px; color:var(--text-sub); line-height:1.62; }
+  .dj-link { display:inline-block; margin-top:10px; font-size:11.5px; color:var(--amber); text-decoration:none; }
+  .dj-link:hover { text-decoration:underline; }
+  .d-foot { margin-top:17px; display:flex; align-items:center; gap:10px; font-size:12px; max-width:680px; }
+  .d-lineage { color:var(--dim); } .d-lineage b { color:var(--text-sub); font-weight:500; }
+  .d-lineage .sep { color:var(--dimmer); margin:0 5px; }
+  .d-open { margin-left:auto; color:var(--green); text-decoration:none; font-weight:500; }
+  .d-open:hover { text-decoration:underline; }
+  .empty { padding:34px; text-align:center; color:var(--dim); font-size:12.5px; }
+
+  /* ---------- mobile ---------- */
+  @media (max-width:720px) {
+    body { font-size:13px; }
+    /* header collapses — identity + progress drop, nav wraps right */
+    .topbar { height:auto; min-height:54px; gap:10px 14px; padding:9px 13px;
+      flex-wrap:wrap; }
+    .brandwrap { gap:12px; }
+    .brand { font-size:22px; }
+    .cursor-bl { width:7px; height:19px; }
+    .identity { display:none; }
+    .progress { display:none; }
+    .hright { margin-left:auto; gap:10px; }
+    .navgroup { margin-left:0; gap:6px; }
+    .seg button { padding:6px 11px; font-size:11px; }
+    .seg .seg-theme { padding:6px 9px; }
+    /* page */
+    .page { padding:12px 13px 88px; }
+    .sec-h.mt { margin-top:16px; }
+    /* projects strip — touch-scroll only, no outside buttons */
+    .strip-btn { display:none !important; }
+    .pmod { flex:0 0 286px; }
+    .pvis, .plogo { height:132px; }
+    /* timeline — tighten the date spine, drop the tech-stack column */
+    .tl::before { left:40px; }
+    .day-pill { left:40px; }
+    .day-rows { margin-left:60px; }
+    .r { gap:9px; padding:8px 4px 9px; }
+    .r-stack { display:none; }
+    .r-status { width:auto; }
+    /* expandable detail */
+    .detail { padding:4px 10px 18px 12px; }
+    .d-long, .d-foot, .d-journal { max-width:100%; }
+    .d-embed.h, .d-embed.d { width:100%; max-width:100%; }
+    .d-foot { flex-wrap:wrap; }
+  }
+</style>
+<script>try{var _t=localStorage.getItem('artlu-theme');if(_t)document.documentElement.dataset.theme=_t;}catch(e){}</script>
+</head>
+<body>
+
+<div class="topbar" id="topbar">
+  <div class="brandwrap">
+    <div class="brand">artlu.ai<span class="cursor-bl"></span></div>
+    <div class="identity">
+      <div class="htitle">100 days. 100 features.</div>
+      <div class="hbio">one person. no coding experience. just AI and an internet connection.</div>
+    </div>
+  </div>
+  <div class="hright">
+    <div class="progress">
+      <span class="pcount">day <b>63</b>/100 · <b>79</b> shipped · <b>21</b> to go</span>
+      <div class="pstrip" id="actStrip"></div>
+    </div>
+    <div class="navgroup">
+      <div class="seg"><button class="on">list</button><button onclick="location.href='astro-map-view.html'">map</button><button onclick="location.href='astro-stack-view.html'">stack</button><button class="seg-theme" onclick="toggleTheme()" title="toggle theme">◐</button></div>
+      <div class="seg"><button onclick="location.href='astro-log-view.html'">log</button><button onclick="location.href='astro-research-view.html'">research</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="col">
+    <h2 class="sec-h">major projects</h2>
+    <div class="strip-wrap">
+      <button class="strip-btn l" id="stripL">« scroll</button>
+      <div class="strip-fade l" id="fadeL"></div>
+      <div class="strip-fade r" id="fadeR"></div>
+      <div class="proj-strip" id="projStrip"></div>
+      <button class="strip-btn r" id="stripR">scroll »</button>
+    </div>
+
+    <h2 class="sec-h mt" id="tlHead">the timeline</h2>
+    <div class="filterbar" id="filterbar"></div>
+    <div id="feed"></div>
+  </div>
+</div>
+
+<script>
+  /* ===== real data — pulled from the artlu.ai tracker ===== */
+  const mainProjects = [
+    { id:'spoolcast', name:'spoolcast', meta:'launched · apr 2026', vid:'7p43_3gHJj0',
+      repo:'https://github.com/artluai/spoolcast',
+      desc:'The AI-to-video pipeline — turns a chat session into a finished, narrated video. It powers every show and devlog.' },
+    { id:'pipelinecpc', name:'PipelineCPC', meta:'launched · apr 2026', site:'https://pipelinecpc.com',
+      wordmark:'<span style="color:#f97316">⚡</span> Pipeline<span style="color:#f97316">CPC</span>',
+      desc:'Paid-search keyword research SaaS for Google Ads, now with an agent campaign-planning bridge.' },
+    { id:'adsmetri', name:'AdsMetri', meta:'launched · may 2026', site:'https://adsmetri.com',
+      logoImg:'https://adsmetri.com/logo-mark.svg',
+      desc:'Meta Ads performance intelligence dashboard built for operators running multiple ad accounts.' },
+    { id:'vibeskill', name:'VibeSkill', meta:'prototype · apr 2026', demo:'https://vsmockup-d.pages.dev/',
+      site:'https://vsmockup-d.pages.dev/',
+      desc:'Skill-tree progress tracking — a neural map of everything a builder has shipped.' },
+    { id:'costintel', name:'CostIntel', meta:'launched · mar 2026', demo:'https://costintel-automator-demo.pages.dev/',
+      site:'https://costintel-automator-demo.pages.dev/',
+      desc:'eCommerce fulfillment automation plus cost analytics, shipped as a Chrome extension.' },
+    { id:'artlu', name:'artlu.ai', meta:'live · mar 2026', demo:'astro-stack-view.html', site:'https://artlu.ai',
+      desc:'The build-in-public tracker behind these 100 days — every feature shipped, in list, map and stack views.' },
+  ];
+  const subgroups = {
+    aninews: { name:'Aninews', project:'spoolcast', slug:'series/aninews' },
+    devlog:  { name:'spoolcast dev-log', project:'spoolcast', slug:'series/spoolcast-dev-log' },
+  };
+  const projName = { spoolcast:'spoolcast', pipelinecpc:'PipelineCPC', adsmetri:'AdsMetri',
+                     vibeskill:'VibeSkill', costintel:'CostIntel', artlu:'artlu.ai' };
+  const journals = {
+    p1:{by:'ai',day:60,title:'pipelinecpc got an agent planning bridge',body:"pipelinecpc can talk to agents now. not as an ad launcher — the useful version is safer: codex, claude, or hermes can read saved keyword research, group it into ad groups, suggest negatives, and export a draft google ads structure."},
+    ep10:{by:'ai',day:60,title:"shipped news-anime-bot ep 10 — cisco's 4,000 layoffs",body:"shipped another news-anime-bot short. cisco posted a record quarter and cut nearly 4,000 jobs the same day. the useful part this run was the stitch fix, not the script."},
+    d7:{by:'ai',day:57,title:'shipped spoolcast dev-log 7 — the AdsMetri three-agent build',body:"shipped the AdsMetri devlog about building one product across Codex, Manus, and Claude. the lesson was not just use three AIs — the product only made sense when the roles separated."},
+    a2:{by:'ai',day:56,title:'adsmetri analyzer pass',body:"turned adsmetri into a real meta ads analysis surface instead of just a budget tool. shipped lifecycle views, fulfillment break-even math, and daily meta p&l."},
+    d6:{by:'ai',day:52,title:'shipped spoolcast dev log 6 — why ai makes things up',body:"today's spoolcast video is about a quieter agent failure: the agent invents answers about its own work because there's nothing real for it to look at."},
+    ep7:{by:'ai',day:52,title:"shipped news-anime-bot ep 7 — google's ai health coach",body:"shipped another news-anime-bot short, about Google launching a Gemini-powered health coach. the useful part was the workflow test."},
+    d5:{by:'ai',day:51,title:'shipped spoolcast dev log 5 — repo gps for ai agents',body:"today's spoolcast video is about AI agents hallucinating workflows, not just facts. my AI was not ignoring instructions — it was lost, so I gave the repo GPS."},
+  };
+  /* mt: 'v'=vertical video, 'h'=horizontal video, 'd'=demo, null=text only */
+  const features = [
+    { id:'ep11', sub:'aninews', type:'video', mt:'v', yt:'zsYb_mliXnc', new:true, date:'may 18', slug:'project/aninews-ep-11',
+      name:'Google Closes In On Nvidia — Aninews ep 11',
+      desc:"anime news satire on google, written off in the AI race, closing in on nvidia as the world's most valuable company",
+      stack:['spoolcast','Seedance 2.0 Fast','Google Cloud TTS','ffmpeg'],
+      long:`For two years, the agreed-upon story was that Google had already lost the artificial intelligence race. A rival's chatbot had arrived, and a rival's chips were powering everything built after it.
+
+This week, that one-time AI afterthought is worth roughly $4.8 trillion. Per CNBC, that puts Alphabet within reach of Nvidia as the most valuable company on Earth. Google Cloud revenue grew sixty-three percent last quarter, and Google designs its own AI chips — competing directly with the company it is closing in on.
+
+Episode 11 of FAUX7 NEWS tells this through an "arena throne" anime trope: the AI race staged as a vast night-time coliseum, a reigning champion on a throne of green server-monoliths, and a written-off swordsman rising from the shadows.
+
+**How it's made**
+Built on the spoolcast video pipeline — 12 anime-cel-shaded beats via Seedance 2.0 Fast, narration via Google Cloud TTS, ffmpeg post for watermark, source chyrons and burned captions.` },
+    { id:'cg', proj:'spoolcast', type:'research', mt:'d', demo:'https://artluai.github.io/context-gate-ai-hallucination/', new:true, date:'may 18', slug:'research/context-gate',
+      name:'AI hallucination experiment — Context Gate',
+      desc:"Tests whether forcing the source of truth into an AI's context reduces hallucination — interactive demo + report.",
+      stack:['Python','vanilla HTML/CSS/JS'],
+      long:`AI agents often hallucinate *before* they answer — they skip the file that holds the rule, then fill the blank with something plausible. This experiment tested a fix: a **Context Gate** that forces the source-of-truth file into the model's context before it acts.
+
+Across three studies and two models, with no gate the model drifted on **90–100% of scenes** — and usually never opened the rule file at all. Forcing the rule in cut that to near zero on DeepSeek, and sharply reduced it on Opus.
+
+**What it means**
+Context Gates don't make a model hallucination-proof. They remove one specific, common cause: answering before the source of truth is in context.
+
+**Read / try it**
+[Interactive demo](https://artluai.github.io/context-gate-ai-hallucination/) · [Full report](https://artluai.github.io/context-gate-ai-hallucination/report.html)` },
+    { id:'p1', proj:'pipelinecpc', type:'project', date:'may 16', status:'launched', slug:'project/agent-campaign-planning-bridge',
+      name:'agent campaign planning bridge — PipelineCPC',
+      desc:'MCP and agent API bridge that lets AI agents use PipelineCPC for Google Ads planning without launching ads.',
+      stack:['Node.js','MCP','Firebase Auth','Firestore','Railway','Google Ads planning'], journal:'p1',
+      long:`PipelineCPC now has a separate MCP bridge and agent-facing API for campaign planning. Agents can read saved keyword lists, group keywords into draft ad groups, suggest negative keywords, and export draft Google Ads campaign structures. Fresh keyword fetches stay gated behind explicit API-key permissions and credit caps, while saved-data planning stays read-only.
+
+The bridge was split into its own repo so Claude, Codex, Hermes, and future agent clients can connect without living inside the main SaaS codebase. The planning flow also infers likely campaign intent and separates keywords into included, needs-review, and excluded buckets before creating ad groups, so noisy saved lists do not turn into bad campaign recommendations.` },
+    { id:'ep10', sub:'aninews', type:'video', mt:'v', yt:'1Ai641l38oc', date:'may 16', slug:'project/aninews-ep-10',
+      name:'Cisco Pops 15% On 4,000 Layoffs — Aninews ep 10',
+      desc:'anime news satire on cisco firing the engineers who built the networks its AI customers are buying',
+      stack:['spoolcast','Seedance 2.0 Fast','Google Cloud TTS','ffmpeg'], journal:'ep10',
+      long:`Cisco announced its largest restructuring in years on Wednesday. The company will cut close to four thousand jobs this quarter — just under five percent of its global workforce. The layoffs are part of a deeper pivot into AI infrastructure.
+
+Per CNBC, Cisco's stock rose roughly fifteen percent on the news of the cuts. The company also reported record quarterly revenue of $15.8 billion and raised its annual AI order guidance from $5 billion to $9 billion.
+
+The order surge is driven by its hyperscaler customers — the firms running the largest AI data centers. The workers being let go are largely the ones who built the networks those data centers run on.
+
+Episode 10 of FAUX7 NEWS tells this through an "empty cathedral" anime trope: a vast corporate temple at dawn, worker silhouettes filing out as a central AI shrine grows brighter.` },
+    { id:'a1', proj:'adsmetri', type:'project', date:'may 16', status:'launched', slug:'project/creative-intelligence-tagging-workbench',
+      name:'creative intelligence tagging workbench — AdsMetri',
+      desc:'Tag Meta ad creatives by hand and compare performance across 7 tag dimensions.',
+      stack:['React 19','tRPC 11','shadcn/ui','Tailwind','Drizzle','MySQL'],
+      long:`**What is AdsMetri Creative Intelligence?**
+A workbench for tagging Meta ad creatives by hand so you can compare performance across creative types, hooks, video structures, and visual styles.
+
+**What it does**
+Syncs ad-level creatives and daily performance snapshots from Meta. Shows them in a dense ops table with thumbnail, campaign / ad set, product, type/hook chips, status, spend, ROAS, CPA, CTR, purchases, and tagged-state pill.
+
+Click a row to open the tagging drawer — preview frame and external links on the left, 7 multi-select tag dimensions on the right, sticky Save and Next footer.
+
+**How it works**
+Tags are stored as comma-separated slugs per dimension — multi-select round-trips through the existing single-string field, no schema break. No inline video embed — Meta gates that permission, so the preview frame stays thumbnail-only.` },
+    { id:'ep9', sub:'aninews', type:'video', mt:'v', yt:'trx2a5jYTf8', date:'may 15', slug:'project/aninews-ep-9',
+      name:'Anthropic Vs OpenAI: 271 Bugs Found — Aninews ep 9',
+      desc:'anime news satire on rival AI labs racing to fix bugs their bigger coding models will eventually write',
+      stack:['spoolcast','Seedance 2.0 Fast','Google Cloud TTS','ffmpeg'],
+      long:`The two largest AI labs both launched competing cybersecurity divisions this month.
+
+Anthropic's new Claude Mythos model was turned loose on the Firefox codebase. Per Mozilla, it identified two hundred seventy-one vulnerabilities. Mozilla's official advisory credits three of those as actual security CVEs.
+
+A separate test on the curl codebase fared worse — the maintainer Daniel Stenberg called the hype around the model, in his words, primarily marketing. OpenAI's response, called Daybreak, arrived two days later with eight enterprise launch partners.
+
+Both labs will continue shipping the larger coding models that write next quarter's bugs. Episode 9 of FAUX7 NEWS stages this as two warriors in a torchlit dojo — both eventually walking back into the same forge.` },
+    { id:'d7', sub:'devlog', type:'video', mt:'h', yt:'21zjy7BDEI0', date:'may 13', slug:'project/spoolcast-dev-log-7',
+      name:'three-ai AdsMetri build story — dev-log #7',
+      desc:'devlog about building AdsMetri across Codex, Manus, and Claude, and why role clarity mattered more than raw AI output.',
+      stack:['Spoolcast','Remotion','Google TTS','AI image generation','YouTube'], journal:'d7',
+      long:`I built AdsMetri, an analytics dashboard for my e-commerce store, across three different AI harnesses: Codex, Manus, and Claude.
+
+The useful part was not that three AIs magically made a product. The useful part was learning where each harness actually fit. Claude helped shape the design and spec direction. Manus handled foundation work and live verification. Codex handled repo-level implementation and debugging.
+
+The video walks through what shipped: Meta OAuth, campaign sync, budget queues, account-aware scheduling, analyzer snapshots, lifecycle charts, funnels, fulfillment break-even math, daily Meta P&L, multi-account scoping — and the coordination problems that came with all of it.` },
+    { id:'a2', proj:'adsmetri', type:'project', date:'may 12', status:'launched', slug:'project/meta-ads-performance-dashboard',
+      name:'meta ads performance dashboard — AdsMetri',
+      desc:'Visualize and analyze Meta Ads performance across campaigns, ad sets, and ads from one dashboard.',
+      stack:['React','Tailwind','tRPC','Express','Drizzle','MySQL','Recharts'], journal:'a2',
+      long:`**What is AdsMetri?**
+A Meta ads intelligence dashboard for people managing multiple ad accounts. It is built to make performance review, budget decisions, and account-level comparisons faster than flipping between Ads Manager, notes, and spreadsheets.
+
+**What it does**
+Lifecycle charts across campaigns, ad sets, and ads with 3d, 7d, 30d, and all-time views. ROAS, CPA, CPC, and CVR trend analysis with account-aware switching. A compact dashboard with spend mix, daily Meta P&L, conversion funnel, and fulfillment break-even ROAS.
+
+**How it works**
+Meta OAuth connects ad accounts. Campaign data is synced into a MySQL cache, while lifecycle charts are built from snapshot backfills. The app keeps dashboard, analyzer, settings, and budget actions scoped to the selected ad account.` },
+    { id:'d6', sub:'devlog', type:'video', mt:'h', yt:'c1tWTNh2D1Y', date:'may 8', slug:'project/spoolcast-dev-log-6',
+      name:'why ai makes things up — dev-log #6',
+      desc:'A devlog about why AI agents invent answers about their own work — and the small tracker that fixes it.',
+      stack:['Spoolcast','Remotion','Google TTS','AI image generation','YouTube'], journal:'d6',
+      long:`AI agents make things up about their own work — not because they're lying, but because they have nothing real to check.
+
+3:30 in the morning. I'd been up all night trying to finish a video. Desperate, I ask my agent one more time — how much is left? It gives me three different answers in a row. Still going. Almost done. Twelve left.
+
+That's not malice. That's an agent reading scraps of half-finished work and putting a guess together, because there's nowhere else to look. This video walks through four times my agent made things up about its own work in one production — and the small tracker I built so it can't anymore.
+
+Status is something you check. Not something you guess.` },
+    { id:'ep7', sub:'aninews', type:'video', mt:'v', yt:'5tFAfZr5biI', date:'may 8', slug:'project/aninews-ep-7',
+      name:"Google's AI Health Coach — Aninews ep 7",
+      desc:'daily ai news satire about Google launching a Gemini-powered health coach and putting wellness behind a subscription gate.',
+      stack:['spoolcast','Seedance 2.0 Fast','Google Cloud TTS','ffmpeg'], journal:'ep7',
+      long:`A 57-second FAUX7 NEWS satire short built with the new script-first Spoolcast workflow.
+
+The episode covers Google's AI Health Coach and Fitbit Air launch: Gemini-powered coaching, screenless tracking, health-context logging, a $9.99/month premium tier, and Google's own caveat that it is not intended for medical purposes.
+
+The workflow used contracts to move through source facts, script, TTS, clip generation, stitch, and output audit without inventing extra steps.` },
+    { id:'d5', sub:'devlog', type:'video', mt:'h', yt:'nOfkukxHjm4', date:'may 7', slug:'project/spoolcast-dev-log-5',
+      name:'repo gps for ai agents — dev-log #5',
+      desc:'A devlog about why AI coding agents hallucinate workflows when a repo does not clearly route the task.',
+      stack:['Spoolcast','Remotion','Google TTS','AI image generation','YouTube'], journal:'d5',
+      long:`AI hallucination is not always about fake facts. Sometimes it is the AI filling in missing routing information.
+
+This devlog traces a real Spoolcast production problem: agents inventing menu options, ignoring existing prompts, applying the wrong pipeline, and getting confused by rule debt. The fix was not more scattered docs. It was a mechanical first step that tells the agent where it is, which workflow owns the task, and what the next allowed move is.
+
+The broader lesson: if an AI coding agent keeps making up process, the repo may not have a clear enough front door. First locate the task. Then follow the right route.` },
+    { id:'ep6', sub:'aninews', type:'video', mt:'v', yt:'jiwn-DjIVno', date:'may 7', slug:'project/aninews-ep-6',
+      name:'Elon Leases An Entire Data Center — Aninews ep 6',
+      desc:"anime news satire on rival ai labs becoming roommates — anthropic moves into elon's entire data center",
+      stack:['spoolcast','Seedance 2.0 Fast','Google Cloud TTS','ffmpeg'],
+      long:`Anthropic this week signed a deal to use the entirety of Elon Musk's Colossus 1 data center in Memphis — over 300 megawatts and more than 220,000 Nvidia GPUs. The new capacity will double Claude Code rate limits and remove peak-hour restrictions for paid subscribers.
+
+In February 2026, Musk publicly criticized Anthropic on X. On May 6, after meeting with their senior team, he posted that he was impressed. In the same announcement, Musk confirmed xAI will be dissolved and renamed SpaceXAI.
+
+Episode 6 of FAUX7 NEWS tells this through a "fortified castle becomes an inn" trope — the xAI lord opens the gates, now in a bellhop uniform, and hands over an ornate lease scroll.` },
+    { id:'artlu_shorts', proj:'artlu', type:'project', date:'may 1', status:'launched', slug:'project/shorts-tiktok-embed',
+      name:'shorts + tiktok embed — artlu.ai',
+      desc:'Vertical 9:16 shorts now sit alongside longform videos in the showcase, each with a 2-col guidebook.',
+      stack:['React','Vite','Node 22','ffmpeg','cwebp','Spoolcast'],
+      long:`**What is this?**
+Extends the artlu.ai video showcase to support vertical 9:16 short-form videos alongside the existing longform widescreen videos. Both formats live in the same homepage grid; each gets its own detail page tuned to the shape of the content.
+
+**What it does**
+- Homepage cards: shorts use a vertical 9:16 thumbnail; longforms keep the 16:9 thumb on top. Same total card height regardless of format, with a SHORT badge on each shorts card.
+- The /video/:id detail page: longform stays single-column; shorts switch to a 2-col layout with the 9:16 video on the left and the guidebook content on the right.
+- Shorts guidebook: summary, recurring characters, a 12-tile beats grid, sources, full transcript, and a pre-roll disclosure.
+
+**How it works**
+The sync script branches on the format field in shipped-videos.json — long format and short format read different session folders. For shorts it parses the script, extracts first frames from each clip via ffmpeg + cwebp, and writes a database-shaped bundle.` },
+    { id:'artlu_heat', proj:'artlu', type:'project', date:'apr 22', status:'launched', slug:'project/activity-heatmap',
+      name:'live-updating activity heatmap — artlu.ai',
+      desc:'real-time activity card — 14-week shipping heatmap with hover tooltips, day counter, and firestore live updates.',
+      stack:['React','Firestore onSnapshot','CSS Grid'],
+      long:`**What is the activity card?**
+The live stats and heatmap panel on the artlu.ai homepage. Shows day X/100, shipped count, remaining, active days, current/best streak, and a 14-week heatmap where each cell is a day colored by how many projects shipped.
+
+**What it does**
+- a 14-week heatmap with l1–l4 intensity based on 1–4+ projects per day
+- hover any cell for a tooltip with the date and the project names that shipped
+- updates live — new projects land on the heatmap without a page reload
+- the day counter rolls over at local midnight without touching the page
+
+**How it works**
+\`subscribeToPublicProjects\` wraps firestore's \`onSnapshot\` instead of \`getDocs\`, so a new project write re-paints the grid. A \`setTimeout\` inside a \`useEffect\` fires 1s after local midnight and bumps a state counter to force a re-render — no polling, no interval.` },
+    { id:'vskill', proj:'vibeskill', type:'research', mt:'d', demo:'https://vsmockup-d.pages.dev/', date:'apr 1', slug:'project/vibeskill-skill-tree-mockup',
+      name:'interactive skill-tree visual mockup — VibeSkill',
+      desc:'A public VibeSkill mockup for testing draggable category boxes, hover-expand controls, and child-branch behavior.',
+      stack:['HTML','CSS','JavaScript','Codex','Cloudflare Pages'],
+      long:`Built and published a separate VibeSkill interaction mockup focused on layout experimentation rather than the main app flow.
+
+This sandbox tests whether category boxes should be draggable for layout tuning, how a hover-based expand control can fit the existing neural-map visual language, and how child branches should form around an expanded category while keeping connector geometry readable.
+
+The mockup stays close to the existing VibeSkill system but explores adaptive arc layouts, collision handling, core clearance, and highlighted parent-child expansion states as a distinct design track.` },
+    { id:'costintel', proj:'costintel', type:'research', mt:'d', demo:'https://costintel-automator-demo.pages.dev/', date:'mar 20', slug:'project/costintel-fulfillment-automator',
+      name:'CostIntel Fulfillment Automator — demo',
+      desc:'Chrome extension that automates repetitive fulfillment tasks — insert cards, gift boxes, custom packaging — across hundreds of orders.',
+      stack:['Chrome Extension','JavaScript','SheetJS','Web Workers','MutationObserver'],
+      long:`Every ecommerce brand using third-party fulfillment has the same problem: before you can submit orders, someone has to manually open each one and add insert cards, branded packaging, or gift boxes based on what the customer bought. At scale, this eats 1-2 hours per day of a VA's time.
+
+CostIntel Fulfillment Automator is a Chrome extension that sits on top of your fulfillment dashboard and handles it automatically. Upload your order export, and the extension parses the file, flags which orders need special packaging based on configurable rules, then clicks through the platform's UI while you watch the progress log scroll.
+
+The tricky part was the fulfillment platform's UI: hover-triggered dropdowns that appear and disappear in milliseconds, React-managed DOM that fights direct manipulation, and binary XLS files disguised as CSVs.` },
+  ];
+
+  const MON={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+  const dayOf = s => { const p=s.split(' ');
+    const dt=new Date(2026,MON[p[0]]!==undefined?MON[p[0]]:4,+p[1]);
+    return 63 - Math.round((new Date(2026,4,19)-dt)/86400000); };
+  const projOf = e => e.proj || (e.sub && subgroups[e.sub].project);
+
+  /* ---- tiny markdown renderer for the long descriptions ---- */
+  function inlineMd(s){
+    return s
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/`([^`]+)`/g,'<code>$1</code>')
+      .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>')
+      .replace(/(^|[^*])\*([^*]+)\*/g,'$1<em>$2</em>');
+  }
+  function renderMd(t){
+    return t.split(/\n\n+/).map(block=>{
+      const lines=block.split('\n');
+      if(lines.length>1 && lines.every(l=>l.trim().startsWith('- ')))
+        return '<ul>'+lines.map(l=>'<li>'+inlineMd(l.trim().slice(2))+'</li>').join('')+'</ul>';
+      return '<p>'+inlineMd(block.replace(/\n/g,' '))+'</p>';
+    }).join('');
+  }
+
+  /* ---- major projects strip ---- */
+  const projStrip=document.getElementById('projStrip');
+  function linksHTML(p){
+    const a=[];
+    if(p.site) a.push(`<a class="plink" href="${p.site}" target="_blank" rel="noopener">site ↗</a>`);
+    if(p.repo) a.push(`<a class="plink" href="${p.repo}" target="_blank" rel="noopener">code ↗</a>`);
+    return a.length?`<div class="pvis-links">${a.join('')}</div>`:'';
+  }
+  const demoFrame=(src,off)=>`<iframe data-pdemo="${src}" scrolling="no" tabindex="-1"
+      style="width:644px;height:560px;transform:scale(0.5);transform-origin:top left;top:${off||0}px"></iframe>`;
+  projStrip.innerHTML=mainProjects.map(p=>{
+    const links=linksHTML(p);
+    let vis;
+    if(p.demo){
+      const off=p.id==='artlu'?-44:-16;
+      const mark=p.id==='artlu'
+        ? `<div class="proj-mark"><span class="pm-name">artlu.ai</span><span class="pm-cursor"></span></div>`
+        : `<div class="proj-mark"><span class="pm-name">${p.name}</span></div>`;
+      vis=`<div class="pvis">${demoFrame(p.demo,off)}${mark}${links}</div>`;
+    }
+    else if(p.vid) vis=`<div class="pvis">
+      <div class="thumb" style="background-image:url('https://i.ytimg.com/vi/${p.vid}/hqdefault.jpg')"></div>
+      <span class="pname-tag">${p.name}</span>${links}</div>`;
+    else if(p.logoImg) vis=`<div class="plogo">
+      <img src="${p.logoImg}" alt="${p.name} logo"><span class="pw">${p.name}</span>${links}</div>`;
+    else if(p.wordmark) vis=`<div class="plogo"><span class="pw">${p.wordmark}</span>${links}</div>`;
+    else vis=`<div class="plogo">
+      <img src="https://www.google.com/s2/favicons?domain=${p.site}&sz=128" alt="">
+      <span class="pw">${p.name}</span>${links}</div>`;
+    return `<div class="pmod" data-proj="${p.id}">${vis}<div class="pmod-body">
+      <div class="pmod-desc">${p.desc}</div>
+      <div class="pmod-meta">${p.meta}</div></div></div>`;
+  }).join('');
+  projStrip.querySelectorAll('iframe[data-pdemo]').forEach(f=>{ f.src=f.dataset.pdemo; });
+
+  /* strip side-arrows */
+  const stripL=document.getElementById('stripL'), stripR=document.getElementById('stripR');
+  const fadeL=document.getElementById('fadeL'), fadeR=document.getElementById('fadeR');
+  function syncArrows(){
+    const max=projStrip.scrollWidth-projStrip.clientWidth;
+    const x=projStrip.scrollLeft;
+    const atL=x<10, atR=x>max-10||max<10;
+    stripL.classList.toggle('show',!atL);
+    stripR.classList.toggle('off',atR);
+    fadeL.style.opacity=atL?0:1; fadeR.style.opacity=atR?0:1;
+  }
+  stripL.onclick=()=>projStrip.scrollBy({left:-340,behavior:'smooth'});
+  stripR.onclick=()=>projStrip.scrollBy({left:340,behavior:'smooth'});
+  projStrip.addEventListener('scroll',syncArrows,{passive:true});
+  window.addEventListener('resize',syncArrows);
+  window.addEventListener('load',syncArrows);
+  projStrip.scrollLeft=0; syncArrows();
+
+  /* ---- filter bar ---- */
+  let typeFilter='all', projFilter=null;
+  const TYPES=[['all','everything'],['video','videos & episodes'],['build','builds & research']];
+  const fb=document.getElementById('filterbar');
+  function renderFilters(){
+    fb.innerHTML='<span class="filter-l">show</span>'
+      + TYPES.map(([k,l])=>`<button class="fchip${typeFilter===k?' on':''}" data-t="${k}">${l}</button>`).join('')
+      + '<span class="filter-l" style="margin-left:8px">project</span>'
+      + mainProjects.map(p=>`<button class="fchip${projFilter===p.id?' on':''}" data-p="${p.id}">${p.name}</button>`).join('')
+      + '<span class="fcount" id="fcount"></span>';
+  }
+  function syncProjActive(){
+    projStrip.querySelectorAll('.pmod').forEach(x=>x.classList.toggle('active',x.dataset.proj===projFilter));
+  }
+  fb.addEventListener('click',e=>{
+    const b=e.target.closest('.fchip'); if(!b) return;
+    if(b.dataset.t!==undefined) typeFilter=b.dataset.t;
+    if(b.dataset.p!==undefined) projFilter=projFilter===b.dataset.p?null:b.dataset.p;
+    renderFilters(); renderFeed(); syncProjActive();
+  });
+  function passes(e){
+    if(typeFilter!=='all'){ const t=e.type==='video'?'video':'build'; if(t!==typeFilter) return false; }
+    if(projFilter && projOf(e)!==projFilter) return false;
+    return true;
+  }
+
+  /* clicking a project card filters the timeline below */
+  projStrip.addEventListener('click',e=>{
+    if(e.target.closest('a')) return;
+    const pm=e.target.closest('.pmod'); if(!pm) return;
+    projFilter = projFilter===pm.dataset.proj ? null : pm.dataset.proj;
+    renderFilters(); renderFeed(); syncProjActive();
+    document.getElementById('tlHead').scrollIntoView({behavior:'smooth',block:'start'});
+  });
+
+  /* ---- timeline ---- */
+  const feed=document.getElementById('feed');
+  function lineageHTML(e){
+    const pid=projOf(e);
+    if(e.sub) return `<b>${projName[subgroups[e.sub].project]}</b><span class="sep">›</span>${subgroups[e.sub].name}`;
+    if(pid) return `<b>${projName[pid]}</b>`;
+    return '';
+  }
+  function embedHTML(e){
+    if(e.mt==='v') return `<div class="d-embed v"><iframe data-src="https://www.youtube.com/embed/${e.yt}" allowfullscreen></iframe></div>`;
+    if(e.mt==='h') return `<div class="d-embed h"><iframe data-src="https://www.youtube.com/embed/${e.yt}" allowfullscreen></iframe></div>`;
+    if(e.mt==='d') return `<div class="d-embed d"><iframe data-src="${e.demo}"></iframe></div>`;
+    return '';
+  }
+  function itemHTML(e){
+    const isV=e.type==='video';
+    const j=e.journal?journals[e.journal]:null;
+    const journalBlock=j?`<div class="d-journal">
+        <div class="dj-h">build note · by the ${j.by} · day ${j.day}</div>
+        <div class="dj-title">${j.title}</div>
+        <div class="dj-body">${j.body}</div>
+        <a class="dj-link" href="#">read the full note in the log ↗</a></div>`:'';
+    const mic = e.mt==='d'?'◧':(e.mt?'▶':'');
+    return `<div class="item" data-id="${e.id}">
+      <div class="r">
+        <span class="caret">▶</span><span class="dot ${isV?'video':'build'}"></span>
+        <div class="r-col"><span class="r-title">${e.name}</span><span class="r-sub">${e.desc}</span></div>
+        <div class="r-stack">${e.stack.join('  ·  ')}</div>
+        <div class="r-status">${e.new?'<span class="new-tag">new</span>':(e.status?`<span class="status">${e.status}</span>`:'')}</div>
+        <span class="r-mic">${mic}</span>
+      </div>
+      <div class="detail">
+        <div class="d-long">${renderMd(e.long)}</div>
+        ${embedHTML(e)}
+        ${journalBlock}
+        <div class="d-foot">
+          <span class="d-lineage">${lineageHTML(e)}</span>
+          <a class="d-open" href="#">open page ↗ <span style="color:var(--dim)">artlu.ai/${e.slug}</span></a>
+        </div>
+      </div>
+    </div>`;
+  }
+  function renderFeed(){
+    const list=features.filter(passes);
+    document.getElementById('fcount').textContent=list.length+' of '+features.length+' shown';
+    if(!list.length){ feed.innerHTML='<div class="empty">no entries match this filter.</div>'; return; }
+    const groups=[]; let cur=null;
+    list.forEach(e=>{ if(e.date!==cur){ cur=e.date; groups.push({date:cur,items:[]}); }
+      groups[groups.length-1].items.push(e); });
+    feed.innerHTML='<div class="tl">'+groups.map(g=>`<div class="day-group">
+      <div class="day-pill-row"><span class="day-pill">${g.date}</span></div>
+      <div class="day-rows">${g.items.map(itemHTML).join('')}</div>
+    </div>`).join('')+'</div>';
+  }
+  feed.addEventListener('click',e=>{
+    const a=e.target.closest('a');
+    if(a){ if((a.getAttribute('href')||'')==='#') e.preventDefault(); return; }
+    const item=e.target.closest('.item[data-id]'); if(!item) return;
+    const open=item.classList.toggle('open');
+    if(open) item.querySelectorAll('iframe[data-src]').forEach(f=>{ if(!f.src) f.src=f.dataset.src; });
+  });
+  renderFilters(); renderFeed();
+
+  /* ---- activity strip ---- */
+  (function(){
+    const act=[1,0,2,1,3,2,0,1,4,2,1,3,2,0,2,1,3,2,4,1];
+    const h=document.getElementById('actStrip'); if(!h) return;
+    const end=new Date(2026,4,18);
+    act.forEach((lv,i)=>{
+      const c=document.createElement('div'); c.className='pcell';
+      const d=new Date(end); d.setDate(d.getDate()-7*(act.length-1-i));
+      const lbl=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      c.dataset.tip='week of '+lbl+' · '+lv+' shipped';
+      if(lv){ c.style.background='var(--green)'; c.style.opacity=(0.3+lv*0.17); }
+      h.appendChild(c);
+    });
+  })();
+
+  /* ---- frozen header on scroll ---- */
+  const topbar=document.getElementById('topbar');
+  function onScroll(){ topbar.classList.toggle('stuck',(window.scrollY||document.documentElement.scrollTop)>6); }
+  window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+
+  function toggleTheme(){ const h=document.documentElement; const t=h.dataset.theme==='light'?'dark':'light';
+    h.dataset.theme=t; try{ localStorage.setItem('artlu-theme',t); }catch(e){} }
+  window.toggleTheme=toggleTheme;
+</script>
+</body>
+</html>

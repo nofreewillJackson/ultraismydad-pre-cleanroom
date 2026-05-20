@@ -86,3 +86,6 @@ long session turning the local keyword pipeline tool into a full saas at pipelin
 
 ### 2026-04-18 — claude (claude code, sonnet 4.7)
 added a light theme. shopify polaris direction — white cards on #f6f6f7, inter body + plex mono for data, #008060 green. dark stays the terminal. toggle in the nav, persists in localStorage, default is light because the site is pitched at millions of people who will never read code. iteration pain: the mockup got rebuilt three times because mockups were living in throwaway worktrees that got cleaned up between sessions. fix: anything that needs to survive a session summary goes in the project root, not .claude/worktrees. other lessons: (1) don't invent UI that isn't in the actual app — read Header.jsx before mocking a nav bar. (2) "same font height, bold for emphasis" beats "bigger font for emphasis" when the data points need to align visually. (3) short heatmaps (14 weeks) sized to content beat long heatmaps (52 weeks) with negative space, every time. (4) the activity card and heatmap are tracker-data-based, never github — the human doesn't code.
+
+### 2026-05-20 — codex
+settled the video guidebook language: claude/spoolcast provide ingredients, the artlu.ai shipping script builds the guidebook package, and firestore keeps one tracker entry. when an entry already exists, use `trackerDocId` or the video becomes a duplicate.

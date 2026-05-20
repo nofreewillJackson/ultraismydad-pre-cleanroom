@@ -90,9 +90,7 @@ export default function PublicView() {
             )}
           </div>
           <div style={isDark ? S.subDark : S.subLight}>
-            {isDark
-              ? "one person. no coding experience. just AI and an internet connection."
-              : "one person. no coding experience. just AI and an internet connection. try every shipped tool in your browser — no installs, no signups."}
+            Just AI and an internet connection.
           </div>
           <div style={S.counter}>
             day <strong style={S.counterStrong}>{day}</strong>/100 ·{" "}

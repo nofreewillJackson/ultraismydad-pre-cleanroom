@@ -55,6 +55,16 @@ service cloud.firestore {
       allow read, write: if request.auth != null
         && request.auth.token.email == "bitbrandsagency@gmail.com";
     }
+    match /mainProjects/{projectId} {
+      allow read: if resource.data.visibility == "public";
+      allow write: if request.auth != null
+        && request.auth.token.email == "bitbrandsagency@gmail.com";
+    }
+    match /series/{seriesId} {
+      allow read: if resource.data.visibility == "public";
+      allow write: if request.auth != null
+        && request.auth.token.email == "bitbrandsagency@gmail.com";
+    }
   }
 }
 ```

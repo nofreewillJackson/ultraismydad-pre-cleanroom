@@ -1,0 +1,163 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import { getPublicProjects, getStats, inferMainProject } from "../lib/data";
+import { fmtDateFull, renderMarkdownLite } from "../lib/format";
+
+const [projects, posts] = await Promise.all([getPublicProjects(), getCollection("research")]);
+const stats = getStats(projects);
+
+function uniq(items: string[]) {
+  return [...new Set(items.map((item) => item.trim()).filter(Boolean))];
+}
+
+const postRefs = new Set(posts.flatMap((post) => [post.data.demoUrl, post.data.repoUrl].filter(Boolean)));
+const postItems = await Promise.all(posts.map(async (post) => {
+  const { Content } = await render(post);
+  const slug = post.id.replace(/\.md$/, "");
+  return {
+    type: "post",
+    title: post.data.title,
+    description: post.data.description,
+    date: post.data.date,
+    tags: post.data.tags,
+    demoUrl: post.data.demoUrl,
+    repoUrl: post.data.repoUrl,
+    projectUrl: "",
+    artifactHtml: "",
+    bodyHtml: "",
+    Content,
+    slug,
+  };
+}));
+const projectItems = projects
+  .filter((project) => (project.mainProjectId || project.parentProjectId || inferMainProject(project)) === "research")
+  .filter((project) => !postRefs.has(project.link || "") && !postRefs.has(project.repo || ""))
+  .map((project) => ({
+    type: "project",
+    title: project.name,
+    description: project.desc || project.longDesc || "",
+    date: project.date || "",
+    tags: uniq(["research", ...(project.tags || []), ...(project.stack || []).filter((item) => /tribe|python|hugging|pytorch/i.test(item)).slice(0, 4)]),
+    demoUrl: "",
+    repoUrl: project.repo || "",
+    projectUrl: `/project/${project.slug}`,
+    artifactHtml: project.artifactHtml || "",
+    bodyHtml: renderMarkdownLite(project.longDesc || project.desc || ""),
+    Content: null,
+    slug: project.slug,
+  }));
+const rendered = [...postItems, ...projectItems].sort((a, b) => b.date.localeCompare(a.date));
+---
+<BaseLayout title="artlu.ai — research" description="AI research writeups and experiments from artlu.ai, published as static crawlable pages.">
+  <Header active="research" stats={stats} heatmapTooltip={false} />
+  <main class="page">
+    <div class="col">
+      <h1 class="page-h1">research</h1>
+      <div class="strip-wrap no-left" id="researchStripWrap">
+        <div class="strip-fade l"></div>
+        <div class="strip-fade r"></div>
+        <div class="r-strip" id="researchStrip">
+          {rendered.map((item, index) => (
+            <article class="r-card" data-research-card={item.slug} data-index={index}>
+              <div class="rc-visual">
+                {item.artifactHtml
+                  ? <iframe srcdoc={item.artifactHtml} title={`${item.title} demo`} tabindex="-1"></iframe>
+                  : item.demoUrl
+                  ? <iframe src={item.demoUrl} title={`${item.title} demo`} tabindex="-1"></iframe>
+                  : <div class="proj-mark"><span class="pm-name">research</span><span class="pm-cursor"></span></div>}
+              </div>
+              <div class="r-card-body">
+                <div class="r-card-title">{item.title}</div>
+                <div class="r-card-desc">{item.description}</div>
+                <div class="r-card-meta">{fmtDateFull(item.date)} · {item.tags.join(" · ")}</div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+      <div class="research-connector" id="researchConnector" aria-hidden="true">
+        <svg class="research-wires" id="researchWires"></svg>
+      </div>
+      {rendered.map((item) => {
+        const Content = item.Content;
+        return (
+          <article class="read-wrap" data-read-panel={item.slug}>
+            <button class="read-back" type="button">← all experiments</button>
+            <div class="meta">{fmtDateFull(item.date)} · {item.tags.join(" · ")}</div>
+            <h2 class="page-h1">{item.title}</h2>
+            <div class="pillrow">
+              {item.demoUrl && <a class="pill" href={item.demoUrl} target="_blank" rel="noreferrer">▶ demo</a>}
+              {item.repoUrl && <a class="pill" href={item.repoUrl} target="_blank" rel="noreferrer">github ↗</a>}
+              {item.projectUrl && <a class="pill" href={item.projectUrl}>project page ↗</a>}
+            </div>
+            {Content ? <div class="md"><Content /></div> : <div class="md" set:html={item.bodyHtml}></div>}
+          </article>
+        );
+      })}
+    </div>
+  </main>
+  <script>
+    const cards = [...document.querySelectorAll("[data-research-card]")];
+    const panels = [...document.querySelectorAll("[data-read-panel]")];
+    const strip = document.getElementById("researchStrip");
+    const stripWrap = document.getElementById("researchStripWrap");
+    const connector = document.getElementById("researchConnector");
+    const wires = document.getElementById("researchWires");
+    let selectedSlug = "";
+    function syncFades(){
+      if (!strip || !stripWrap) return;
+      const max = strip.scrollWidth - strip.clientWidth;
+      const solo = strip.classList.contains("solo");
+      stripWrap.classList.toggle("no-left", solo || strip.scrollLeft <= 8);
+      stripWrap.classList.toggle("no-right", solo || max <= 8 || strip.scrollLeft >= max - 8);
+    }
+    function browse(){
+      selectedSlug = "";
+      cards.forEach((card) => card.classList.remove("active","min"));
+      document.getElementById("researchStrip")?.classList.remove("solo");
+      panels.forEach((panel) => panel.classList.remove("show"));
+      connector?.classList.remove("show");
+      if (wires) wires.innerHTML = "";
+      requestAnimationFrame(syncFades);
+    }
+    function drawResearchWire(){
+      if (!selectedSlug || !connector || !wires) return;
+      const card = document.querySelector(`[data-research-card="${selectedSlug}"]`);
+      const panel = document.querySelector(`[data-read-panel="${selectedSlug}"]`);
+      if (!card || !panel) return;
+      const box = connector.getBoundingClientRect();
+      const a = card.getBoundingClientRect();
+      const b = panel.getBoundingClientRect();
+      const x1 = a.left + a.width / 2 - box.left;
+      const y1 = Math.max(2, a.bottom - box.top);
+      const x2 = b.left + b.width / 2 - box.left;
+      const y2 = Math.min(box.height - 2, b.top - box.top);
+      const dy = Math.max(28, Math.abs(y2 - y1) * 0.45);
+      wires.setAttribute("viewBox", `0 0 ${Math.max(1, box.width)} ${Math.max(1, box.height)}`);
+      wires.innerHTML = `<path class="wire on" d="M${x1},${y1} C${x1},${y1 + dy} ${x2},${y2 - dy} ${x2},${y2}" />`;
+    }
+    cards.forEach((card) => card.addEventListener("click", () => {
+      const slug = card.getAttribute("data-research-card");
+      selectedSlug = slug || "";
+      cards.forEach((other) => {
+        other.classList.toggle("active", other === card);
+        other.classList.toggle("min", other !== card);
+      });
+      document.getElementById("researchStrip")?.classList.add("solo");
+      requestAnimationFrame(syncFades);
+      panels.forEach((panel) => panel.classList.toggle("show", panel.getAttribute("data-read-panel") === slug));
+      connector?.classList.add("show");
+      requestAnimationFrame(drawResearchWire);
+      document.querySelector(`[data-read-panel="${slug}"]`)?.scrollIntoView({ behavior:"smooth", block:"start" });
+    }));
+    document.querySelectorAll(".read-back").forEach((btn) => btn.addEventListener("click", browse));
+    strip?.addEventListener("scroll", syncFades, { passive:true });
+    window.addEventListener("resize", () => {
+      syncFades();
+      drawResearchWire();
+    }, { passive:true });
+    requestAnimationFrame(syncFades);
+  </script>
+</BaseLayout>

@@ -110,7 +110,7 @@ export default function FeaturedCard({ project }) {
         )}
         <div style={isDark ? S.titleDark : S.titleLight}>{project.name}</div>
         {project.desc && <div style={isDark ? S.descDark : S.descLight}>{project.desc}</div>}
-        <div style={S.cta}>open full page →</div>
+        <div style={S.cta}>open page ↗</div>
       </div>
     </div>
   );

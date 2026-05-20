@@ -1,0 +1,87 @@
+---
+import type { MainProject } from "../lib/data";
+
+type Props = { projects: MainProject[]; active?: string | null };
+const { projects, active = null } = Astro.props;
+
+function projectHref(projectId: string) {
+  const params = new URLSearchParams(Astro.url.searchParams);
+  if (active === projectId) params.delete("project");
+  else params.set("project", projectId);
+  const query = params.toString();
+  return `/list${query ? `?${query}` : ""}`;
+}
+
+function projectHeroStyle(src?: string) {
+  if (!src) return undefined;
+  return `--project-bg:url("${src.replaceAll('"', "%22")}")`;
+}
+---
+<div class="strip-wrap">
+  <button class="strip-btn l" id="stripL" type="button">« scroll</button>
+  <div class="strip-fade l" id="fadeL"></div>
+  <div class="strip-fade r" id="fadeR"></div>
+  <div class="proj-strip" id="projStrip">
+    {projects.map((project) => (
+      <article class:list={["pmod", active === project.id && "active"]} data-project-card={project.id}>
+        <a class="pmod-hit" href={projectHref(project.id)} aria-label={`show only ${project.name} updates`}></a>
+        <div class:list={[project.logoImg || project.wordmark ? "plogo" : "pvis", project.heroImg && "with-bg"]} style={projectHeroStyle(project.heroImg)}>
+          {project.logoImg ? (
+            <img class="project-logo hero" src={project.logoImg} alt="" loading="lazy" />
+          ) : project.wordmark ? (
+            <div class="pw" set:html={project.wordmark}></div>
+          ) : (
+            <div class="proj-mark"><span class="pm-name">{project.name}</span><span class="pm-cursor"></span></div>
+          )}
+          <div class="pvis-links">
+            {project.site && <a class="plink" href={project.site} target="_blank" rel="noreferrer">site ↗</a>}
+            {project.repo && <a class="plink" href={project.repo} target="_blank" rel="noreferrer">repo ↗</a>}
+            {project.demo && <a class="plink" href={project.demo} target="_blank" rel="noreferrer">demo ↗</a>}
+          </div>
+        </div>
+        <div class="pmod-body">
+          <div class="pmod-desc">{project.desc}</div>
+          <div class="pmod-meta">{project.meta} · {project.count} entries</div>
+        </div>
+      </article>
+    ))}
+  </div>
+  <button class="strip-btn r" id="stripR" type="button">scroll »</button>
+</div>
+
+<script>
+  const strip = document.getElementById("projStrip");
+  const left = document.getElementById("stripL");
+  const right = document.getElementById("stripR");
+  const fadeL = document.getElementById("fadeL");
+  const fadeR = document.getElementById("fadeR");
+  function syncArrows() {
+    if (!strip) return;
+    const max = strip.scrollWidth - strip.clientWidth;
+    const x = strip.scrollLeft;
+    left?.classList.toggle("show", x > 10);
+    right?.classList.toggle("off", x >= max - 10);
+    if (fadeL) fadeL.style.opacity = x > 8 ? "1" : "0";
+    if (fadeR) fadeR.style.opacity = x < max - 8 ? "1" : "0";
+  }
+  left?.addEventListener("click", () => strip?.scrollBy({ left: -340, behavior: "smooth" }));
+  right?.addEventListener("click", () => strip?.scrollBy({ left: 340, behavior: "smooth" }));
+  strip?.addEventListener("scroll", syncArrows, { passive: true });
+  window.addEventListener("resize", syncArrows);
+  window.addEventListener("load", syncArrows);
+  syncArrows();
+  document.querySelectorAll("[data-project-card]").forEach((card) => {
+    card.addEventListener("click", (event) => {
+      const link = event.target.closest("a");
+      if (link && !link.classList.contains("pmod-hit")) return;
+      event.preventDefault();
+      const id = card.getAttribute("data-project-card");
+      const url = new URL(window.location.href);
+      if (url.searchParams.get("project") === id) url.searchParams.delete("project");
+      else url.searchParams.set("project", id);
+      const query = url.searchParams.toString();
+      history.pushState({}, "", `${url.pathname}${query ? `?${query}` : ""}`);
+      window.dispatchEvent(new Event("artlu:filters-changed"));
+    });
+  });
+</script>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>artlu.ai — option 2 · project clusters</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:#08090a; --surface:#0e0f11; --surface-2:#16191d;
+    --border:#1a1d22; --border-strong:#2b3038;
+    --text:#c0c4cc; --text-bright:#f0f1f3; --text-sub:#9aa0aa;
+    --dim:#6b7280; --green:#4ade80; --green-bg:#062b12; --green-border:#1d4d31;
+    --blue:#60a5fa; --amber:#d8a657; --amber-bg:#1c1a12;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; }
+  body { background:var(--bg); color:var(--text); font-family:var(--mono); font-size:13px; }
+  .topbar { height:52px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; align-items:center; gap:14px; padding:0 18px; position:sticky; top:0; z-index:30; }
+  .brand { font-weight:600; font-size:15px; color:var(--text-bright); }
+  .opt { font-size:11px; color:var(--green); border:1px solid var(--green-border); background:var(--green-bg); padding:3px 9px; border-radius:4px; }
+  .tip { margin-left:auto; font-size:11.5px; color:var(--dim); }
+  .tip b { color:var(--text-sub); font-weight:500; }
+
+  .board {
+    padding:28px; display:grid; gap:24px;
+    grid-template-columns:repeat(auto-fill, minmax(430px, 1fr));
+    background:radial-gradient(circle,#15181d 1.4px,transparent 1.4px); background-size:30px 30px;
+    min-height:calc(100vh - 52px);
+  }
+  .cluster {
+    background:var(--surface); border:1px solid var(--border-strong); border-radius:10px;
+    box-shadow:0 8px 26px rgba(0,0,0,0.5); overflow:hidden;
+  }
+  .c-head { display:flex; align-items:center; gap:9px; padding:12px 15px; background:var(--green-bg); border-bottom:1px solid var(--border); }
+  .c-glyph { color:var(--green); font-size:11px; }
+  .c-name { color:var(--text-bright); font-weight:600; font-size:15px; flex:1; }
+  .c-tag { font-size:10px; color:var(--green); border:1px solid var(--green-border); border-radius:3px; padding:2px 7px; }
+  .c-flow { display:flex; align-items:stretch; padding:14px 15px; gap:0; }
+  .c-col { flex:1; min-width:0; }
+  .c-col h5 { font-size:9px; letter-spacing:1.2px; text-transform:uppercase; color:var(--dim); margin-bottom:8px; }
+  .mini { display:flex; align-items:center; gap:7px; padding:6px 8px; border:1px solid var(--border); border-radius:5px; background:var(--surface-2); margin-bottom:5px; font-size:11.5px; }
+  .mini .md { width:6px; height:6px; border-radius:2px; flex-shrink:0; }
+  .mini.tech .md { background:var(--blue); }
+  .mini.ship .md { border-radius:50%; background:var(--amber); }
+  .mini .mn { color:var(--text-bright); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .c-mid { width:46px; display:flex; align-items:center; justify-content:center; }
+  .c-arrow { color:var(--border-strong); font-size:18px; }
+  .c-foot { padding:8px 15px 12px; font-size:11px; color:var(--dim); border-top:1px solid var(--border); }
+  .more { color:var(--dim); font-size:11px; text-align:center; padding:5px; border:1px dashed var(--border); border-radius:5px; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">artlu.ai</div><span class="opt">option 2 · project clusters</span>
+  <div class="tip"><b>each project is a self-contained cluster — they tile in 2D, wrapping to new rows. adding projects never stretches one axis.</b></div>
+</div>
+<div class="board" id="board"></div>
+
+<script>
+  const projects=[
+    {n:'AdsMetri',cat:'frontend + data',tech:['React','Tailwind','tRPC','Drizzle','MySQL'],ships:['tagging workbench','meta ads dashboard']},
+    {n:'spoolcast',cat:'ai · media',tech:['Remotion','ffmpeg','Google TTS','Seedance'],ships:['Aninews · 11 ep','dev-log · 6 ep']},
+    {n:'PipelineCPC',cat:'api + data',tech:['Node.js','MCP','Firebase','Railway'],ships:['agent planning bridge','keyword filtering']},
+    {n:'VibeSkill',cat:'frontend',tech:['React','Tailwind','vanilla JS'],ships:['skill-tree mockup','evidence engine']},
+    {n:'Animabot',cat:'api + backend',tech:['Node.js','Postgres','Playwright'],ships:['control panel','subnet adapter']},
+    {n:'xqboost',cat:'full-stack',tech:['Node.js','React','Firebase'],ships:['tweet generator','MCP server']},
+    {n:'sitesnapshot',cat:'backend + infra',tech:['Node.js','Playwright','Firebase'],ships:['snapshot web app','Claude skill']},
+    {n:'TRACK',cat:'frontend + data',tech:['React','Firebase'],ships:['contractor tracker','TRACK v2']},
+  ];
+  const board=document.getElementById('board');
+  projects.forEach(p=>{
+    const techRows=p.tech.slice(0,4).map(t=>`<div class="mini tech"><span class="md"></span><span class="mn">${t}</span></div>`).join('')
+      + (p.tech.length>4?`<div class="more">+${p.tech.length-4} more</div>`:'');
+    const shipRows=p.ships.map(s=>`<div class="mini ship"><span class="md"></span><span class="mn">${s}</span></div>`).join('');
+    const el=document.createElement('div'); el.className='cluster';
+    el.innerHTML=`
+      <div class="c-head"><span class="c-glyph">◆</span><span class="c-name">${p.n}</span><span class="c-tag">project</span></div>
+      <div class="c-flow">
+        <div class="c-col"><h5>tech stack</h5>${techRows}</div>
+        <div class="c-mid"><span class="c-arrow">›</span></div>
+        <div class="c-col"><h5>series &amp; updates</h5>${shipRows}</div>
+      </div>
+      <div class="c-foot">${p.cat} · ${p.tech.length} technologies · ${p.ships.length} shipped lines</div>`;
+    board.appendChild(el);
+  });
+</script>
+</body>
+</html>
