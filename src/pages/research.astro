@@ -55,10 +55,10 @@ const rendered = [...postItems, ...projectItems].sort((a, b) => b.date.localeCom
   <main class="page">
     <div class="col">
       <h1 class="page-h1">research</h1>
-      <div class="strip-wrap no-left" id="researchStripWrap">
+      <div class="strip-wrap research-list-wrap no-left no-right" id="researchStripWrap">
         <div class="strip-fade l"></div>
         <div class="strip-fade r"></div>
-        <div class="r-strip" id="researchStrip">
+        <div class="r-strip research-list" id="researchStrip">
           {rendered.map((item, index) => (
             <article class="r-card" data-research-card={item.slug} data-index={index}>
               <div class="rc-visual">

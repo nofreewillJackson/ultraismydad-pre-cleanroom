@@ -1,0 +1,223 @@
+{
+  "id": "news-anime-bot-2026-05-21",
+  "format": "short",
+  "show": "news-anime-bot",
+  "title": "Anthropic buys Stainless, the toolmaker behind every major AI company",
+  "desc": "Daily AI news satire. Anthropic acquires Stainless, the small dev-tools vendor that quietly generated the SDKs and MCP connectors used by OpenAI, Google, Cloudflare, Replicate, Runway and Anthropic itself.",
+  "shippedAt": "2026-05-21",
+  "durationSec": 78,
+  "topicTier": "GREEN",
+  "video": {
+    "youtubeId": "wEO52HTo7-w",
+    "tiktokId": "7642402246654807327",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7642402246654807327",
+    "mp4Url": null,
+    "thumbnailUrl": "https://i.ytimg.com/vi/wEO52HTo7-w/oardefault.jpg"
+  },
+  "preRoll": {
+    "burnedText": "⚠ SATIRE — AI-GENERATED PARODY — NOT REAL",
+    "voiceTag": "FAUX7 News. Satire."
+  },
+  "characters": [
+    {
+      "name": "altman",
+      "kind": "character",
+      "imageUrl": "/videos/news-anime-bot-2026-05-21/assets/characters/altman.webp",
+      "description": "",
+      "usedInBeats": [
+        9
+      ]
+    },
+    {
+      "name": "pichai",
+      "kind": "character",
+      "imageUrl": "/videos/news-anime-bot-2026-05-21/assets/characters/pichai.webp",
+      "description": "",
+      "usedInBeats": [
+        3
+      ]
+    }
+  ],
+  "beats": [
+    {
+      "n": 1,
+      "name": "two-rivals-two-blades",
+      "durationSec": 6,
+      "narration": "For years, the major AI companies disagreed about almost everything, except one quiet vendor.",
+      "character": "altman, pichai",
+      "sourceChyron": "ALTMAN OPENAI / PICHAI GOOGLE (dual label)",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-21/assets/beats/01-two-rivals-two-blades.webp"
+    },
+    {
+      "n": 2,
+      "name": "the-neutral-anvil",
+      "durationSec": 5,
+      "narration": "The vendor was Stainless, a small developer tools company founded in 2022 that generated the libraries those companies use to ship their AI to the world.",
+      "character": "-",
+      "sourceChyron": "FOUNDED 2022",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-21/assets/beats/02-the-neutral-anvil.webp"
+    },
+    {
+      "n": 3,
+      "name": "pichai-with-his-scroll",
+      "durationSec": 6,
+      "narration": "OpenAI used it. Google used it. Cloudflare, Replicate, Runway. And Anthropic.",
+      "character": "pichai",
+      "sourceChyron": "USED BY OPENAI AND GOOGLE",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-21/assets/beats/03-pichai-with-his-scroll.webp"
+    },
+    {
+      "n": 4,
+      "name": "the-hooded-buyer-arrives",
+      "durationSec": 6,
+      "narration": "The work was the kind of thing almost no one notices, the connectors, command-line tools, and plumbing that let an app actually call an API.",
+      "character": "-",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-21/assets/beats/04-the-hooded-buyer-arrives.webp"
+    },
+    {
+      "n": 5,
+      "name": "the-handshake",
+      "durationSec": 6,
+      "narration": "This week, Anthropic acquired Stainless.",
+      "character": "-",
+      "sourceChyron": "ANNOUNCED MAY 18, 2026",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-21/assets/beats/05-the-handshake.webp"
+    },
+    {
+      "n": 6,
+      "name": "the-banner-changes",
+      "durationSec": 5,
+      "narration": "The deal was not officially priced. Reports cite a figure of more than three hundred million dollars.",
+      "character": "-",
+      "sourceChyron": "REPORTED PRICE OVER $300M",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-21/assets/beats/06-the-banner-changes.webp"
+    },
+    {
+      "n": 7,
+      "name": "the-gates-close",
+      "durationSec": 6,
+      "narration": "The hosted product that rivals had been using to generate new libraries is being wound down.",
+      "character": "-",
+      "sourceChyron": "HOSTED PRODUCTS WOUND DOWN",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-21/assets/beats/07-the-gates-close.webp"
+    },
+    {
+      "n": 8,
+      "name": "rivals-return-find-it-closed",
+      "durationSec": 6,
+      "narration": "The companies racing the hardest against Anthropic now share, briefly, a small administrative problem.",
+      "character": "altman, pichai",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-21/assets/beats/08-rivals-return-find-it-closed.webp"
+    },
+    {
+      "n": 9,
+      "name": "the-blades-they-have",
+      "durationSec": 5,
+      "narration": "The libraries already generated for those customers will keep working.",
+      "character": "altman",
+      "sourceChyron": "EXISTING SDKS RETAINED",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-21/assets/beats/09-the-blades-they-have.webp"
+    },
+    {
+      "n": 10,
+      "name": "the-smith-works-on-inside",
+      "durationSec": 6,
+      "narration": "The founding team, and the engine that made those libraries, are joining Anthropic.",
+      "character": "-",
+      "sourceChyron": "FOUNDING TEAM JOINS ANTHROPIC",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-21/assets/beats/10-the-smith-works-on-inside.webp"
+    },
+    {
+      "n": 11,
+      "name": "rivals-walk-down-the-mountain",
+      "durationSec": 6,
+      "narration": "Their plumbing was being built by a neutral shop on the side of the road. Anthropic just bought the shop.",
+      "character": "altman, pichai",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-21/assets/beats/11-rivals-walk-down-the-mountain.webp"
+    },
+    {
+      "n": 12,
+      "name": "the-amber-banner-empty-courtyard",
+      "durationSec": 7,
+      "narration": "It is a small bill, for a quiet company. It is also a reminder that in the AI race, the most valuable real estate may not be the model. It may be the gate it ships through.",
+      "character": "-",
+      "sourceChyron": "THE PUBLIC FORGE IS CLOSED",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-21/assets/beats/12-the-amber-banner-empty-courtyard.webp"
+    }
+  ],
+  "sources": [
+    {
+      "fact": "",
+      "attribution": "Anthropic acquires Stainless (Anthropic)",
+      "url": "https://www.anthropic.com/news/anthropic-acquires-stainless"
+    },
+    {
+      "fact": "",
+      "attribution": "Anthropic has acquired the dev tools startup used by OpenAI, Google, and Cloudflare (TechCrunch)",
+      "url": "https://techcrunch.com/2026/05/18/anthropic-has-acquired-the-dev-tools-startup-used-by-openai-google-and-cloudflare/"
+    },
+    {
+      "fact": "",
+      "attribution": "Anthropic acquires Stainless to strengthen Claude's developer tooling (InfoWorld)",
+      "url": "https://www.infoworld.com/article/4172947/anthropic-acquires-stainless-to-strengthen-claudes-developer-tooling.html"
+    },
+    {
+      "fact": "",
+      "attribution": "Anthropic Acquires Stainless, Shuts Hosted SDK Tools (Winbuzzer)",
+      "url": "https://winbuzzer.com/2026/05/19/anthropic-buys-stainless-ends-hosted-sdk-tools-xcxwbn/"
+    },
+    {
+      "fact": "",
+      "attribution": "Anthropic buys Stainless, forcing OpenAI and Google to rebuild or migrate SDK tooling (DigiTimes)",
+      "url": "https://www.digitimes.com/news/a20260520PD210/anthropic-openai-google-startup-acquisition.html"
+    },
+    {
+      "fact": "",
+      "attribution": "Anthropic acquires Stainless | Hacker News",
+      "url": "https://news.ycombinator.com/item?id=48182281"
+    }
+  ],
+  "transcript": "For years, the major AI companies disagreed about almost everything, except one quiet vendor. The vendor was Stainless, a small developer tools company founded in 2022 that generated the libraries those companies use to ship their AI to the world. OpenAI used it. Google used it. Cloudflare, Replicate, Runway. And Anthropic. The work was the kind of thing almost no one notices, the connectors, command-line tools, and plumbing that let an app actually call an API. This week, Anthropic acquired Stainless. The deal was not officially priced. Reports cite a figure of more than three hundred million dollars. The hosted product that rivals had been using to generate new libraries is being wound down. The companies racing the hardest against Anthropic now share, briefly, a small administrative problem. The libraries already generated for those customers will keep working. The founding team, and the engine that made those libraries, are joining Anthropic. Their plumbing was being built by a neutral shop on the side of the road. Anthropic just bought the shop. It is a small bill, for a quiet company. It is also a reminder that in the AI race, the most valuable real estate may not be the model. It may be the gate it ships through.",
+  "summary": {
+    "writing": {
+      "author": "Claude",
+      "role": "script · beat plan · narration · sources audit"
+    },
+    "videoClips": {
+      "platform": "kie.ai",
+      "models": [
+        "Seedance 2.0 Fast"
+      ],
+      "clipCount": 12
+    },
+    "audio": {
+      "tts": "Google Cloud TTS",
+      "voice": "Schedar",
+      "beatCount": 12
+    },
+    "render": {
+      "engine": "ffmpeg",
+      "passed": true
+    },
+    "cost": "~$5.50"
+  },
+  "showcase": {
+    "hiddenBeatNs": [],
+    "notes": "Aninews ep 13. Tracker entry exists (OGQhwO5B5cO2b4Fy1Y47), guidebookStatus: pending — backfilling shipment row so ship-video.mjs can flip it to ready. First episode using the dual-character CHARACTER_LABELS overlay system."
+  }
+}

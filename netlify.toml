@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"
+  command = "npm run sync:data && npm run validate:stack && npm run build:strict"
   publish = "dist"
 
 [[redirects]]

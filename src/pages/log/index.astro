@@ -3,10 +3,12 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import { getPublicJournalEntries, getPublicProjects, getStats } from "../../lib/data";
 import { fmtDateFull, renderMarkdownLite } from "../../lib/format";
+import { createProjectRefResolver } from "../../lib/projectRefs";
 
 const [projects, entries] = await Promise.all([getPublicProjects(), getPublicJournalEntries()]);
 const stats = getStats(projects);
 const href = (value: string) => value === "all" ? "/log" : `/log?author=${value}`;
+const resolveProjectRef = createProjectRefResolver(projects);
 ---
 <BaseLayout title="artlu.ai — the log" description="Journal entries from the artlu.ai 100 day build.">
   <Header active="log" stats={stats} />
@@ -27,7 +29,10 @@ const href = (value: string) => value === "all" ? "/log" : `/log?author=${value}
           <h2 class="entry-title"><a href={`/log/${entry.slug}`}>{entry.title}</a></h2>
           <div class="md" set:html={renderMarkdownLite(entry.body || "")}></div>
           <div class="refs">
-            {(entry.projectRefs || []).map((ref) => <a class="ref" href={`/project/${ref}`}>↗ {ref}</a>)}
+            {(entry.projectRefs || []).map((ref) => {
+              const link = resolveProjectRef(ref);
+              return link.href ? <a class="ref" href={link.href}>↗ {link.label}</a> : <span class="ref">↗ {link.label}</span>;
+            })}
             {(entry.tags || []).map((tag) => <span class="tag">{tag}</span>)}
           </div>
         </article>

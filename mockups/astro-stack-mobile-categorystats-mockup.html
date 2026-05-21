@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>mobile stack — category stats mockup (light + dark)</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* ============================================================
+     The CSS below is COPIED VERBATIM from src/components/MobileStackView.astro
+     except for:
+       - the @media (max-width:720px) wrapper is removed so the shell renders at any width here
+       - the html[data-theme="…"] tokens are scoped to .theme-dark / .theme-light shells
+         so both themes can be shown side-by-side on one page
+     The ONLY new rules are flagged with === DELTA === comments.
+     The ONLY new markup is flagged in the HTML with === DELTA === comments.
+     Nothing else — tile CSS, hero, axis row, panel — is touched.
+     ============================================================ */
+
+  /* tokens — scoped per shell */
+  .theme-dark {
+    --bg:#040506; --surface:#13161a; --surface-2:#1a1e23;
+    --border:#1a1d22; --border-strong:#2b3038; --border-hover:#4a525e;
+    --text:#c0c4cc; --text-bright:#f0f1f3; --text-sub:#9aa0aa;
+    --dim:#6b7280; --dimmer:#3a3f48;
+    --green:#4ade80; --green-bg:#062b12; --green-border:#1d4d31;
+    --blue:#60a5fa; --amber:#d8a657;
+    --grid-line:#0b0d10; --grid-dot:#181b20;
+    --wire:#2b3038;
+    --node-shadow:0 8px 26px rgba(0,0,0,0.6);
+    --font:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  .theme-light {
+    --bg:#e9eaec; --surface:#ffffff; --surface-2:#f2f3f5;
+    --border:#dcdfe2; --border-strong:#b7bcc3; --border-hover:#9ba0a8;
+    --text:#34373c; --text-bright:#15171a; --text-sub:#50545a;
+    --dim:#676c74; --dimmer:#9298a0;
+    --green:#0a7d5e; --green-bg:#e6f4ee; --green-border:#a9ddc9;
+    --blue:#2563eb; --amber:#8a6300;
+    --grid-line:#dee1e3; --grid-dot:#cdd1d4;
+    --wire:#a8adb5;
+    --node-shadow:0 1px 2px rgba(22,24,27,0.07), 0 4px 14px rgba(22,24,27,0.06);
+    --font:'Inter',system-ui,sans-serif;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#16191c; color:#aab1b9;
+    font-family:'IBM Plex Mono','SF Mono',Consolas,monospace; font-size:14px;
+    padding:24px 12px 48px; display:flex; flex-direction:column; align-items:center; gap:18px; }
+  .note { max-width:1020px; width:100%; font-size:12px; line-height:1.6; color:#aab1b9; }
+  .note b { color:#fff; }
+  .frame-row { display:grid; grid-template-columns:repeat(2, 1fr); gap:18px; max-width:1020px; width:100%; }
+  .frame { display:flex; flex-direction:column; gap:8px; }
+  .frame-label { font-size:10px; letter-spacing:1.4px; text-transform:uppercase; color:#9aa0aa; text-align:center; }
+
+  /* ============ shell — verbatim from MobileStackView.astro ============ */
+  .mobile-stack-shell {
+    display:block; position:relative;
+    background:var(--bg); color:var(--text); font-family:var(--font);
+    width:100%; max-width:480px; margin:0 auto;
+    border:1px solid var(--border-strong); border-radius:6px; overflow:hidden;
+  }
+
+  /* topbar — matches Header.astro single row */
+  .topbar { height:54px; background:var(--bg); display:flex; align-items:center;
+    gap:14px; padding:0 14px; border-bottom:1px solid var(--border); }
+  .brand { font-weight:600; font-size:18px; letter-spacing:-0.02em; color:var(--text-bright);
+    display:flex; align-items:center; gap:3px; }
+  .cursor-bl { width:7px; height:16px; background:var(--green); display:inline-block; }
+  .hright { margin-left:auto; display:flex; align-items:center; gap:6px; }
+  .seg { display:flex; border:1px solid var(--border); border-radius:4px; overflow:hidden; }
+  .seg button { font-family:var(--mono); font-size:11px; background:transparent; color:var(--dim);
+    border:none; padding:5px 9px; cursor:default; }
+  .seg button.on { background:var(--green-bg); color:var(--green); }
+
+  .mobile-stack-home {
+    padding:10px 14px 22px;
+    background:
+      linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 160px 160px,
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 160px 160px,
+      radial-gradient(var(--grid-dot) 1px, transparent 1px) 0 0 / 32px 32px,
+      var(--bg);
+  }
+  .mobile-axis-row { display:flex; align-items:center; gap:8px; padding:2px 2px 9px;
+    font-family:var(--mono); font-size:9px; letter-spacing:1.2px; text-transform:uppercase;
+    color:var(--dimmer); }
+  .mobile-axis-row .line { flex:1; height:1px; background:var(--border); }
+  .mobile-axis-row b { color:var(--green); font-weight:500; }
+  .mobile-tech-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:9px;
+    align-items:end; width:100%; max-width:100%;
+    /* === DELTA === fix the first two rows: row 1 = cat-label only, row 2 = pill height (96px).
+       this keeps the pills' vertical position locked even when the hero description grows. */
+    grid-template-rows:min-content 96px; }
+
+  /* ============ category label — verbatim ============ */
+  .mobile-cat-label {
+    grid-column:span 4;
+    font-family:var(--mono);
+    font-size:8.5px;
+    letter-spacing:1.3px;
+    text-transform:uppercase;
+    color:var(--dim);
+    padding:3px 2px 0;
+    line-height:1;
+  }
+  .mobile-cat-label.api { color:var(--blue); }
+  .mobile-cat-label.data { color:var(--amber); }
+  .mobile-cat-label.infra,
+  .mobile-cat-label.media { color:var(--text-sub); }
+
+  /* === DELTA === one new color rule for the frontend label, mirroring the others.
+     gives all 5 categories a colored title; matches the tile-dot green for fe. */
+  .mobile-cat-label.fe { color:var(--green); }
+
+  /* === DELTA === modifier for the FIRST category label only — sits in cols 3-4
+     so its left edge lines up with the first tech tile (React), not the hero.
+     hero gets grid-row: 1 / span 2 so the "projects" title still sits at the top
+     and React/Astro stay on the hero's row, exactly like the live build. */
+  .mobile-cat-label.first { grid-column:3 / -1; padding-left:11px; }
+  .mobile-cat-label.first .cat-stats { margin-left:5px; }
+
+  /* === DELTA === the stats element, sits inline after the category title.
+     inherits the section title color exactly — one tone for the whole row.
+     no extra weight beyond making the numbers slightly heavier so they read as data. */
+  .mobile-cat-label .cat-stats {
+    color:inherit;
+    font-weight:400;
+    margin-left:7px;
+  }
+  .mobile-cat-label .cat-stats b { color:inherit; font-weight:600; }
+  .mobile-cat-label .cat-stats .sep { color:inherit; opacity:0.55; margin:0 5px; }
+
+  /* hero — verbatim shape + DELTA tweaks for top-of-pill alignment */
+  .mobile-hero-text { grid-column:span 2;
+    display:flex; flex-direction:column; justify-content:flex-start; min-width:0;
+    /* === DELTA === span rows 1-2; bottom-anchor the hero block to the pill row's bottom;
+       force min-height equal to the pill so by default the "projects" title's top
+       lines up with the pill's top edge.  when the description grows past the pill height,
+       the hero block grows upward (into row 1) — the title and desc move up, pills don't move. */
+    grid-row:1 / span 2;
+    align-self:end;
+    min-height:96px;
+    /* the original 6px top padding is dropped so the title hugs the hero block's top
+       and matches the pill's top edge exactly (pill has no top padding above its dot). */
+    padding:0 4px 4px; }
+  .mobile-hero-title { font-size:19px; font-weight:700; color:var(--text-bright);
+    letter-spacing:-0.02em; line-height:1.1; }
+  .mobile-hero-desc { font-family:var(--mono); font-size:10.5px; color:var(--text-sub);
+    line-height:1.55; margin-top:6px; display:-webkit-box; -webkit-line-clamp:4;
+    -webkit-box-orient:vertical; overflow:hidden; }
+  .mobile-hero-link { color:var(--green); text-decoration:none; border-bottom:1px solid var(--green-border); }
+
+  /* ============ tile — VERBATIM copy from MobileStackView.astro, NOTHING CHANGED ============ */
+  .mobile-tile {
+    height:96px;
+    background:var(--surface);
+    border:1px solid var(--border-strong);
+    border-radius:16px;
+    box-shadow:var(--node-shadow);
+    display:flex;
+    flex-direction:column;
+    padding:9px 10px 10px;
+    cursor:pointer;
+    position:relative;
+    font-family:inherit;
+    color:inherit;
+    text-align:left;
+    transition:transform .14s, border-color .14s;
+    overflow:hidden;
+    min-width:0;
+  }
+  .mobile-tile:active { transform:scale(.97); }
+  .mobile-tile.empty { opacity:.5; box-shadow:none; }
+  .mobile-ttop { display:flex; align-items:center; gap:6px; min-width:0; }
+  .mobile-tdot { width:8px; height:8px; border-radius:2px; flex-shrink:0; background:var(--blue); }
+  .mobile-tile.fe .mobile-tdot { background:var(--green); }
+  .mobile-tile.api .mobile-tdot { background:var(--blue); }
+  .mobile-tile.data .mobile-tdot { background:var(--amber); }
+  .mobile-tile.infra .mobile-tdot { background:var(--text-sub); }
+  /* === DELTA === media tile-dot was var(--blue) in the live code, but the media
+     cat-label is var(--text-sub) — making them visually inconsistent with every
+     other category (whose label and dot colors match). dimming the dot to
+     text-sub matches the label and the back-end-spectrum story. */
+  .mobile-tile.media .mobile-tdot { background:var(--text-sub); }
+  .mobile-tname {
+    color:var(--text-bright);
+    font-weight:600;
+    font-size:11.5px;
+    line-height:1.15;
+    flex:1;
+    min-width:0;
+    overflow:hidden;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+  }
+  .mobile-tmeta {
+    margin-top:auto;
+    font-family:var(--mono);
+    font-size:9px;
+    line-height:1.45;
+    color:var(--dim);
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+    min-width:0;
+  }
+  .mobile-tm-count { color:var(--text-sub); }
+  .mobile-tm-proj { color:var(--text-bright); font-weight:500; overflow:hidden;
+    text-overflow:ellipsis; white-space:nowrap; }
+  .mobile-tm-date { color:var(--dim); }
+  .mobile-tile.empty .mobile-tname { color:var(--text-sub); }
+
+  /* === DELTA === final tally, sits after the tech grid */
+  .mobile-final-tally {
+    margin-top:18px;
+    padding:10px 2px 2px;
+    border-top:1px solid var(--border);
+    font-family:var(--mono);
+    font-size:9px;
+    letter-spacing:1.3px;
+    text-transform:uppercase;
+    color:var(--dim);
+    text-align:center;
+    line-height:1.4;
+  }
+  .mobile-final-tally b { color:var(--text-bright); font-weight:600; }
+  .mobile-final-tally .sep { color:var(--dimmer); margin:0 5px; }
+
+  @media (max-width:900px){ .frame-row { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<div class="note">
+  <b>mockup — mobile stack home</b><br>
+  · first label uses the <b>shorthand</b> only: <code>fe  proj 5 · upd 8 · demo 4</code> (because it sits in the narrow 2-col slot next to the hero). every other label uses the full words: <code>api  projects 4 · updates 8 · demos 1</code>, etc.<br>
+  · first label is positioned in cols 3–4 (above the React tile) and its left edge lines up with the React pill's left edge.<br>
+  · <b>vertical alignment by default:</b> the "projects" title's top edge lines up with the React pill's top edge. the hero block is bottom-anchored to the pill row and forced to a 96px min-height to match the pill.<br>
+  · <b>when the desc gets longer:</b> the hero block grows upward into the cat-label row — the title and desc rise, the pills do not move (the pill row is locked at 96px via <code>grid-template-rows: min-content 96px</code>).<br>
+  · stats inherit the section title color; final tally sits below the last tile group.<br>
+  tile CSS, axis row, panel, and other category labels (api/data/infra/media) are untouched.
+</div>
+
+<div class="frame-row">
+
+  <!-- ============ DARK ============ -->
+  <div class="frame">
+    <div class="frame-label">dark</div>
+    <div class="mobile-stack-shell theme-dark">
+
+      <div class="topbar">
+        <span class="brand">artlu.ai<span class="cursor-bl"></span></span>
+        <div class="hright">
+          <div class="seg">
+            <button>list</button>
+            <button class="on">stack</button>
+            <button>◐</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mobile-stack-home">
+
+        <div class="mobile-axis-row"><b>▲ FRONT-END</b><span class="line"></span><span>BACK-END ▼</span></div>
+
+        <div class="mobile-tech-grid">
+
+          <!-- === DELTA === new frontend label, sits on row 1 above the hero -->
+          <div class="mobile-cat-label fe first">fe<span class="cat-stats">proj <b>5</b><span class="sep">·</span>upd <b>8</b><span class="sep">·</span>demo <b>4</b></span></div>
+
+          <!-- row 2: hero(span 2) + React + Astro — exact same as current build -->
+          <div class="mobile-hero-text">
+            <h1 class="mobile-hero-title">projects</h1>
+            <p class="mobile-hero-desc">Tap on a tech tile to view individual projects.<br>Also check out <a class="mobile-hero-link" href="#">List View</a>.</p>
+          </div>
+          <button class="mobile-tile fe"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">React</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">3 projects</div><div class="mobile-tm-proj">AdsMetri</div><div class="mobile-tm-date">may 16</div></div></button>
+          <button class="mobile-tile fe"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Astro</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">artlu.ai</div><div class="mobile-tm-date">may 20</div></div></button>
+
+          <button class="mobile-tile fe"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Tailwind</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">2 projects</div><div class="mobile-tm-proj">AdsMetri</div><div class="mobile-tm-date">may 20</div></div></button>
+          <button class="mobile-tile fe"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">shadcn/ui</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">AdsMetri</div><div class="mobile-tm-date">may 16</div></div></button>
+          <button class="mobile-tile fe"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Recharts</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">AdsMetri</div><div class="mobile-tm-date">may 12</div></div></button>
+          <button class="mobile-tile fe"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Vite</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">artlu.ai</div><div class="mobile-tm-date">may 19</div></div></button>
+
+          <button class="mobile-tile fe"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">TypeScript</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">artlu.ai</div><div class="mobile-tm-date">may 20</div></div></button>
+          <button class="mobile-tile fe"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">vanilla JS</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">research</div><div class="mobile-tm-date">may 18</div></div></button>
+
+          <!-- === DELTA === stats appended inside existing label -->
+          <div class="mobile-cat-label api">api<span class="cat-stats">projects <b>4</b><span class="sep">·</span>updates <b>8</b><span class="sep">·</span>demos <b>1</b></span></div>
+          <button class="mobile-tile api"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">tRPC</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">AdsMetri</div><div class="mobile-tm-date">may 16</div></div></button>
+          <button class="mobile-tile api"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Express</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">AdsMetri</div><div class="mobile-tm-date">may 12</div></div></button>
+          <button class="mobile-tile api"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Node.js</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">3 projects</div><div class="mobile-tm-proj">PipelineCPC</div><div class="mobile-tm-date">may 16</div></div></button>
+          <button class="mobile-tile api"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">MCP</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">PipelineCPC</div><div class="mobile-tm-date">may 16</div></div></button>
+          <button class="mobile-tile api"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Python</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">research</div><div class="mobile-tm-date">may 18</div></div></button>
+
+          <div class="mobile-cat-label data">data<span class="cat-stats">projects <b>3</b><span class="sep">·</span>updates <b>6</b><span class="sep">·</span>demos <b>0</b></span></div>
+          <button class="mobile-tile data"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Drizzle</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">AdsMetri</div><div class="mobile-tm-date">may 16</div></div></button>
+          <button class="mobile-tile data"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">MySQL</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">AdsMetri</div><div class="mobile-tm-date">may 16</div></div></button>
+          <button class="mobile-tile data"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Firestore</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">3 projects</div><div class="mobile-tm-proj">artlu.ai</div><div class="mobile-tm-date">may 20</div></div></button>
+          <button class="mobile-tile data"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Firebase Auth</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">2 projects</div><div class="mobile-tm-proj">artlu.ai</div><div class="mobile-tm-date">may 20</div></div></button>
+
+          <div class="mobile-cat-label infra">infra<span class="cat-stats">projects <b>4</b><span class="sep">·</span>updates <b>3</b><span class="sep">·</span>demos <b>3</b></span></div>
+          <button class="mobile-tile infra"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Railway</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">PipelineCPC</div><div class="mobile-tm-date">may 16</div></div></button>
+          <button class="mobile-tile infra empty"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Netlify</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">no updates yet</div></div></button>
+          <button class="mobile-tile infra"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Cloudflare Pages</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">3 projects</div><div class="mobile-tm-proj">artlu.ai</div><div class="mobile-tm-date">may 19</div></div></button>
+
+          <div class="mobile-cat-label media">media<span class="cat-stats">projects <b>3</b><span class="sep">·</span>updates <b>3</b><span class="sep">·</span>demos <b>0</b></span></div>
+          <button class="mobile-tile media"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Remotion</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">spoolcast</div><div class="mobile-tm-date">may 13</div></div></button>
+          <button class="mobile-tile media"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">ffmpeg</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">2 projects</div><div class="mobile-tm-proj">spoolcast</div><div class="mobile-tm-date">may 18</div></div></button>
+          <button class="mobile-tile media"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Google Cloud TTS</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">spoolcast</div><div class="mobile-tm-date">may 18</div></div></button>
+          <button class="mobile-tile media"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Seedance</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">spoolcast</div><div class="mobile-tm-date">may 18</div></div></button>
+          <button class="mobile-tile media"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">cwebp</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">artlu.ai</div><div class="mobile-tm-date">may 1</div></div></button>
+          <button class="mobile-tile media"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">YouTube</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">spoolcast</div><div class="mobile-tm-date">may 18</div></div></button>
+          <button class="mobile-tile media"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">PyTorch</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">research</div><div class="mobile-tm-date">apr 10</div></div></button>
+          <button class="mobile-tile media"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">WhisperX</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">research</div><div class="mobile-tm-date">apr 10</div></div></button>
+
+        </div>
+
+        <!-- === DELTA === final tally -->
+        <div class="mobile-final-tally">total<span class="sep">·</span><b>7</b> projects<span class="sep">·</span><b>11</b> updates<span class="sep">·</span><b>4</b> demos</div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============ LIGHT ============ -->
+  <div class="frame">
+    <div class="frame-label">light</div>
+    <div class="mobile-stack-shell theme-light">
+
+      <div class="topbar">
+        <span class="brand">artlu.ai<span class="cursor-bl"></span></span>
+        <div class="hright">
+          <div class="seg">
+            <button>list</button>
+            <button class="on">stack</button>
+            <button>◐</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mobile-stack-home">
+
+        <div class="mobile-axis-row"><b>▲ FRONT-END</b><span class="line"></span><span>BACK-END ▼</span></div>
+
+        <div class="mobile-tech-grid">
+
+          <div class="mobile-cat-label fe first">fe<span class="cat-stats">proj <b>5</b><span class="sep">·</span>upd <b>8</b><span class="sep">·</span>demo <b>4</b></span></div>
+
+          <div class="mobile-hero-text">
+            <h1 class="mobile-hero-title">projects</h1>
+            <p class="mobile-hero-desc">Tap on a tech tile to view individual projects.<br>Also check out <a class="mobile-hero-link" href="#">List View</a>.</p>
+          </div>
+          <button class="mobile-tile fe"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">React</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">3 projects</div><div class="mobile-tm-proj">AdsMetri</div><div class="mobile-tm-date">may 16</div></div></button>
+          <button class="mobile-tile fe"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Astro</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">artlu.ai</div><div class="mobile-tm-date">may 20</div></div></button>
+
+          <button class="mobile-tile fe"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Tailwind</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">2 projects</div><div class="mobile-tm-proj">AdsMetri</div><div class="mobile-tm-date">may 20</div></div></button>
+          <button class="mobile-tile fe"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">shadcn/ui</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">AdsMetri</div><div class="mobile-tm-date">may 16</div></div></button>
+          <button class="mobile-tile fe"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Recharts</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">AdsMetri</div><div class="mobile-tm-date">may 12</div></div></button>
+          <button class="mobile-tile fe"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Vite</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">artlu.ai</div><div class="mobile-tm-date">may 19</div></div></button>
+
+          <button class="mobile-tile fe"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">TypeScript</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">artlu.ai</div><div class="mobile-tm-date">may 20</div></div></button>
+          <button class="mobile-tile fe"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">vanilla JS</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">research</div><div class="mobile-tm-date">may 18</div></div></button>
+
+          <div class="mobile-cat-label api">api<span class="cat-stats">projects <b>4</b><span class="sep">·</span>updates <b>8</b><span class="sep">·</span>demos <b>1</b></span></div>
+          <button class="mobile-tile api"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">tRPC</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">AdsMetri</div><div class="mobile-tm-date">may 16</div></div></button>
+          <button class="mobile-tile api"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Express</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">AdsMetri</div><div class="mobile-tm-date">may 12</div></div></button>
+          <button class="mobile-tile api"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Node.js</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">3 projects</div><div class="mobile-tm-proj">PipelineCPC</div><div class="mobile-tm-date">may 16</div></div></button>
+          <button class="mobile-tile api"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">MCP</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">PipelineCPC</div><div class="mobile-tm-date">may 16</div></div></button>
+          <button class="mobile-tile api"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Python</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">research</div><div class="mobile-tm-date">may 18</div></div></button>
+
+          <div class="mobile-cat-label data">data<span class="cat-stats">projects <b>3</b><span class="sep">·</span>updates <b>6</b><span class="sep">·</span>demos <b>0</b></span></div>
+          <button class="mobile-tile data"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Drizzle</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">AdsMetri</div><div class="mobile-tm-date">may 16</div></div></button>
+          <button class="mobile-tile data"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">MySQL</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">AdsMetri</div><div class="mobile-tm-date">may 16</div></div></button>
+          <button class="mobile-tile data"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Firestore</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">3 projects</div><div class="mobile-tm-proj">artlu.ai</div><div class="mobile-tm-date">may 20</div></div></button>
+          <button class="mobile-tile data"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Firebase Auth</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">2 projects</div><div class="mobile-tm-proj">artlu.ai</div><div class="mobile-tm-date">may 20</div></div></button>
+
+          <div class="mobile-cat-label infra">infra<span class="cat-stats">projects <b>4</b><span class="sep">·</span>updates <b>3</b><span class="sep">·</span>demos <b>3</b></span></div>
+          <button class="mobile-tile infra"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Railway</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">PipelineCPC</div><div class="mobile-tm-date">may 16</div></div></button>
+          <button class="mobile-tile infra empty"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Netlify</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">no updates yet</div></div></button>
+          <button class="mobile-tile infra"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Cloudflare Pages</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">3 projects</div><div class="mobile-tm-proj">artlu.ai</div><div class="mobile-tm-date">may 19</div></div></button>
+
+          <div class="mobile-cat-label media">media<span class="cat-stats">projects <b>3</b><span class="sep">·</span>updates <b>3</b><span class="sep">·</span>demos <b>0</b></span></div>
+          <button class="mobile-tile media"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Remotion</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">spoolcast</div><div class="mobile-tm-date">may 13</div></div></button>
+          <button class="mobile-tile media"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">ffmpeg</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">2 projects</div><div class="mobile-tm-proj">spoolcast</div><div class="mobile-tm-date">may 18</div></div></button>
+          <button class="mobile-tile media"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Google Cloud TTS</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">spoolcast</div><div class="mobile-tm-date">may 18</div></div></button>
+          <button class="mobile-tile media"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">Seedance</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">spoolcast</div><div class="mobile-tm-date">may 18</div></div></button>
+          <button class="mobile-tile media"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">cwebp</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">artlu.ai</div><div class="mobile-tm-date">may 1</div></div></button>
+          <button class="mobile-tile media"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">YouTube</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">spoolcast</div><div class="mobile-tm-date">may 18</div></div></button>
+          <button class="mobile-tile media"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">PyTorch</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">research</div><div class="mobile-tm-date">apr 10</div></div></button>
+          <button class="mobile-tile media"><div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">WhisperX</span></div><div class="mobile-tmeta"><div class="mobile-tm-count">1 project</div><div class="mobile-tm-proj">research</div><div class="mobile-tm-date">apr 10</div></div></button>
+
+        </div>
+
+        <div class="mobile-final-tally">total<span class="sep">·</span><b>7</b> projects<span class="sep">·</span><b>11</b> updates<span class="sep">·</span><b>4</b> demos</div>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

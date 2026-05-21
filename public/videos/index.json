@@ -1,5 +1,31 @@
 [
   {
+    "id": "news-anime-bot-2026-05-21",
+    "format": "short",
+    "show": "news-anime-bot",
+    "title": "Anthropic buys Stainless, the toolmaker behind every major AI company",
+    "desc": "Daily AI news satire. Anthropic acquires Stainless, the small dev-tools vendor that quietly generated the SDKs and MCP connectors used by OpenAI, Google, Cloudflare, Replicate, Runway and Anthropic itself.",
+    "shippedAt": "2026-05-21",
+    "durationSec": 78,
+    "youtubeId": "wEO52HTo7-w",
+    "tiktokId": "7642402246654807327",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7642402246654807327",
+    "thumbnailUrl": "https://i.ytimg.com/vi/wEO52HTo7-w/oardefault.jpg"
+  },
+  {
+    "id": "news-anime-bot-2026-05-19",
+    "format": "short",
+    "show": "news-anime-bot",
+    "title": "OpenAI launches a self-serve ChatGPT Ads Manager",
+    "desc": "Daily AI news satire. OpenAI opens a self-serve Ads Manager inside ChatGPT, after years of arguing that paying for ChatGPT meant the answers weren't shaped by advertisers.",
+    "shippedAt": "2026-05-19",
+    "durationSec": 65,
+    "youtubeId": "4pmazLei5pM",
+    "tiktokId": "7641677511809715486",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7641677511809715486",
+    "thumbnailUrl": "https://i.ytimg.com/vi/4pmazLei5pM/oardefault.jpg"
+  },
+  {
     "id": "news-anime-bot-2026-05-18",
     "format": "short",
     "show": "news-anime-bot",

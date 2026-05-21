@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "build:strict": "ARTLU_REQUIRE_SNAPSHOT=1 astro build",
     "preview": "astro preview",
+    "sync:data": "node scripts/sync-firestore-snapshot.mjs",
+    "validate:stack": "node scripts/validate-stack-metadata.mjs",
     "seed:main-projects": "node scripts/seed-main-projects.mjs",
     "seed:series": "node scripts/seed-series.mjs",
     "seed:technologies": "node scripts/seed-technologies.mjs",

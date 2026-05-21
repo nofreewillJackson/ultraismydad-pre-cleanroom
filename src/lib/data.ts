@@ -64,6 +64,8 @@ export type JournalEntry = {
   author?: "ai" | "human" | string;
   visibility?: string;
   projectRefs?: string[];
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type VideoIndexItem = {
@@ -155,12 +157,26 @@ export type TechnologyRecord = {
 
 const fallbackBackup = "/Users/ralphxu/Documents/Projects/artlu-tracker-mcp/backups/tracker-backup-20260519-015522.json";
 const defaultServiceAccount = path.join(os.homedir(), "Documents", "keys", "artlu-tracker-sa.json");
+const snapshotPath = path.join(process.cwd(), "src", "data", "tracker-snapshot.json");
 
 let projectCache: Project[] | null = null;
 let journalCache: JournalEntry[] | null = null;
 let mainProjectCache: Omit<MainProject, "count">[] | null = null;
 let seriesCache: Omit<SeriesRecord, "count">[] | null = null;
 let technologyCache: Omit<TechnologyRecord, "count">[] | null = null;
+let trackerSnapshotCache: TrackerSnapshot | null | undefined;
+
+type TrackerSnapshot = {
+  generatedAt?: string;
+  source?: string;
+  collections?: {
+    projects?: any[];
+    journal?: any[];
+    mainProjects?: any[];
+    series?: any[];
+    technologies?: any[];
+  };
+};
 
 const technologyCategoryLabels: Record<string, string> = {
   frontend: "front-end",
@@ -179,16 +195,29 @@ const publicStackTechnologyAliases: Record<string, string | string[] | null> = {
   chatgpt: "codex",
   cron: ["github-actions", "upstash"],
   "css-variables": "css",
+  longform: null,
   "lucide-react": "react",
   "motion-react": "react",
   oauth: null,
   "react-router": "react",
+  short: null,
 };
 
 const projectThumbnailOverrides: Record<string, string> = {
   adsmetri: "/images/project-thumbnails/adsmetri-performance-overview.png",
   "ai-brain-response-video-comparison-with-tribe-v2": "/images/project-thumbnails/tribe-v2-roi-chart.png",
   "ai-hallucination-experiment-context-gate": "/images/project-thumbnails/context-gate-style-library.png",
+  "artlu-ai-rebuild-mockup": "/images/project-thumbnails/artlu-rebuild-mockup.png",
+  "astro-tracker-rebuild-artlu-ai-v3": "/images/project-thumbnails/artlu-stack-view.png",
+  "artifact-embed": "/images/project-thumbnails/artlu-artifact-embed.png",
+  "costintel-ecommerce-fulfillment-analytics-dashboard": "/images/project-thumbnails/costintel-demo.png",
+  "costintel-fulfillment-automator": "/images/project-thumbnails/costintel-automator.png",
+  "creative-intelligence-tagging-workbench-adsmetri": "/images/project-thumbnails/adsmetri-creative-intelligence.png",
+  "drag-drop-tags-permalinks-artlu-ai-v2": "/images/project-thumbnails/artlu-v2-drag-tags-permalinks.png",
+  "evidence-engine-for-skill-based-progress-tracking-vibeskill": "/images/project-thumbnails/vibeskill-evidence-engine.png",
+  "interactive-skill-tree-visual-mockup-vibeskill": "/images/project-thumbnails/vibeskill-skill-map.png",
+  "canonical-skill-map-prototype-gemini-codex": "/images/project-thumbnails/vibeskill-canonical-map.png",
+  "live-updating-activity-heatmap-artlu-ai": "/images/project-thumbnails/artlu-activity-heatmap.png",
   "meta-ads-performance-intelligence-dashboard-adsmetri": "/images/project-thumbnails/adsmetri-roas-campaigns.png",
   "payment-engine-rewrite-calendar-ui-light-theme-track-v2": "/images/project-thumbnails/track-v2-calendar.png",
 };
@@ -359,6 +388,8 @@ function normalizeJournal(id: string, data: any): JournalEntry {
     slug: data.slug || slugify(`day-${data.day || ""}-${title}`),
     tags: Array.isArray(data.tags) ? data.tags.map(refLabel).filter(Boolean) : [],
     projectRefs: Array.isArray(data.projectRefs) ? data.projectRefs.map(refLabel).filter(Boolean) : [],
+    createdAt: normalizeTimestamp(data.createdAt),
+    updatedAt: normalizeTimestamp(data.updatedAt),
   };
 }
 
@@ -374,6 +405,28 @@ async function loadFallback() {
   const projects = (backup.collections?.projects || []).map((item: any) => normalizeProject(item.id, item));
   const journal = (backup.collections?.journal || []).map((item: any) => normalizeJournal(item.id, item));
   return { projects, journal };
+}
+
+function requireSnapshot() {
+  return process.env.ARTLU_REQUIRE_SNAPSHOT === "1" || process.env.NETLIFY === "true";
+}
+
+async function loadTrackerSnapshot() {
+  if (process.env.ARTLU_DATA_SOURCE === "firestore") return null;
+  if (trackerSnapshotCache !== undefined) return trackerSnapshotCache;
+  try {
+    const raw = await fs.readFile(snapshotPath, "utf8");
+    const snapshot = JSON.parse(raw) as TrackerSnapshot;
+    if (!snapshot.collections) throw new Error("snapshot is missing collections");
+    trackerSnapshotCache = snapshot;
+  } catch (error) {
+    trackerSnapshotCache = null;
+    if (requireSnapshot()) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(`[data] tracker snapshot unavailable: ${message}. Run npm run sync:data before building.`);
+    }
+  }
+  return trackerSnapshotCache || null;
 }
 
 async function getClientDb() {
@@ -412,7 +465,15 @@ async function getAdminDb() {
 }
 
 export async function getPublicProjects() {
-  if (projectCache) return projectCache;
+  if (projectCache) return [...projectCache].sort(projectSort);
+  const snapshot = await loadTrackerSnapshot();
+  if (snapshot?.collections?.projects) {
+    projectCache = snapshot.collections.projects
+      .map((item: any) => normalizeProject(item.id, item))
+      .filter((project) => project.visibility === "public");
+    projectCache = [...projectCache].sort(projectSort);
+    return [...projectCache];
+  }
   try {
     const db = await getClientDb();
     const snap = await getDocs(query(collection(db, "projects"), where("visibility", "==", "public"), orderBy("createdAt", "desc")));
@@ -422,11 +483,20 @@ export async function getPublicProjects() {
     const fallback = await loadFallback();
     projectCache = fallback.projects.filter((project) => project.visibility === "public");
   }
-  return [...projectCache].sort(projectSort);
+  projectCache = [...projectCache].sort(projectSort);
+  return [...projectCache];
 }
 
 export async function getPublicJournalEntries() {
-  if (journalCache) return journalCache;
+  if (journalCache) return [...journalCache].sort(journalSort);
+  const snapshot = await loadTrackerSnapshot();
+  if (snapshot?.collections?.journal) {
+    journalCache = snapshot.collections.journal
+      .map((item: any) => normalizeJournal(item.id, item))
+      .filter((entry) => entry.visibility !== "private");
+    journalCache = withUniqueJournalSlugs(journalCache).sort(journalSort);
+    return [...journalCache];
+  }
   try {
     const db = await getClientDb();
     const snap = await getDocs(query(collection(db, "journal"), where("visibility", "==", "public"), orderBy("createdAt", "desc")));
@@ -436,12 +506,20 @@ export async function getPublicJournalEntries() {
     const fallback = await loadFallback();
     journalCache = fallback.journal.filter((entry) => entry.visibility !== "private");
   }
-  journalCache = withUniqueJournalSlugs(journalCache);
-  return [...journalCache].sort((a, b) => dateValue(b.date) - dateValue(a.date));
+  journalCache = withUniqueJournalSlugs(journalCache).sort(journalSort);
+  return [...journalCache];
 }
 
 async function getMainProjectRecords() {
-  if (mainProjectCache) return mainProjectCache;
+  if (mainProjectCache) return sortMainProjectRecords(mainProjectCache);
+  const snapshot = await loadTrackerSnapshot();
+  if (snapshot?.collections?.mainProjects) {
+    const rows = snapshot.collections.mainProjects
+      .map((item: any) => normalizeMainProject(item.id, item))
+      .filter((main: any) => main.visibility !== "private");
+    mainProjectCache = rows.length ? rows : mainProjectDefaults.map((row: any) => normalizeMainProject(row.id, row));
+    return sortMainProjectRecords(mainProjectCache);
+  }
   try {
     const adminDb = await getAdminDb();
     if (adminDb) {
@@ -451,7 +529,7 @@ async function getMainProjectRecords() {
         .filter((main: any) => main.visibility !== "private");
       if (rows.length) {
         mainProjectCache = rows;
-        return [...mainProjectCache].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0) || a.name.localeCompare(b.name));
+        return sortMainProjectRecords(mainProjectCache);
       }
     }
   } catch (error) {
@@ -468,11 +546,19 @@ async function getMainProjectRecords() {
     console.warn("[data] Firestore mainProjects failed; using local defaults", error);
     mainProjectCache = mainProjectDefaults.map((row: any) => normalizeMainProject(row.id, row));
   }
-  return [...mainProjectCache].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0) || a.name.localeCompare(b.name));
+  return sortMainProjectRecords(mainProjectCache);
 }
 
 async function getSeriesRecords() {
-  if (seriesCache) return seriesCache;
+  if (seriesCache) return sortSeriesRecords(seriesCache);
+  const snapshot = await loadTrackerSnapshot();
+  if (snapshot?.collections?.series) {
+    const rows = snapshot.collections.series
+      .map((item: any) => normalizeSeries(item.id, item))
+      .filter((series: any) => series.visibility !== "private");
+    seriesCache = rows.length ? rows : seriesDefaults.map((row: any) => normalizeSeries(row.id, row));
+    return sortSeriesRecords(seriesCache);
+  }
   try {
     const adminDb = await getAdminDb();
     if (adminDb) {
@@ -482,7 +568,7 @@ async function getSeriesRecords() {
         .filter((series: any) => series.visibility !== "private");
       if (rows.length) {
         seriesCache = rows;
-        return [...seriesCache].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0) || a.name.localeCompare(b.name));
+        return sortSeriesRecords(seriesCache);
       }
     }
   } catch (error) {
@@ -499,11 +585,19 @@ async function getSeriesRecords() {
     console.warn("[data] Firestore series failed; using local defaults", error);
     seriesCache = seriesDefaults.map((row: any) => normalizeSeries(row.id, row));
   }
-  return [...seriesCache].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0) || a.name.localeCompare(b.name));
+  return sortSeriesRecords(seriesCache);
 }
 
 async function getTechnologyRecords() {
-  if (technologyCache) return technologyCache;
+  if (technologyCache) return sortTechnologyRecords(technologyCache);
+  const snapshot = await loadTrackerSnapshot();
+  if (snapshot?.collections?.technologies) {
+    const rows = snapshot.collections.technologies
+      .map((item: any) => normalizeTechnology(item.id, item))
+      .filter((tech: any) => tech.visibility !== "private");
+    technologyCache = rows.length ? mergeTechnologyDefaults(rows) : technologyDefaults.map((row: any) => normalizeTechnology(row.id, row));
+    return sortTechnologyRecords(technologyCache);
+  }
   try {
     const adminDb = await getAdminDb();
     if (adminDb) {
@@ -539,6 +633,14 @@ function sortTechnologyRecords<T extends Pick<TechnologyRecord, "category" | "so
     if (byCat) return byCat;
     return (a.sortOrder ?? 0) - (b.sortOrder ?? 0) || a.name.localeCompare(b.name);
   });
+}
+
+function sortMainProjectRecords<T extends Pick<MainProjectRecord, "sortOrder" | "name">>(rows: T[]) {
+  return [...rows].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0) || a.name.localeCompare(b.name));
+}
+
+function sortSeriesRecords<T extends Pick<SeriesRecord, "sortOrder" | "name">>(rows: T[]) {
+  return [...rows].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0) || a.name.localeCompare(b.name));
 }
 
 function withUniqueJournalSlugs(entries: JournalEntry[]) {
@@ -582,6 +684,16 @@ export function projectSort(a: Project, b: Project) {
   const byUpdate = entrySortValue(b.updatedAt, b.date) - entrySortValue(a.updatedAt, a.date);
   if (byUpdate !== 0) return byUpdate;
   return (a.sortOrder ?? 0) - (b.sortOrder ?? 0);
+}
+
+function journalSort(a: JournalEntry, b: JournalEntry) {
+  const byDate = dateValue(b.date) - dateValue(a.date);
+  if (byDate !== 0) return byDate;
+  const byCreated = entrySortValue(b.createdAt, b.date) - entrySortValue(a.createdAt, a.date);
+  if (byCreated !== 0) return byCreated;
+  const byUpdate = entrySortValue(b.updatedAt, b.date) - entrySortValue(a.updatedAt, a.date);
+  if (byUpdate !== 0) return byUpdate;
+  return a.title.localeCompare(b.title);
 }
 
 function entrySortValue(primary?: string | null, fallback?: string | null) {
@@ -844,6 +956,20 @@ function publicStackTechnologyIds(id?: string) {
   return id ? [id] : [];
 }
 
+function publicStackIdsForKey(key: string, aliases: Map<string, string>) {
+  const raw = String(key || "").trim().toLowerCase();
+  const slug = slugify(raw);
+  for (const value of [raw, slug]) {
+    if (Object.prototype.hasOwnProperty.call(publicStackTechnologyAliases, value)) {
+      const mapped = publicStackTechnologyAliases[value];
+      if (!mapped) return [];
+      return (Array.isArray(mapped) ? mapped : [mapped]).flatMap((id) => publicStackTechnologyIds(id));
+    }
+  }
+  const id = aliases.get(raw) || aliases.get(slug);
+  return publicStackTechnologyIds(id);
+}
+
 type StackInput = {
   stack?: string[];
   stackRefs?: string[];
@@ -856,16 +982,10 @@ export function resolveTechnologyIds(
   const aliases = technologyAliasMap(technologies);
   const ids = new Set<string>();
   for (const ref of input.stackRefs || []) {
-    const key = String(ref || "").trim().toLowerCase();
-    const id = aliases.get(key) || aliases.get(slugify(key));
-    publicStackTechnologyIds(id).forEach((publicId) => ids.add(publicId));
+    publicStackIdsForKey(ref, aliases).forEach((publicId) => ids.add(publicId));
   }
   for (const raw of input.stack || []) {
-    const key = String(raw || "").trim().toLowerCase();
-    const id = aliases.get(key) || aliases.get(slugify(key));
-    const publicIds = publicStackTechnologyIds(id);
-    if (publicIds.length) publicIds.forEach((publicId) => ids.add(publicId));
-    else if (key && aliases.has("other")) ids.add("other");
+    publicStackIdsForKey(raw, aliases).forEach((publicId) => ids.add(publicId));
   }
   return [...ids];
 }

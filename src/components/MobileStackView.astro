@@ -1,0 +1,785 @@
+---
+type Props = {
+  data: any;
+};
+
+const { data: rawData } = Astro.props;
+const stackCategories = ["frontend", "api", "data", "infra", "media"];
+const collectMobileItems = (source: any) => {
+  const byId = new Map();
+  const addItem = (item: any) => {
+    if (!item) return;
+    const key = item.id || `${item.type || "item"}:${item.projectId || ""}:${item.title || ""}`;
+    if (!byId.has(key)) byId.set(key, item);
+  };
+  (source.items || []).forEach(addItem);
+  Object.values(source.childrenByProject || {}).forEach((children: any) => {
+    (children?.demos || []).forEach(addItem);
+    (children?.updates || []).forEach(addItem);
+    (children?.series || []).forEach((series: any) => {
+      addItem(series);
+      (series?.episodes || []).forEach(addItem);
+    });
+  });
+  return [...byId.values()];
+};
+const mobileItemsForStats = collectMobileItems(rawData);
+const makeCategoryStats = (category: string) => {
+  const techIds = new Set((rawData.techs || []).filter((tech: any) => tech.category === category).map((tech: any) => tech.id));
+  const projects = new Set();
+  const updateIds = new Set();
+  const demoIds = new Set();
+  mobileItemsForStats.forEach((item: any) => {
+    const itemTechIds = Array.isArray(item.techIds) ? item.techIds : [];
+    if (!itemTechIds.some((id: string) => techIds.has(id))) return;
+    if (item.projectId) projects.add(item.projectId);
+    if (item.type === "demo") demoIds.add(item.id || `${item.projectId}:${item.title}`);
+    else if (item.type === "update") updateIds.add(item.id || `${item.projectId}:${item.title}`);
+  });
+  return { projects: projects.size, updates: updateIds.size, demos: demoIds.size };
+};
+const makeTotalStats = () => {
+  const projects = new Set();
+  const updateIds = new Set();
+  const demoIds = new Set();
+  mobileItemsForStats.forEach((item: any) => {
+    if (item.projectId) projects.add(item.projectId);
+    if (item.type === "demo") demoIds.add(item.id || `${item.projectId}:${item.title}`);
+    else if (item.type === "update") updateIds.add(item.id || `${item.projectId}:${item.title}`);
+  });
+  return { projects: projects.size, updates: updateIds.size, demos: demoIds.size };
+};
+const data = {
+  ...rawData,
+  categoryStats: Object.fromEntries(stackCategories.map((category) => [category, makeCategoryStats(category)])),
+  totalStats: makeTotalStats(),
+};
+---
+<section class="mobile-stack-shell" id="mobileStackShell" aria-label="mobile stack view">
+  <div class="mobile-stack-home" id="mobileStackHome">
+    <div id="mobileTechHome"></div>
+  </div>
+  <div class="mobile-stack-panel" id="mobileTechPanel" aria-hidden="true">
+    <div class="mobile-panel-h">
+      <div class="mobile-panel-h-row">
+        <button class="mobile-panel-back" id="mobileTechBack" type="button">← projects</button>
+        <span class="mobile-panel-name" id="mobileTechPanelName"></span>
+        <span class="mobile-panel-tag" id="mobileTechPanelTag"></span>
+      </div>
+      <div class="mobile-panel-meta" id="mobileTechPanelMeta"></div>
+    </div>
+    <div class="mobile-panel-body" id="mobileTechPanelBody"></div>
+  </div>
+</section>
+
+<style is:global>
+  .mobile-stack-shell { display:none; }
+  @media (max-width:720px) {
+    html[data-theme="dark"] .mobile-stack-shell {
+      --bg:#040506;
+      --surface:#13161a;
+      --surface-2:#1a1e23;
+      --grid-line:#0b0d10;
+      --grid-dot:#181b20;
+      --wire:#2b3038;
+    }
+    html[data-theme="light"] .mobile-stack-shell {
+      --grid-line:#dee1e3;
+      --grid-dot:#cdd1d4;
+      --wire:#a8adb5;
+    }
+    .mobile-stack-shell {
+      display:block;
+      position:relative;
+      height:calc(100vh - 54px);
+      overflow:hidden;
+      background:var(--bg);
+      max-width:480px;
+      margin:0 auto;
+    }
+    .stack-mobile-fallback { display:none !important; }
+    .mobile-stack-home {
+      height:100%;
+      overflow-y:auto;
+      overflow-x:hidden;
+      padding:10px 14px 60px;
+      background:
+        linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 160px 160px,
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 160px 160px,
+        radial-gradient(var(--grid-dot) 1px, transparent 1px) 0 0 / 32px 32px,
+        var(--bg);
+      scrollbar-width:thin;
+      -webkit-overflow-scrolling:touch;
+    }
+    .mobile-stack-home::-webkit-scrollbar,
+    .mobile-panel-body::-webkit-scrollbar { width:3px; }
+    .mobile-stack-home::-webkit-scrollbar-thumb,
+    .mobile-panel-body::-webkit-scrollbar-thumb { background:var(--border-strong); border-radius:2px; }
+    .mobile-axis-row {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:2px 2px 9px;
+      font-family:var(--mono);
+      font-size:9px;
+      letter-spacing:1.2px;
+      text-transform:uppercase;
+      color:var(--dimmer);
+    }
+    .mobile-axis-row .line { flex:1; height:1px; background:var(--border); }
+    .mobile-axis-row b { color:var(--green); font-weight:500; }
+    .mobile-tech-grid {
+      display:grid;
+      grid-template-columns:repeat(4, 1fr);
+      grid-template-rows:min-content 96px;
+      gap:9px;
+      align-items:end;
+      width:100%;
+      max-width:100%;
+    }
+    .mobile-cat-label {
+      grid-column:span 4;
+      font-family:var(--mono);
+      font-size:8.5px;
+      letter-spacing:1.3px;
+      text-transform:uppercase;
+      color:var(--dim);
+      padding:3px 2px 0;
+      line-height:1;
+    }
+    .mobile-cat-label.fe { color:var(--green); }
+    .mobile-cat-label.api { color:var(--blue); }
+    .mobile-cat-label.data { color:var(--amber); }
+    .mobile-cat-label.infra,
+    .mobile-cat-label.media { color:var(--text-sub); }
+    .mobile-cat-label.first { grid-column:3 / -1; padding-left:0; }
+    .mobile-cat-label.first .cat-stats { margin-left:5px; }
+    .mobile-cat-label .cat-stats { color:inherit; font-weight:400; margin-left:7px; }
+    .mobile-cat-label .cat-stats b { color:inherit; font-weight:600; }
+    .mobile-cat-label .cat-stats .sep { color:inherit; opacity:.55; margin:0 5px; }
+    .mobile-hero-text {
+      grid-column:span 2;
+      grid-row:1 / span 2;
+      padding:0 4px 4px;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-start;
+      align-self:end;
+      min-height:96px;
+      min-width:0;
+    }
+    .mobile-hero-title {
+      font-size:19px;
+      font-weight:700;
+      color:var(--text-bright);
+      letter-spacing:-0.02em;
+      line-height:1.1;
+    }
+    .mobile-hero-desc {
+      font-family:var(--mono);
+      font-size:10.5px;
+      color:var(--text-sub);
+      line-height:1.55;
+      margin-top:6px;
+      display:-webkit-box;
+      -webkit-line-clamp:4;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+    }
+    .mobile-hero-link { color:var(--green); text-decoration:none; border-bottom:1px solid var(--green-border); }
+    .mobile-tile {
+      height:96px;
+      background:var(--surface);
+      border:1px solid var(--border-strong);
+      border-radius:16px;
+      box-shadow:var(--node-shadow);
+      display:flex;
+      flex-direction:column;
+      padding:9px 10px 10px;
+      cursor:pointer;
+      position:relative;
+      font-family:inherit;
+      color:inherit;
+      text-align:left;
+      transition:transform .14s, border-color .14s;
+      overflow:hidden;
+      min-width:0;
+    }
+    .mobile-tile:active { transform:scale(.97); }
+    .mobile-tile.empty { opacity:.5; box-shadow:none; }
+    .mobile-ttop { display:flex; align-items:center; gap:6px; min-width:0; }
+    .mobile-tdot { width:8px; height:8px; border-radius:2px; flex-shrink:0; background:var(--blue); }
+    .mobile-tile.fe .mobile-tdot { background:var(--green); }
+    .mobile-tile.api .mobile-tdot { background:var(--blue); }
+    .mobile-tile.data .mobile-tdot { background:var(--amber); }
+    .mobile-tile.infra .mobile-tdot { background:var(--text-sub); }
+    .mobile-tile.media .mobile-tdot { background:var(--text-sub); }
+    .mobile-tname {
+      color:var(--text-bright);
+      font-weight:600;
+      font-size:11.5px;
+      line-height:1.15;
+      flex:1;
+      min-width:0;
+      overflow:hidden;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+    }
+    .mobile-tmeta {
+      margin-top:auto;
+      font-family:var(--mono);
+      font-size:9px;
+      line-height:1.45;
+      color:var(--dim);
+      display:flex;
+      flex-direction:column;
+      gap:1px;
+      min-width:0;
+    }
+    .mobile-tm-count { color:var(--text-sub); }
+    .mobile-tm-proj {
+      color:var(--text-bright);
+      font-weight:500;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .mobile-tm-date { color:var(--dim); }
+    .mobile-final-tally {
+      margin-top:18px;
+      padding:10px 2px 2px;
+      border-top:1px solid var(--border);
+      font-family:var(--mono);
+      font-size:9px;
+      letter-spacing:1.3px;
+      text-transform:uppercase;
+      color:var(--dim);
+      text-align:center;
+      line-height:1.4;
+    }
+    .mobile-final-tally b { color:var(--text-bright); font-weight:600; }
+    .mobile-final-tally .sep { color:var(--dimmer); margin:0 5px; }
+    .mobile-stack-panel {
+      position:absolute;
+      inset:0;
+      background:var(--bg);
+      z-index:30;
+      opacity:0;
+      transform:scale(.18);
+      transition:opacity .26s ease-out, transform .26s cubic-bezier(.2,.7,.2,1);
+      pointer-events:none;
+      transform-origin:50% 50%;
+      display:flex;
+      flex-direction:column;
+    }
+    .mobile-stack-panel.open { opacity:1; transform:scale(1); pointer-events:auto; }
+    .mobile-panel-h {
+      background:var(--bg);
+      padding:8px 13px 7px;
+      border-bottom:1px solid var(--border);
+      flex-shrink:0;
+      display:flex;
+      flex-direction:column;
+      gap:3px;
+    }
+    .mobile-panel-h-row { display:flex; align-items:center; gap:10px; min-width:0; }
+    .mobile-panel-back {
+      flex-shrink:0;
+      background:transparent;
+      border:none;
+      color:var(--green);
+      font-family:var(--mono);
+      font-size:11px;
+      padding:2px 4px 2px 0;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap:4px;
+    }
+    .mobile-panel-name {
+      flex:1;
+      color:var(--text-bright);
+      font-weight:600;
+      font-size:15px;
+      letter-spacing:-0.01em;
+      min-width:0;
+      line-height:1.2;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .mobile-panel-tag {
+      flex-shrink:0;
+      font-size:10px;
+      color:var(--green);
+      border:1px solid var(--green-border);
+      border-radius:3px;
+      padding:1px 6px;
+      font-family:var(--mono);
+    }
+    .mobile-panel-tag.api { color:var(--blue); border-color:var(--blue); }
+    .mobile-panel-tag.data { color:var(--amber); border-color:var(--amber); }
+    .mobile-panel-tag.infra,
+    .mobile-panel-tag.media { color:var(--text-sub); border-color:var(--border-strong); }
+    .mobile-panel-meta {
+      font-family:var(--mono);
+      font-size:10.5px;
+      color:var(--text-sub);
+      line-height:1.4;
+    }
+    .mobile-panel-meta b { color:var(--text-bright); font-weight:500; }
+    .mobile-panel-meta .sep { color:var(--dimmer); margin:0 5px; }
+    .mobile-panel-body {
+      flex:1;
+      overflow-y:auto;
+      padding:12px 14px 32px;
+      scrollbar-width:thin;
+      -webkit-overflow-scrolling:touch;
+    }
+    .mobile-project-group { margin-bottom:11px; }
+    .mobile-pcard,
+    .mobile-dcard,
+    .mobile-fcard,
+    .mobile-ep-row {
+      background:var(--surface);
+      border:1px solid var(--border-strong);
+      border-radius:8px;
+      box-shadow:var(--node-shadow);
+      overflow:hidden;
+    }
+    .mobile-pcard { cursor:pointer; transition:border-color .12s; }
+    .mobile-pcard-h {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:9px 12px;
+      background:var(--surface-2);
+      border-bottom:1px solid var(--border);
+    }
+    .mobile-pcard-h .glyph { color:var(--green); font-family:var(--mono); font-size:11px; }
+    .mobile-pcard-h .nname {
+      flex:1;
+      color:var(--text-bright);
+      font-weight:600;
+      font-size:13px;
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .mobile-pcard-h .caret { color:var(--text-sub); font-size:9px; transition:transform .14s; }
+    .mobile-project-group.expanded .mobile-pcard-h .caret { transform:rotate(180deg); color:var(--green); }
+    .mobile-pcard-h .ntag {
+      font-size:10px;
+      color:var(--green);
+      border:1px solid var(--green-border);
+      border-radius:3px;
+      padding:1px 6px;
+      font-family:var(--mono);
+    }
+    .mobile-pcard-body { padding:9px 12px 11px; }
+    .mobile-pcard-body .ndesc,
+    .mobile-fcard-body .ndesc {
+      color:var(--text-sub);
+      line-height:1.55;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+    }
+    .mobile-pcard-body .ndesc { font-size:12px; }
+    .mobile-pcard-body .nmeta {
+      margin-top:8px;
+      font-family:var(--mono);
+      font-size:10.5px;
+      color:var(--dim);
+      display:flex;
+      flex-wrap:wrap;
+      gap:5px 9px;
+    }
+    .mobile-accent { color:var(--green); }
+    .mobile-expand-children { display:none; }
+    .mobile-project-group.expanded .mobile-expand-children { display:block; }
+    .mobile-expand-children > * { margin-bottom:8px; }
+    .mobile-expand-children > *:last-child { margin-bottom:0; }
+    .mobile-wire {
+      display:block;
+      width:1.4px;
+      height:14px;
+      background:var(--wire);
+      opacity:.7;
+      margin:0 auto;
+    }
+    .mobile-ep-group { padding-left:22px; }
+    .mobile-ep-group > * { margin-bottom:6px; }
+    .mobile-ep-group > *:last-child { margin-bottom:0; }
+    .mobile-series-sep { margin:14px 6px; height:1px; background:var(--border); border:0; }
+    .mobile-dcard-h,
+    .mobile-fcard-h {
+      display:flex;
+      align-items:flex-start;
+      gap:7px;
+      padding:9px 11px;
+      border-bottom:1px solid var(--border);
+    }
+    .mobile-dcard-h { align-items:center; background:var(--amber-bg); }
+    .mobile-dcard-h .glyph { color:var(--amber); font-family:var(--mono); font-size:10px; }
+    .mobile-dcard-h .nname,
+    .mobile-fcard-h .nname {
+      flex:1;
+      color:var(--text-bright);
+      font-weight:600;
+      font-size:12.5px;
+      min-width:0;
+      overflow:hidden;
+    }
+    .mobile-dcard-h .nname { text-overflow:ellipsis; white-space:nowrap; }
+    .mobile-fcard-h .nname { line-height:1.35; }
+    .mobile-dcard-h .ntag,
+    .mobile-fcard-h .ntag {
+      flex-shrink:0;
+      font-size:9.5px;
+      border-radius:3px;
+      padding:1px 6px;
+      font-family:var(--mono);
+    }
+    .mobile-dcard-h .ntag {
+      color:var(--amber);
+      border:0;
+      padding:1px 0;
+    }
+    .mobile-demo-toggle {
+      flex-shrink:0;
+      border:1px solid var(--amber);
+      border-radius:3px;
+      background:transparent;
+      color:var(--amber);
+      font-family:var(--mono);
+      font-size:9.5px;
+      line-height:1.2;
+      padding:1px 6px;
+      cursor:pointer;
+      appearance:none;
+      -webkit-appearance:none;
+    }
+    .mobile-demo-toggle:hover { color:var(--text-bright); border-color:var(--text-bright); }
+    .mobile-dcard-embed {
+      width:100%;
+      aspect-ratio:9/16;
+      background:var(--surface-2);
+      border:0;
+      display:block;
+    }
+    .mobile-dcard-embed.wide { aspect-ratio:4/3; }
+    .mobile-dcard.collapsed .mobile-dcard-embed { display:none; }
+    .mobile-dcard-foot {
+      padding:8px 11px 10px;
+      font-family:var(--mono);
+      font-size:10.5px;
+      color:var(--dim);
+      border-top:1px solid var(--border);
+      line-height:1.5;
+    }
+    .mobile-dcard-foot .mobile-accent { color:var(--amber); }
+    .mobile-dcard-foot a { color:var(--green); text-decoration:none; word-break:break-all; }
+    .mobile-fcard-h { background:var(--surface-2); }
+    .mobile-fcard.series .mobile-fcard-h { background:var(--amber-bg); }
+    .mobile-fcard-h .sdot {
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      flex-shrink:0;
+      margin-top:5px;
+      background:var(--green);
+    }
+    .mobile-fcard.series .mobile-fcard-h .sdot { background:var(--amber); }
+    .mobile-fcard-h .ntag { color:var(--dim); border:1px solid var(--border); margin-top:2px; }
+    .mobile-fcard.series .mobile-fcard-h .ntag { color:var(--amber); border-color:var(--amber-border); }
+    .mobile-fcard-link {
+      display:block;
+      color:inherit;
+      text-decoration:none;
+    }
+    .mobile-fcard-link:hover .mobile-fcard { border-color:var(--border-hover); }
+    .mobile-fcard-body { padding:9px 11px 11px; }
+    .mobile-fcard-body .ndesc { font-size:11.5px; line-height:1.5; }
+    .mobile-fcard-body .nmeta {
+      margin-top:7px;
+      font-family:var(--mono);
+      font-size:10px;
+      color:var(--dim);
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      gap:4px 7px;
+    }
+    .mobile-status {
+      padding:1px 6px;
+      border-radius:3px;
+      font-size:9.5px;
+      background:var(--green-bg);
+      color:var(--green);
+      border:1px solid var(--green-border);
+    }
+    .mobile-ep-row {
+      display:flex;
+      align-items:center;
+      gap:9px;
+      padding:7px 11px 7px 8px;
+      text-decoration:none;
+      color:inherit;
+      cursor:pointer;
+      transition:border-color .12s;
+    }
+    .mobile-ep-thumb {
+      width:44px;
+      height:44px;
+      flex-shrink:0;
+      border-radius:5px;
+      background:#000 center / cover;
+      border:1px solid var(--border);
+    }
+    .mobile-ep-thumb.v { width:30px; height:50px; }
+    .mobile-ep-row .ecol { flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+    .mobile-ep-row .ename {
+      color:var(--text-bright);
+      font-weight:500;
+      font-size:11.5px;
+      line-height:1.3;
+      overflow:hidden;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+    }
+    .mobile-ep-row .emeta { font-family:var(--mono); font-size:9px; color:var(--dim); }
+    .mobile-ep-row .play { flex-shrink:0; font-size:11px; color:var(--green); font-family:var(--mono); }
+    .mobile-empty-state {
+      padding:24px 12px;
+      text-align:center;
+      color:var(--dim);
+      font-size:11.5px;
+      line-height:1.6;
+      font-family:var(--mono);
+    }
+  }
+</style>
+
+<script define:vars={{ mobileStackData: data }}>
+  const mobileData = mobileStackData;
+  const mobileShell = document.getElementById("mobileStackShell");
+  const mobileHome = document.getElementById("mobileStackHome");
+  const mobileTechHome = document.getElementById("mobileTechHome");
+  const mobilePanel = document.getElementById("mobileTechPanel");
+  const mobilePanelName = document.getElementById("mobileTechPanelName");
+  const mobilePanelTag = document.getElementById("mobileTechPanelTag");
+  const mobilePanelMeta = document.getElementById("mobileTechPanelMeta");
+  const mobilePanelBody = document.getElementById("mobileTechPanelBody");
+  const mobileBack = document.getElementById("mobileTechBack");
+
+  const catLabels = { frontend: "front-end", api: "api", data: "data", infra: "infra", media: "media" };
+  const catCls = (id) => id === "frontend" ? "fe" : (id || "infra");
+  const catLabel = (id) => catLabels[id] || id || "other";
+
+  function esc(value) {
+    return String(value || "").replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    })[char]);
+  }
+  function attr(value) {
+    return esc(value).replace(/`/g, "&#96;");
+  }
+  function shortUrl(url) {
+    return String(url || "").replace(/^https?:\/\//, "").replace(/\/$/, "");
+  }
+  function chipsLine(techIds) {
+    if (!techIds || !techIds.length) return "";
+    return techIds.map((id) => mobileData.techById[id]?.name || id).filter(Boolean).join(" · ");
+  }
+  function metaForTech(id) {
+    const matches = mobileData.items.filter((item) => item.techIds.includes(id));
+    const projects = new Set(matches.map((item) => item.projectId).filter(Boolean));
+    const sorted = [...matches].sort((a, b) => (b.dateValue || 0) - (a.dateValue || 0) || a.title.localeCompare(b.title));
+    const last = sorted[0];
+    return {
+      projects: projects.size,
+      entries: matches.length,
+      lastProject: last ? mobileData.projects[last.projectId]?.name : "",
+      lastDate: last?.dateLabel || "",
+    };
+  }
+  function statsForCategory(category) {
+    return mobileData.categoryStats?.[category] || { projects: 0, updates: 0, demos: 0 };
+  }
+  function totalStats() {
+    return mobileData.totalStats || { projects: 0, updates: 0, demos: 0 };
+  }
+  function statsMarkup(stats, short = false) {
+    const labels = short
+      ? ["proj", "upd", "demo"]
+      : ["projects", "updates", "demos"];
+    return `<span class="cat-stats">${labels[0]} <b>${stats.projects}</b><span class="sep">·</span>${labels[1]} <b>${stats.updates}</b><span class="sep">·</span>${labels[2]} <b>${stats.demos}</b></span>`;
+  }
+  function renderHome() {
+    if (!mobileTechHome) return;
+    let previousCategory = "frontend";
+    const frontendStats = statsForCategory("frontend");
+    const total = totalStats();
+    let html = `<div class="mobile-axis-row"><b>▲ FRONT-END</b><span class="line"></span><span>BACK-END ▼</span></div><div class="mobile-tech-grid">
+      <div class="mobile-cat-label fe first">fe${statsMarkup(frontendStats, true)}</div>
+      <div class="mobile-hero-text">
+        <h1 class="mobile-hero-title">projects</h1>
+        <p class="mobile-hero-desc">Tap on a tech tile to view individual projects.<br>Also check out <a href="/list" class="mobile-hero-link">List View</a>.</p>
+      </div>`;
+    for (const tech of mobileData.techs) {
+      const meta = metaForTech(tech.id);
+      const empty = meta.entries === 0;
+      if (tech.category !== previousCategory && previousCategory) {
+        html += `<div class="mobile-cat-label ${esc(catCls(tech.category))}">${esc(catLabel(tech.category))}${statsMarkup(statsForCategory(tech.category))}</div>`;
+      }
+      previousCategory = tech.category;
+      html += `<button class="mobile-tile ${esc(catCls(tech.category))}${empty ? " empty" : ""}" type="button" data-tech="${esc(tech.id)}">
+        <div class="mobile-ttop"><span class="mobile-tdot"></span><span class="mobile-tname">${esc(tech.name)}</span></div>
+        <div class="mobile-tmeta">
+          ${empty ? `<div class="mobile-tm-count">no updates yet</div>` : `<div class="mobile-tm-count">${meta.projects} project${meta.projects === 1 ? "" : "s"}</div><div class="mobile-tm-proj">${esc(meta.lastProject || "—")}</div><div class="mobile-tm-date">${esc(meta.lastDate)}</div>`}
+        </div>
+      </button>`;
+    }
+    html += `</div><div class="mobile-final-tally">total<span class="sep">·</span><b>${total.projects}</b> projects<span class="sep">·</span><b>${total.updates}</b> updates<span class="sep">·</span><b>${total.demos}</b> demos</div>`;
+    mobileTechHome.innerHTML = html;
+  }
+  function demoCardHtml(item) {
+    const embed = item.demoUrl
+      ? `<iframe class="mobile-dcard-embed" src="${attr(item.demoUrl)}" loading="lazy" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>`
+      : `<iframe class="mobile-dcard-embed wide" sandbox="allow-scripts" srcdoc="${attr(item.artifactHtml || "")}" loading="lazy"></iframe>`;
+    return `<div class="mobile-dcard">
+      <div class="mobile-dcard-h"><span class="glyph">▣</span><span class="nname">${esc(item.title)}</span><span class="ntag">demo</span><button class="mobile-demo-toggle" type="button" data-demo-toggle aria-expanded="true">hide</button></div>
+      ${embed}
+      <div class="mobile-dcard-foot">
+        <div>${esc(item.desc)}</div>
+        ${item.techIds?.length ? `<div class="mobile-accent" style="margin-top:3px">${esc(chipsLine(item.techIds))}</div>` : ""}
+        ${item.route ? `<div style="margin-top:3px"><a href="${attr(item.route)}">open entry ↗</a></div>` : ""}
+        ${item.demoUrl ? `<div style="margin-top:3px"><a href="${attr(item.demoUrl)}" target="_blank" rel="noreferrer">open ↗ ${esc(shortUrl(item.demoUrl))}</a></div>` : ""}
+      </div>
+    </div>`;
+  }
+  function featureCardHtml(item, isSeries = false) {
+    const card = `<div class="mobile-fcard ${isSeries ? "series" : ""}">
+      <div class="mobile-fcard-h"><span class="sdot"></span><span class="nname">${esc(item.title)}</span><span class="ntag">${isSeries ? "series" : "update"}</span></div>
+      <div class="mobile-fcard-body">
+        <p class="ndesc">${esc(item.desc)}</p>
+        <div class="nmeta">
+          ${item.status && !isSeries ? `<span class="mobile-status">${esc(item.status)}</span>` : ""}
+          <span>${esc(item.meta || item.dateLabel || "")}</span>
+          ${item.techIds?.length ? `<span>·</span><span>${esc(chipsLine(item.techIds))}</span>` : ""}
+        </div>
+      </div>
+    </div>`;
+    return !isSeries && item.route ? `<a class="mobile-fcard-link" href="${attr(item.route)}">${card}</a>` : card;
+  }
+  function episodeRowHtml(item) {
+    const thumb = item.thumbnailUrl || (item.youtubeId ? `https://img.youtube.com/vi/${item.youtubeId}/hqdefault.jpg` : "");
+    return `<a class="mobile-ep-row" href="${attr(item.route || "#")}">
+      <div class="mobile-ep-thumb ${item.orient === "v" ? "v" : ""}"${thumb ? ` style="background-image:url('${attr(thumb)}')"` : ""}></div>
+      <div class="ecol"><span class="ename">${esc(item.title)}</span><span class="emeta">${esc(item.dateLabel || "")}</span></div>
+      <span class="play">▶</span>
+    </a>`;
+  }
+  function buildExpandChildren(projectId) {
+    const children = mobileData.childrenByProject[projectId] || { demos: [], updates: [], series: [] };
+    if (!children.demos.length && !children.updates.length && !children.series.length) {
+      return '<div class="mobile-empty-state">no features or demos yet.</div>';
+    }
+    let html = '<div class="mobile-wire"></div>';
+    children.demos.forEach((item) => { html += demoCardHtml(item); });
+    children.updates.forEach((item) => { html += featureCardHtml(item); });
+    children.series.forEach((series, index) => {
+      if (index > 0) html += '<hr class="mobile-series-sep">';
+      html += featureCardHtml(series, true);
+      if (series.episodes?.length) {
+        html += '<div class="mobile-ep-group">';
+        series.episodes.forEach((episode) => { html += episodeRowHtml(episode); });
+        html += '</div>';
+      }
+    });
+    return html;
+  }
+  function openTechPanel(techId, origin) {
+    const tech = mobileData.techById[techId];
+    if (!tech || !mobilePanel) return;
+    const matches = mobileData.items.filter((item) => item.techIds.includes(techId));
+    const projectIds = [...new Set(matches.map((item) => item.projectId).filter(Boolean))];
+    const meta = metaForTech(techId);
+    mobilePanelName.textContent = tech.name;
+    mobilePanelTag.textContent = catLabel(tech.category);
+    mobilePanelTag.className = `mobile-panel-tag ${catCls(tech.category)}`;
+    mobilePanelMeta.innerHTML = projectIds.length
+      ? `<b>${projectIds.length}</b> project${projectIds.length === 1 ? "" : "s"}<span class="sep">·</span><b>${meta.entries}</b> entr${meta.entries === 1 ? "y" : "ies"}${meta.lastDate ? `<span class="sep">·</span>last update <b>${esc(meta.lastDate)}</b>` : ""}`
+      : `no shipped features or demos using <b>${esc(tech.name)}</b> yet`;
+    mobilePanelBody.innerHTML = projectIds.length ? projectIds.map((projectId) => {
+      const project = mobileData.projects[projectId];
+      if (!project) return "";
+      const projectMatches = matches.filter((item) => item.projectId === projectId);
+      const featureCount = projectMatches.filter((item) => item.type !== "demo").length;
+      const demoCount = projectMatches.filter((item) => item.type === "demo").length;
+      const countBits = [];
+      if (featureCount) countBits.push(`<span class="mobile-accent">${featureCount}</span> feature${featureCount === 1 ? "" : "s"}`);
+      if (demoCount) countBits.push(`<span class="mobile-accent">${demoCount}</span> demo${demoCount === 1 ? "" : "s"}`);
+      return `<div class="mobile-project-group" data-project="${esc(projectId)}">
+        <div class="mobile-pcard">
+          <div class="mobile-pcard-h"><span class="glyph">${esc(project.mark || "$_")}</span><span class="nname">${esc(project.name)}</span><span class="caret">▾</span><span class="ntag">project</span></div>
+          <div class="mobile-pcard-body"><p class="ndesc">${esc(project.desc)}</p><div class="nmeta"><span>${esc(project.meta)}</span>${countBits.length ? `<span>·</span><span>${countBits.join(" · ")}</span>` : ""}</div></div>
+        </div>
+        <div class="mobile-expand-children">${buildExpandChildren(projectId)}</div>
+      </div>`;
+    }).join("") : `<div class="mobile-empty-state">when a feature ships with this stack tag, it appears here.</div>`;
+    if (origin && mobileShell) {
+      const rect = mobileShell.getBoundingClientRect();
+      mobilePanel.style.transformOrigin = `${origin.x - rect.left}px ${origin.y - rect.top}px`;
+    } else {
+      mobilePanel.style.transformOrigin = "50% 50%";
+    }
+    requestAnimationFrame(() => {
+      mobilePanel.classList.add("open");
+      mobilePanel.setAttribute("aria-hidden", "false");
+    });
+  }
+  function closeTechPanel() {
+    mobilePanel?.classList.remove("open");
+    mobilePanel?.setAttribute("aria-hidden", "true");
+  }
+
+  renderHome();
+  mobileHome?.addEventListener("click", (event) => {
+    const tile = event.target.closest(".mobile-tile");
+    if (!tile) return;
+    const rect = tile.getBoundingClientRect();
+    openTechPanel(tile.dataset.tech, { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+  });
+  mobileBack?.addEventListener("click", closeTechPanel);
+  mobilePanelBody?.addEventListener("click", (event) => {
+    const toggle = event.target.closest("[data-demo-toggle]");
+    if (toggle) {
+      const card = toggle.closest(".mobile-dcard");
+      if (!card) return;
+      const collapsed = card.classList.toggle("collapsed");
+      toggle.textContent = collapsed ? "show" : "hide";
+      toggle.setAttribute("aria-expanded", String(!collapsed));
+      return;
+    }
+    if (event.target.closest(".mobile-expand-children")) return;
+    const card = event.target.closest(".mobile-pcard");
+    if (!card) return;
+    card.closest(".mobile-project-group")?.classList.toggle("expanded");
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && mobilePanel?.classList.contains("open")) closeTechPanel();
+  });
+  mobileHome?.addEventListener("scroll", (event) => {
+    document.getElementById("topbar")?.classList.toggle("stuck", (event.currentTarget.scrollTop || 0) > 6);
+  }, { passive:true });
+</script>

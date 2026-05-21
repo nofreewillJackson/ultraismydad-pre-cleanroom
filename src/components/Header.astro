@@ -40,8 +40,10 @@ const adminClass = sticky === "none" || isAdmin ? "admin-static" : "";
             <a class={active === "settings" ? "on" : ""} href="/admin/settings">settings</a>
             <button type="button" class="seg-theme" onclick="toggleTheme()" title="toggle theme">◐</button>
           </div>
-          <div class="seg">
+          <div class="seg admin-action-seg">
             <a href="/">public</a>
+          </div>
+          <div class="seg admin-action-seg">
             <button type="button" id="adminSignOut" data-admin-authed-only hidden>sign out</button>
           </div>
         </>
@@ -49,7 +51,7 @@ const adminClass = sticky === "none" || isAdmin ? "admin-static" : "";
         <>
           <div class="seg">
             <a class={active === "list" ? "on" : ""} href="/list">list</a>
-            <a class={active === "map" ? "on" : ""} href="/map">map</a>
+            <a class:list={["mobile-hide-map", active === "map" ? "on" : ""]} href="/map">map</a>
             <a class={active === "stack" ? "on" : ""} href="/">stack</a>
             <button type="button" class="seg-theme" onclick="toggleTheme()" title="toggle theme">◐</button>
           </div>

@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>artlu.ai — stack (mobile)</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* ---------- tokens ---------- */
+  html[data-theme="dark"] {
+    --bg:#040506; --surface:#13161a; --surface-2:#1a1e23;
+    --border:#1a1d22; --border-strong:#2b3038; --border-hover:#4a525e;
+    --text:#c0c4cc; --text-bright:#f0f1f3; --text-sub:#9aa0aa;
+    --dim:#6b7280; --dimmer:#3a3f48;
+    --green:#4ade80; --green-bg:#062b12; --green-border:#1d4d31;
+    --blue:#60a5fa; --amber:#d8a657; --amber-bg:#1c1a12; --amber-border:#3a3320;
+    --wire:#2b3038;
+    --grid-line:#0b0d10; --grid-dot:#181b20;
+    --node-shadow:0 8px 26px rgba(0,0,0,0.6);
+    --font:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  html[data-theme="light"] {
+    --bg:#e9eaec; --surface:#ffffff; --surface-2:#f2f3f5;
+    --border:#dcdfe2; --border-strong:#b7bcc3; --border-hover:#9ba0a8;
+    --text:#34373c; --text-bright:#15171a; --text-sub:#50545a;
+    --dim:#676c74; --dimmer:#9298a0;
+    --green:#0a7d5e; --green-bg:#e6f4ee; --green-border:#a9ddc9;
+    --blue:#2563eb; --amber:#8a6300; --amber-bg:#f3e9d2; --amber-border:#e1d5aa;
+    --wire:#a8adb5;
+    --grid-line:#dee1e3; --grid-dot:#cdd1d4;
+    --node-shadow:0 1px 2px rgba(22,24,27,0.07), 0 4px 14px rgba(22,24,27,0.06);
+    --font:'Inter',system-ui,sans-serif;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { height:100%; }
+  body { background:var(--bg); color:var(--text); font-family:var(--font); font-size:14px;
+    -webkit-font-smoothing:antialiased; min-height:100%; overflow:hidden; }
+
+  /* ---------- header ---------- */
+  .topbar { height:54px; background:var(--bg); display:flex; align-items:center;
+    gap:14px; padding:0 14px;
+    border-bottom:1px solid transparent;
+    position:relative; z-index:50;
+    transition:border-color .16s, box-shadow .16s; }
+  .topbar.stuck { border-bottom-color:var(--border); box-shadow:var(--node-shadow); }
+  .brand { font-weight:600; font-size:22px; letter-spacing:-0.02em; color:var(--text-bright);
+    display:flex; align-items:center; gap:3px; text-decoration:none; }
+  .cursor-bl { width:7px; height:19px; background:var(--green); display:inline-block; animation:blink 1s step-end infinite; }
+  @keyframes blink { 50% { opacity:0; } }
+  .hright { margin-left:auto; display:flex; align-items:center; gap:6px; }
+  .seg { display:flex; border:1px solid var(--border); border-radius:4px; overflow:hidden; }
+  .seg button { font-family:var(--mono); font-size:11px; background:transparent; color:var(--dim);
+    border:none; padding:5px 9px; cursor:pointer; }
+  .seg button.on { background:var(--green-bg); color:var(--green); }
+  .seg .seg-theme { padding:5px 8px; font-size:12px; border-left:1px solid var(--border); }
+
+  /* ---------- shell — no L/R borders so pills go truly full width ---------- */
+  .shell { position:relative; max-width:480px; margin:0 auto;
+    height:calc(100vh - 54px); overflow:hidden;
+    background:var(--bg); }
+
+  /* ---------- home ---------- */
+  .home { height:100%; overflow-y:auto; overflow-x:hidden;
+    padding:10px 14px 60px;
+    /* ComfyUI-style subtle grid background — same pattern the desktop stack canvas uses.
+       gives texture to the bg so it reads as distinct from the tile surfaces. */
+    background:
+      linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 160px 160px,
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 160px 160px,
+      radial-gradient(var(--grid-dot) 1px, transparent 1px) 0 0 / 32px 32px,
+      var(--bg);
+    scrollbar-width:thin; -webkit-overflow-scrolling:touch; }
+  .home::-webkit-scrollbar { width:3px; }
+  .home::-webkit-scrollbar-thumb { background:var(--border-strong); border-radius:2px; }
+
+  /* axis row — above the first tile row, full width */
+  .axis-row { display:flex; align-items:center; gap:8px;
+    padding:2px 2px 9px;
+    font-family:var(--mono); font-size:9px; letter-spacing:1.2px; text-transform:uppercase;
+    color:var(--dimmer); }
+  .axis-row .line { flex:1; height:1px; background:var(--border); }
+  .axis-row b { color:var(--green); font-weight:500; }
+
+  /* single continuous tech grid — hero text takes 2 cols in row 1, tiles fill the rest.
+     align-items:end so when the hero text grows taller than a tile, the extra space
+     accumulates ABOVE the row-1 tiles (between them and the axis), not below
+     (between row 1 and row 2). */
+  .tech-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:9px;
+    align-items:end;
+    width:100%; max-width:100%; }
+
+  /* thin category label row — spans all 4 cols, no overlap with adjacent tiles */
+  .cat-label {
+    grid-column:span 4;
+    font-family:var(--mono); font-size:8.5px; letter-spacing:1.3px; text-transform:uppercase;
+    color:var(--dim);
+    padding:3px 2px 0;
+    line-height:1;
+  }
+  .cat-label.api   { color:var(--blue); }
+  .cat-label.data  { color:var(--amber); }
+  .cat-label.infra { color:var(--text-sub); }
+  .cat-label.media { color:var(--text-sub); }
+
+  /* hero — floating text in 2 cols of row 1 (no card, no border).
+     top-aligned within its cell so the title sits at the top when the row grows tall. */
+  .hero-text {
+    grid-column:span 2;
+    padding:6px 4px 4px;
+    display:flex; flex-direction:column; justify-content:flex-start;
+    align-self:start;
+    min-width:0;
+  }
+  .hero-title { font-size:19px; font-weight:700; color:var(--text-bright); letter-spacing:-0.02em;
+    line-height:1.1; }
+  .hero-desc { font-family:var(--mono); font-size:10.5px; color:var(--text-sub); line-height:1.55;
+    margin-top:6px;
+    display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
+  .hero-link { color:var(--green); text-decoration:none; border-bottom:1px solid var(--green-border); }
+  .hero-link:hover { color:var(--text-bright); border-bottom-color:var(--text-bright); }
+
+  /* tile — uniform 96px height, dot+name on top row, meta below */
+  .tile {
+    height:96px;
+    background:var(--surface);
+    border:1px solid var(--border-strong);
+    border-radius:16px;
+    box-shadow:var(--node-shadow);
+    display:flex; flex-direction:column;
+    padding:9px 10px 10px;
+    cursor:pointer; position:relative;
+    font-family:inherit; color:inherit; text-align:left;
+    transition:transform .14s, border-color .14s;
+    overflow:hidden;
+    min-width:0;   /* let grid shrink the tile to fit its column */
+  }
+  .tile:active { transform:scale(.97); }
+  @media (hover:hover) { .tile:hover { border-color:var(--border-hover); } }
+  .tile .ttop { display:flex; align-items:center; gap:6px; min-width:0; }
+  .tile .tdot { width:8px; height:8px; border-radius:2px; flex-shrink:0; background:var(--blue); }
+  .tile.fe .tdot    { background:var(--green); }
+  .tile.api .tdot   { background:var(--blue); }
+  .tile.data .tdot  { background:var(--amber); }
+  .tile.infra .tdot { background:var(--text-sub); }
+  .tile.media .tdot { background:var(--blue); }
+  .tile .tname {
+    color:var(--text-bright); font-weight:600; font-size:11.5px;
+    line-height:1.15; flex:1; min-width:0;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .tile .tmeta {
+    margin-top:auto;
+    font-family:var(--mono); font-size:9px; line-height:1.45;
+    color:var(--dim);
+    display:flex; flex-direction:column; gap:1px;
+    min-width:0;
+  }
+  .tile .tmeta .tm-count { color:var(--text-sub); }
+  .tile .tmeta .tm-proj {
+    color:var(--text-bright); font-weight:500;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .tile .tmeta .tm-date { color:var(--dim); }
+  .tile.empty { opacity:0.5; box-shadow:none; }
+  .tile.empty .tname { color:var(--text-sub); }
+  .tile.empty .tmeta .tm-count { color:var(--dim); }
+
+
+  /* ---------- tech panel ---------- */
+  .panel {
+    position:absolute; inset:0;
+    background:var(--bg);
+    z-index:30;
+    opacity:0; transform:scale(0.18);
+    transition:opacity .26s ease-out, transform .26s cubic-bezier(.2,.7,.2,1);
+    pointer-events:none;
+    transform-origin:50% 50%;
+    display:flex; flex-direction:column;
+  }
+  .panel.open { opacity:1; transform:scale(1); pointer-events:auto; }
+  /* panel head — back/name/tag on a single row, meta line below at the panel's left padding */
+  .panel-h {
+    background:var(--bg);
+    padding:8px 13px 7px;
+    border-bottom:1px solid var(--border);
+    flex-shrink:0;
+    display:flex; flex-direction:column; gap:3px;
+  }
+  .panel-h-row { display:flex; align-items:center; gap:10px; min-width:0; }
+  .panel-back {
+    flex-shrink:0;
+    background:transparent; border:none;
+    color:var(--green); font-family:var(--mono); font-size:11px;
+    padding:2px 4px 2px 0; cursor:pointer;
+    display:flex; align-items:center; gap:4px;
+  }
+  .panel-back:hover { color:var(--text-bright); }
+  .panel-name { flex:1; color:var(--text-bright); font-weight:600; font-size:15px;
+    letter-spacing:-0.01em; min-width:0; line-height:1.2;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .panel-tag { flex-shrink:0; font-size:10px;
+    color:var(--green); border:1px solid var(--green-border);
+    border-radius:3px; padding:1px 6px; font-family:var(--mono); }
+  .panel-tag.api   { color:var(--blue);     border-color:var(--blue); }
+  .panel-tag.data  { color:var(--amber);    border-color:var(--amber); }
+  .panel-tag.infra { color:var(--text-sub); border-color:var(--border-strong); }
+  .panel-tag.media { color:var(--text-sub); border-color:var(--border-strong); }
+  .panel-meta {
+    font-family:var(--mono); font-size:10.5px; color:var(--text-sub);
+    line-height:1.4;
+  }
+  .panel-meta b { color:var(--text-bright); font-weight:500; }
+  .panel-meta .sep { color:var(--dimmer); margin:0 5px; }
+
+  .panel-body { flex:1; overflow-y:auto; padding:12px 14px 32px;
+    scrollbar-width:thin; -webkit-overflow-scrolling:touch; }
+  .panel-body::-webkit-scrollbar { width:3px; }
+  .panel-body::-webkit-scrollbar-thumb { background:var(--border-strong); border-radius:2px; }
+
+  /* ---------- project group ---------- */
+  .project-group { margin-bottom:11px; }
+  /* pill — bordered card with a subtle header band (matches desktop project-node chrome). */
+  .pcard {
+    background:var(--surface);
+    border:1px solid var(--border-strong);
+    border-radius:8px;
+    box-shadow:var(--node-shadow);
+    overflow:hidden;
+    cursor:pointer;
+    transition:border-color .12s;
+  }
+  @media (hover:hover) { .pcard:hover { border-color:var(--border-hover); } }
+  .pcard-h {
+    display:flex; align-items:center; gap:8px;
+    padding:9px 12px;
+    background:var(--surface-2);
+    border-bottom:1px solid var(--border);
+  }
+  .pcard-h .glyph { color:var(--green); font-family:var(--mono); font-size:11px; }
+  .pcard-h .nname { flex:1; color:var(--text-bright); font-weight:600; font-size:13px; min-width:0;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pcard-h .caret { color:var(--text-sub); font-size:9px; transition:transform .14s; }
+  .project-group.expanded .pcard-h .caret { transform:rotate(180deg); color:var(--green); }
+  .pcard-h .ntag { font-size:10px; color:var(--green); border:1px solid var(--green-border);
+    border-radius:3px; padding:1px 6px; font-family:var(--mono); }
+  .pcard-body { padding:9px 12px 11px; }
+  .pcard-body .ndesc { color:var(--text-sub); font-size:12px; line-height:1.55;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .pcard-body .nmeta { margin-top:8px; font-family:var(--mono); font-size:10.5px; color:var(--dim);
+    display:flex; flex-wrap:wrap; gap:5px 9px; }
+  .pcard-body .nmeta .accent { color:var(--green); }
+
+  /* ---------- expanded children ---------- */
+  .expand-children { display:none; }
+  .project-group.expanded .expand-children { display:block; }
+  /* direct children of project stack full-width with NO inter-sibling wires */
+  .expand-children > * { margin-bottom:8px; }
+  .expand-children > *:last-child { margin-bottom:0; }
+
+  /* connector wire — vertical, 1.4px, --wire color, 0.7 opacity (matches desktop bezier stroke) */
+  .wire {
+    display:block; width:1.4px; height:14px;
+    background:var(--wire); opacity:0.7;
+    margin:0 auto;
+  }
+
+  /* episode group — episodes inside a series get a slight indent, no inter-episode wires.
+     the wire BEFORE the ep-group sits outside it, centered in the full container. */
+  .ep-group { padding-left:22px; }
+  .ep-group > * { margin-bottom:6px; }
+  .ep-group > *:last-child { margin-bottom:0; }
+
+  /* horizontal separator between two consecutive series under the same project.
+     only shows when the project is expanded (since .expand-children is collapsed otherwise).
+     symmetric top/bottom margin so the gaps above and below the line are equal. */
+  .series-sep {
+    margin:14px 6px;
+    height:1px;
+    background:var(--border);
+    border:0;
+  }
+
+  /* ---------- demo pill — subtle amber header band ---------- */
+  .dcard {
+    background:var(--surface);
+    border:1px solid var(--border-strong);
+    border-radius:8px;
+    box-shadow:var(--node-shadow);
+    overflow:hidden;
+  }
+  .dcard-h {
+    display:flex; align-items:center; gap:7px;
+    padding:9px 11px;
+    background:var(--amber-bg);
+    border-bottom:1px solid var(--border);
+  }
+  .dcard-h .glyph { color:var(--amber); font-family:var(--mono); font-size:10px; }
+  .dcard-h .nname { flex:1; color:var(--text-bright); font-weight:600; font-size:12.5px; min-width:0;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .dcard-h .ntag { font-size:9.5px; color:var(--amber);
+    border:1px solid var(--amber); border-radius:3px;
+    padding:1px 6px; font-family:var(--mono); }
+  .dcard-embed {
+    width:100%; aspect-ratio:9/16;
+    background:var(--surface-2); border:0; display:block;
+  }
+  .dcard-embed.wide { aspect-ratio:4/3; }
+  .dcard-foot { padding:8px 11px 10px; font-family:var(--mono); font-size:10.5px; color:var(--dim);
+    border-top:1px solid var(--border); line-height:1.5; }
+  .dcard-foot .accent { color:var(--amber); }
+  .dcard-foot a { color:var(--green); text-decoration:none; word-break:break-all; }
+
+  /* ---------- feature / series pill — subtle header band (amber on series, surface-2 on updates) ---------- */
+  .fcard {
+    background:var(--surface);
+    border:1px solid var(--border-strong);
+    border-radius:8px;
+    box-shadow:var(--node-shadow);
+    overflow:hidden;
+  }
+  .fcard-h {
+    display:flex; align-items:flex-start; gap:7px;
+    padding:9px 11px;
+    background:var(--surface-2);
+    border-bottom:1px solid var(--border);
+  }
+  .fcard.series .fcard-h { background:var(--amber-bg); }
+  .fcard-h .sdot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-top:5px; background:var(--green); }
+  .fcard.series .fcard-h .sdot { background:var(--amber); }
+  .fcard-h .nname { flex:1; color:var(--text-bright); font-weight:600; font-size:12.5px; line-height:1.35; min-width:0; }
+  .fcard-h .ntag { flex-shrink:0; margin-top:2px; font-size:9.5px; color:var(--dim);
+    border:1px solid var(--border); border-radius:3px; padding:1px 6px; font-family:var(--mono); }
+  .fcard.series .fcard-h .ntag { color:var(--amber); border-color:var(--amber-border); }
+  .fcard-body { padding:9px 11px 11px; }
+  .fcard-body .ndesc { color:var(--text-sub); font-size:11.5px; line-height:1.5;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .fcard-body .nmeta { margin-top:7px; font-family:var(--mono); font-size:10px; color:var(--dim);
+    display:flex; flex-wrap:wrap; align-items:center; gap:4px 7px; }
+  .fcard-body .nmeta .accent { color:var(--green); }
+  .fcard-body .status { padding:1px 6px; border-radius:3px; font-size:9.5px;
+    background:var(--green-bg); color:var(--green); border:1px solid var(--green-border); }
+
+  /* episode row — slim, full-width, nested visually under its series */
+  .ep-row {
+    display:flex; align-items:center; gap:9px;
+    padding:7px 11px 7px 8px;
+    background:var(--surface);
+    border:1px solid var(--border-strong);
+    border-radius:8px;
+    text-decoration:none; color:inherit;
+    cursor:pointer;
+    transition:border-color .12s;
+  }
+  .ep-row:hover { border-color:var(--border-hover); }
+  .ep-thumb {
+    width:44px; height:44px; flex-shrink:0;
+    border-radius:5px; background:#000;
+    background-size:cover; background-position:center;
+    border:1px solid var(--border);
+  }
+  .ep-thumb.v { width:30px; height:50px; }
+  .ep-row .ecol { flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+  .ep-row .ename { color:var(--text-bright); font-weight:500; font-size:11.5px; line-height:1.3;
+    overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+  .ep-row .emeta { font-family:var(--mono); font-size:9px; color:var(--dim); }
+  .ep-row .play { flex-shrink:0; font-size:11px; color:var(--green); font-family:var(--mono); }
+
+  .empty-state {
+    padding:24px 12px; text-align:center;
+    color:var(--dim); font-size:11.5px; line-height:1.6;
+    font-family:var(--mono);
+  }
+
+  .panel-sec-h {
+    margin:14px 0 9px; font-family:var(--mono);
+    font-size:9.5px; letter-spacing:1.4px; text-transform:uppercase;
+    color:var(--dim);
+    display:flex; align-items:center; gap:8px;
+  }
+  .panel-sec-h:first-child { margin-top:0; }
+  .panel-sec-h::after { content:''; flex:1; height:1px; background:var(--border); }
+</style>
+<script>try{var _t=localStorage.getItem('artlu-theme');if(_t)document.documentElement.dataset.theme=_t;}catch(e){}</script>
+</head>
+<body>
+
+<div class="topbar" id="topbar">
+  <a class="brand" href="astro-list-view.html">artlu.ai<span class="cursor-bl"></span></a>
+  <div class="hright">
+    <div class="seg">
+      <button onclick="location.href='astro-list-view.html'">list</button>
+      <button class="on">stack</button>
+      <button class="seg-theme" onclick="toggleTheme()" title="toggle theme">◐</button>
+    </div>
+  </div>
+</div>
+
+<div class="shell" id="shell">
+
+  <div class="home" id="home">
+    <div id="techHome"></div>
+  </div>
+
+  <div class="panel" id="techPanel" aria-hidden="true">
+    <div class="panel-h">
+      <div class="panel-h-row">
+        <button class="panel-back" id="techBack" type="button">← projects</button>
+        <span class="panel-name" id="techPanelName"></span>
+        <span class="panel-tag" id="techPanelTag"></span>
+      </div>
+      <div class="panel-meta" id="techPanelMeta"></div>
+    </div>
+    <div class="panel-body" id="techPanelBody"></div>
+  </div>
+
+</div>
+
+<script>
+  /* ===== data ===== */
+
+  const CATS = [
+    { id:'frontend', label:'front-end', cls:'fe' },
+    { id:'api',      label:'api',       cls:'api' },
+    { id:'data',     label:'data',      cls:'data' },
+    { id:'infra',    label:'infra',     cls:'infra' },
+    { id:'media',    label:'media',     cls:'media' },
+  ];
+
+  const techs = [
+    /* frontend */
+    { id:'react',      n:'React',       c:'frontend' },
+    { id:'astro',      n:'Astro',       c:'frontend' },
+    { id:'tailwind',   n:'Tailwind',    c:'frontend' },
+    { id:'shadcn',     n:'shadcn/ui',   c:'frontend' },
+    { id:'recharts',   n:'Recharts',    c:'frontend' },
+    { id:'vite',       n:'Vite',        c:'frontend' },
+    { id:'typescript', n:'TypeScript',  c:'frontend' },
+    { id:'vanillajs',  n:'vanilla JS',  c:'frontend' },
+    /* api */
+    { id:'trpc',     n:'tRPC',     c:'api' },
+    { id:'express',  n:'Express',  c:'api' },
+    { id:'node',     n:'Node.js',  c:'api' },
+    { id:'mcp',      n:'MCP',      c:'api' },
+    { id:'python',   n:'Python',   c:'api' },
+    /* data */
+    { id:'drizzle',  n:'Drizzle',       c:'data' },
+    { id:'mysql',    n:'MySQL',         c:'data' },
+    { id:'firestore',n:'Firestore',     c:'data' },
+    { id:'fbauth',   n:'Firebase Auth', c:'data' },
+    /* infra */
+    { id:'railway',  n:'Railway',          c:'infra' },
+    { id:'netlify',  n:'Netlify',          c:'infra' },
+    { id:'cfpages',  n:'Cloudflare Pages', c:'infra' },
+    /* media */
+    { id:'remotion', n:'Remotion',         c:'media' },
+    { id:'ffmpeg',   n:'ffmpeg',           c:'media' },
+    { id:'gtts',     n:'Google Cloud TTS', c:'media' },
+    { id:'seedance', n:'Seedance',         c:'media' },
+    { id:'cwebp',    n:'cwebp',            c:'media' },
+    { id:'youtube',  n:'YouTube',          c:'media' },
+    { id:'pytorch',  n:'PyTorch',          c:'media' },
+    { id:'whisperx', n:'WhisperX',         c:'media' },
+  ];
+  const techById = Object.fromEntries(techs.map(t=>[t.id,t]));
+  const catCls = id => CATS.find(c=>c.id===id).cls;
+  const catLabel = id => CATS.find(c=>c.id===id).label;
+
+  const projects = {
+    spoolcast:   { id:'spoolcast',   name:'spoolcast',   meta:'launched · apr 2026',
+      desc:'The AI-to-video pipeline behind every show and devlog. Turns a chat session into a finished, narrated video.' },
+    pipelinecpc: { id:'pipelinecpc', name:'PipelineCPC', meta:'launched · apr 2026',
+      desc:'Paid-search keyword research SaaS for Google Ads — now with an agent campaign-planning bridge that lets Codex, Claude, or Hermes export draft Google Ads structures from saved keyword research.' },
+    adsmetri:    { id:'adsmetri',    name:'AdsMetri',    meta:'launched · may 2026',
+      desc:'A Meta Ads performance intelligence dashboard built for operators managing multiple ad accounts. Lifecycle charts, ROAS / CPA / CPC / CVR trend analysis.' },
+    artlu:       { id:'artlu',       name:'artlu.ai',    meta:'live · mar 2026',
+      desc:'The build-in-public tracker behind these 100 days — every feature shipped, in list, map and stack views. Now being rebuilt as a static Astro site.' },
+    research:    { id:'research',    name:'research',    meta:'ongoing',
+      desc:'AI research experiments — methods, results, and the results that went the other way. Each one ships with a demo or visual report.' },
+    vibeskill:   { id:'vibeskill',   name:'VibeSkill',   meta:'prototype · apr 2026',
+      desc:'Skill-tree progress tracking — a neural map of everything a builder has shipped.' },
+    costintel:   { id:'costintel',   name:'CostIntel',   meta:'launched · mar 2026',
+      desc:'eCommerce fulfillment automation plus cost analytics, shipped as a Chrome extension.' },
+  };
+
+  const features = [
+    { id:'aninews', kind:'series', name:'Aninews',
+      desc:'Daily AI-news anime satire — the FAUX7 NEWS show. New episode every weekday.',
+      techs:['seedance','gtts','ffmpeg','youtube'], project:'spoolcast', date:'may 18', sd:'2026-05-18',
+      meta:'11 episodes · latest may 18' },
+    { id:'devlog', kind:'series', name:'spoolcast dev-log',
+      desc:'Behind-the-scenes YouTube series on building with AI.',
+      techs:['remotion','gtts','youtube'], project:'spoolcast', date:'may 13', sd:'2026-05-13',
+      meta:'6 episodes · latest may 13' },
+    { id:'p1', kind:'update', status:'launched', name:'agent campaign planning bridge',
+      desc:'MCP + agent API bridge that lets AI agents use PipelineCPC for Google Ads planning.',
+      techs:['node','mcp','firestore','fbauth','railway'], project:'pipelinecpc', date:'may 16', sd:'2026-05-16' },
+    { id:'p2', kind:'update', status:'launched', name:'keyword filtering + Stripe billing',
+      desc:'Negative keyword filtering plus full Stripe subscription billing for PipelineCPC.',
+      techs:['node','firestore','railway'], project:'pipelinecpc', date:'apr 6', sd:'2026-04-06' },
+    { id:'a1', kind:'update', status:'launched', name:'creative intelligence tagging workbench',
+      desc:'Tag Meta ad creatives by hand and compare performance across 7 tag dimensions.',
+      techs:['react','tailwind','shadcn','trpc','drizzle','mysql'], project:'adsmetri', date:'may 16', sd:'2026-05-16' },
+    { id:'a2', kind:'update', status:'launched', name:'meta ads performance dashboard',
+      desc:'Lifecycle charts across campaigns, ad sets, and ads — ROAS / CPA / CPC / CVR trend analysis.',
+      techs:['react','tailwind','recharts','trpc','express','drizzle','mysql'], project:'adsmetri', date:'may 12', sd:'2026-05-12' },
+    { id:'al1', kind:'update', status:'launched', name:'artlu.ai astro rebuild — admin dashboard',
+      desc:'New static admin dashboard for the artlu.ai rebuild — project tree, entry editor, canonical stack-tag registry.',
+      techs:['astro','typescript','tailwind','firestore','fbauth'], project:'artlu', date:'may 20', sd:'2026-05-20' },
+    { id:'al2', kind:'update', status:'launched', name:'artlu.ai astro rebuild — list / map / stack views',
+      desc:'The three public homepage modes ported into Astro with a shared design system.',
+      techs:['astro','typescript','tailwind','vite','cfpages'], project:'artlu', date:'may 19', sd:'2026-05-19' },
+    { id:'al3', kind:'update', status:'launched', name:'live-updating activity heatmap',
+      desc:'Real-time 14-week shipping heatmap on the homepage. Firestore onSnapshot re-paints on every write; rolls over at local midnight without page reload.',
+      techs:['react','firestore'], project:'artlu', date:'apr 22', sd:'2026-04-22' },
+    { id:'al4', kind:'update', status:'launched', name:'video showcase + per-video guidebook pages',
+      desc:'Shipped a homepage video showcase and a /video/[id] detail page per shipped video.',
+      techs:['react','vite','node','ffmpeg','cwebp'], project:'artlu', date:'apr 15', sd:'2026-04-15' },
+    { id:'al5', kind:'update', status:'launched', name:'shorts + tiktok embed — artlu.ai',
+      desc:'Vertical 9:16 shorts now sit alongside longform videos in the showcase, each with a 2-col guidebook.',
+      techs:['react','vite','node','ffmpeg','cwebp'], project:'artlu', date:'may 1', sd:'2026-05-01' },
+    { id:'cg', kind:'update', status:'launched', name:'Context Gate hallucination experiment',
+      desc:"Tests whether forcing the source-of-truth into context cuts hallucination — across 3 studies and 2 models.",
+      techs:['python','vanillajs'], project:'research', date:'may 18', sd:'2026-05-18' },
+    { id:'tribe', kind:'update', status:'launched', name:'TRIBE v2 brain-response video comparison',
+      desc:"Compared two ad videos with Meta's TRIBE v2 brain-response model — the model favored A, real ROAS favored B.",
+      techs:['python','pytorch','whisperx'], project:'research', date:'apr 10', sd:'2026-04-10' },
+  ];
+
+  const episodes = [
+    { series:'aninews', id:'an11', name:'Google Closes In On Nvidia — ep 11',     date:'may 18', yt:'zsYb_mliXnc', orient:'v' },
+    { series:'aninews', id:'an10', name:'Cisco Pops 15% On 4,000 Layoffs — ep 10', date:'may 16', yt:'1Ai641l38oc', orient:'v' },
+    { series:'aninews', id:'an9',  name:'Anthropic Vs OpenAI: 271 Bugs — ep 9',   date:'may 15', yt:'trx2a5jYTf8', orient:'v' },
+    { series:'aninews', id:'an7',  name:"Google's AI Health Coach — ep 7",        date:'may 8',  yt:'5tFAfZr5biI', orient:'v' },
+    { series:'aninews', id:'an6',  name:'Elon Leases A Data Center — ep 6',       date:'may 7',  yt:'jiwn-DjIVno', orient:'v' },
+    { series:'devlog',  id:'dl7',  name:'three-ai AdsMetri build story — #7',     date:'may 13', yt:'21zjy7BDEI0', orient:'h' },
+    { series:'devlog',  id:'dl6',  name:'why ai makes things up — #6',            date:'may 8',  yt:'c1tWTNh2D1Y', orient:'h' },
+    { series:'devlog',  id:'dl5',  name:'repo gps for ai agents — #5',            date:'may 7',  yt:'nOfkukxHjm4', orient:'h' },
+    { series:'devlog',  id:'dl4',  name:"the bug an AI couldn't catch — #4",      date:'may 2',  yt:'7Cp2e9Eo00M', orient:'h' },
+    { series:'devlog',  id:'dl3',  name:'how AI hides its own mistakes — #3',     date:'apr 27', yt:'yozYCL3qOBs', orient:'h' },
+  ];
+  const epRoute = ep => ep.orient === 'v' ? 'astro-video-view.html' : 'astro-video-long-view.html';
+
+  const DEMO_A = `<!doctype html><meta charset=utf-8><style>
+body{margin:0;font-family:'IBM Plex Mono',monospace;background:#16191d;color:#9aa0aa;padding:14px;font-size:12px}
+h4{margin:0 0 12px;color:#f0f1f3;font-size:13px}
+.f{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+input{width:74px;background:#0e0f11;border:1px solid #2b3038;color:#f0f1f3;font:inherit;padding:5px 7px;border-radius:5px}
+.out{margin-top:11px;padding:13px;border-radius:6px;text-align:center}
+.out b{font-size:23px;display:block;margin-top:4px}
+</style><h4>$/conv calculator</h4>
+<div class=f><span>CPC ($)</span><input id=cpc type=number value=2.40 step=.1></div>
+<div class=f><span>CVR (%)</span><input id=cvr type=number value=3 step=.5></div>
+<div class=out id=o></div>
+<script>var c=cpc,v=cvr,o=document.getElementById('o');
+function r(){var x=(+c.value)/((+v.value)/100||1);var col=x<20?'#4ade80':x<50?'#facc15':x<150?'#a78bfa':'#f87171';
+o.style.background=col+'22';o.style.color=col;o.innerHTML='$ per conversion<b>$'+x.toFixed(2)+'</b>';}
+c.oninput=v.oninput=r;r();<\/script>`;
+
+  const DEMO_B = `<!doctype html><meta charset=utf-8><style>
+body{margin:0;font-family:'IBM Plex Mono',monospace;background:#16191d;color:#9aa0aa;padding:14px;font-size:12px}
+h4{margin:0 0 10px;color:#f0f1f3;font-size:13px}
+.sw{width:42px;height:22px;border-radius:12px;background:#1a1d22;border:1px solid #2b3038;position:relative;cursor:pointer;display:inline-block;vertical-align:middle}
+.sw.on{background:#062b12;border-color:#1d4d31}
+.sw i{position:absolute;top:1px;left:1px;width:18px;height:18px;border-radius:50%;background:#6b7280;transition:.15s}
+.sw.on i{left:22px;background:#4ade80}
+.ans{margin-top:12px;padding:12px;border-radius:6px;line-height:1.5}
+</style><h4>rule-gate demo</h4>
+<div><span class=sw id=s onclick="t()"><i></i></span> <span id=l>gate: off</span></div>
+<div class=ans id=a></div>
+<script>var on=false;function t(){on=!on;r();}
+function r(){var s=document.getElementById('s'),l=document.getElementById('l'),a=document.getElementById('a');
+s.className='sw'+(on?' on':'');l.textContent='gate: '+(on?'on':'off');
+a.style.background=on?'#062b12':'#1a1011';a.style.color=on?'#4ade80':'#f87171';
+a.textContent=on?'\\u2713 answer cites its source':'\\u2717 answer invents a result';}
+r();<\/script>`;
+
+  const demos = [
+    { id:'pd1', project:'pipelinecpc', name:'$/conv calculator',
+      desc:'Live cost-per-conversion calc with color-coded bands.',
+      techs:['vanillajs'], srcdoc:DEMO_A, wide:true },
+    { id:'pd2', project:'pipelinecpc', name:'rule-gate demo',
+      desc:'Toggle the source-of-truth gate and watch the answer flip.',
+      techs:['vanillajs'], srcdoc:DEMO_B, wide:true },
+    { id:'ad1', project:'adsmetri', name:'creative tag inspector',
+      desc:'Toggle a tagging rule and see the creative-performance read change.',
+      techs:['vanillajs'], srcdoc:DEMO_B, wide:true },
+    { id:'ad2', project:'adsmetri', name:'ROAS quick-calc',
+      desc:'A small cost-per-conversion estimator for Meta ads.',
+      techs:['vanillajs'], srcdoc:DEMO_A, wide:true },
+    { id:'al-bundle', project:'artlu', name:'artlu.ai rebuild — live mockup',
+      desc:'The full Astro rebuild stitched into one self-contained file, hosted on Cloudflare Pages.',
+      techs:['astro','typescript','tailwind','cfpages'],
+      url:'https://artluaiv2-mockup.pages.dev/' },
+    { id:'vs-mockup', project:'vibeskill', name:'VibeSkill skill-tree mockup',
+      desc:'Public interaction mockup — draggable category boxes, hover-expand, child branches.',
+      techs:['vanillajs','cfpages'],
+      url:'https://vsmockup-d.pages.dev/' },
+    { id:'ci-demo', project:'costintel', name:'CostIntel fulfillment automator',
+      desc:'Chrome-extension demo for automated fulfillment + insert-card logic across order exports.',
+      techs:['vanillajs','cfpages'],
+      url:'https://costintel-automator-demo.pages.dev/' },
+    { id:'cg-demo', project:'research', name:'Context Gate experiment',
+      desc:'Interactive demo of the source-of-truth gate that cuts AI hallucination from ~90% to near-zero.',
+      techs:['python','vanillajs'],
+      url:'https://artluai.github.io/context-gate-ai-hallucination/' },
+  ];
+
+  /* ===== home ===== */
+  const techHome = document.getElementById('techHome');
+
+  function metaForTech(tid) {
+    const matches = features.filter(f => f.techs.includes(tid));
+    const dms = demos.filter(d => d.techs && d.techs.includes(tid));
+    const projSet = new Set([
+      ...matches.map(f => f.project),
+      ...dms.map(d => d.project),
+    ]);
+    matches.sort((a,b) => b.sd.localeCompare(a.sd));
+    return {
+      projects: projSet.size,
+      entries: matches.length + dms.length,
+      lastProj: matches[0] ? projects[matches[0].project].name : null,
+      lastDate: matches[0] ? matches[0].date : null,
+    };
+  }
+
+  function renderHome() {
+    const axis = `<div class="axis-row"><b>▲ FRONT-END</b><span class="line"></span><span>BACK-END ▼</span></div>`;
+    let grid = '<div class="tech-grid">';
+    /* hero text as first grid item, spanning 2 cols of row 1 */
+    grid += `<div class="hero-text">
+      <h1 class="hero-title">projects</h1>
+      <p class="hero-desc">Tap on a tech tile to view individual projects.<br>Also check out <a href="astro-list-view.html" class="hero-link">List View</a>.</p>
+    </div>`;
+    /* tiles flow continuously after the hero — no row breaks between categories.
+       the first tile of each new category gets a floating "cat-pop" supertext
+       positioned above it via absolute (sits in the grid gap, doesn't add a row). */
+    let prevCat = null;
+    techs.forEach(t => {
+      const m = metaForTech(t.id);
+      const empty = m.entries === 0;
+      const cls = `${catCls(t.c)} ${empty ? 'empty' : ''}`;
+      const isFirstOfCat = t.c !== prevCat;
+      /* thin cat-label row before the first tile of each NEW category (skip the very first;
+         FRONT-END is already labeled in the axis row above) */
+      if (isFirstOfCat && t.c !== techs[0].c) {
+        grid += `<div class="cat-label ${catCls(t.c)}">${catLabel(t.c)}</div>`;
+      }
+      prevCat = t.c;
+      grid += `<button class="tile ${cls}" type="button" data-tech="${t.id}">
+        <div class="ttop">
+          <span class="tdot"></span>
+          <span class="tname">${t.n}</span>
+        </div>
+        <div class="tmeta">
+          ${empty
+            ? `<div class="tm-count">no updates yet</div>`
+            : `<div class="tm-count">${m.projects} project${m.projects===1?'':'s'}</div>
+               <div class="tm-proj">${m.lastProj || '—'}</div>
+               <div class="tm-date">${m.lastDate || ''}</div>`}
+        </div>
+      </button>`;
+    });
+    grid += '</div>';
+    techHome.innerHTML = axis + grid;
+  }
+  renderHome();
+
+  /* ===== tech panel ===== */
+  const techPanel = document.getElementById('techPanel');
+  const techPanelName = document.getElementById('techPanelName');
+  const techPanelTag = document.getElementById('techPanelTag');
+  const techPanelMeta = document.getElementById('techPanelMeta');
+  const techPanelBody = document.getElementById('techPanelBody');
+
+  function chipsLine(techIds) {
+    if (!techIds || !techIds.length) return '';
+    return techIds.map(id => techById[id] ? techById[id].n : id).join(' · ');
+  }
+  function shortUrl(url) {
+    return url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+  }
+
+  function demoCardHtml(d) {
+    const embed = d.url
+      ? `<iframe class="dcard-embed" src="${d.url}" loading="lazy" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>`
+      : `<iframe class="dcard-embed wide" sandbox="allow-scripts" srcdoc='${(d.srcdoc||'').replace(/'/g, "&#39;")}' loading="lazy"></iframe>`;
+    return `<div class="dcard">
+      <div class="dcard-h">
+        <span class="glyph">▣</span>
+        <span class="nname">${d.name}</span>
+        <span class="ntag">demo</span>
+      </div>
+      ${embed}
+      <div class="dcard-foot">
+        <div>${d.desc}</div>
+        ${d.techs && d.techs.length ? `<div class="accent" style="margin-top:3px">${chipsLine(d.techs)}</div>` : ''}
+        ${d.url ? `<div style="margin-top:3px"><a href="${d.url}" target="_blank">open ↗ ${shortUrl(d.url)}</a></div>` : ''}
+      </div>
+    </div>`;
+  }
+
+  function featureCardHtml(f) {
+    const isSeries = f.kind === 'series';
+    const cls = isSeries ? 'series' : '';
+    return `<div class="fcard ${cls}">
+      <div class="fcard-h">
+        <span class="sdot"></span>
+        <span class="nname">${f.name}</span>
+        <span class="ntag">${isSeries ? 'series' : 'update'}</span>
+      </div>
+      <div class="fcard-body">
+        <p class="ndesc">${f.desc}</p>
+        <div class="nmeta">
+          ${f.status ? `<span class="status">${f.status}</span>` : ''}
+          <span>${f.meta || f.date}</span>
+          <span>·</span>
+          <span>${chipsLine(f.techs)}</span>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function episodeRowHtml(e) {
+    const thumb = `https://img.youtube.com/vi/${e.yt}/hqdefault.jpg`;
+    const thumbCls = e.orient === 'v' ? 'v' : '';
+    return `<a class="ep-row" href="${epRoute(e)}" target="_blank">
+      <div class="ep-thumb ${thumbCls}" style="background-image:url('${thumb}')"></div>
+      <div class="ecol">
+        <span class="ename">${e.name}</span>
+        <span class="emeta">${e.date}</span>
+      </div>
+      <span class="play">▶</span>
+    </a>`;
+  }
+
+  /* build the expand-children HTML for a project.
+     wires only connect parent → children GROUP (not between siblings):
+       - one wire from project to the start of its direct-children stack
+       - each series gets one wire to its episode group; episodes nest indented under
+       - no wires between siblings
+     order: demos → non-series updates → series (each with its episodes nested) */
+  function buildExpandChildren(pid) {
+    const feats = features.filter(f => f.project === pid);
+    const dms = demos.filter(d => d.project === pid);
+    const updates = feats.filter(f => f.kind === 'update');
+    const series = feats.filter(f => f.kind === 'series');
+
+    if (!dms.length && !feats.length) {
+      return '<div class="empty-state">no features or demos yet.</div>';
+    }
+
+    let html = '<div class="wire"></div>';  /* single wire from project to children */
+    dms.forEach(d => { html += demoCardHtml(d); });
+    updates.forEach(u => { html += featureCardHtml(u); });
+    series.forEach((s, i) => {
+      /* separator between two consecutive series under the same project */
+      if (i > 0) html += '<hr class="series-sep">';
+      html += featureCardHtml(s);
+      const eps = episodes.filter(e => e.series === s.id);
+      if (eps.length) {
+        /* no wire here — the indent on .ep-group is enough to show series→episodes hierarchy */
+        html += '<div class="ep-group">';
+        eps.forEach(e => { html += episodeRowHtml(e); });
+        html += '</div>';
+      }
+    });
+
+    return html;
+  }
+
+  function openTechPanel(techId, origin) {
+    const t = techById[techId];
+    techPanelName.textContent = t.n;
+    techPanelTag.textContent = catLabel(t.c);
+    techPanelTag.className = 'panel-tag ' + catCls(t.c);
+
+    const m = metaForTech(techId);
+    const pids = [...new Set([
+      ...features.filter(f => f.techs.includes(techId)).map(f => f.project),
+      ...demos.filter(d => d.techs && d.techs.includes(techId)).map(d => d.project),
+    ])];
+
+    techPanelMeta.innerHTML = pids.length
+      ? `<b>${pids.length}</b> project${pids.length===1?'':'s'}<span class="sep">·</span><b>${m.entries}</b> entr${m.entries===1?'y':'ies'}${m.lastDate ? `<span class="sep">·</span>last update <b>${m.lastDate}</b>` : ''}`
+      : `no shipped features or demos using <b>${t.n}</b> yet`;
+
+    if (!pids.length) {
+      techPanelBody.innerHTML = `<div class="empty-state">when a feature ships with this stack tag, it appears here.</div>`;
+    } else {
+      techPanelBody.innerHTML = pids.map(pid => {
+        const p = projects[pid];
+        const fCount = features.filter(f => f.project === pid && f.techs.includes(techId)).length;
+        const dCount = demos.filter(d => d.project === pid && (d.techs||[]).includes(techId)).length;
+        const cParts = [];
+        if (fCount) cParts.push(`<span class="accent">${fCount}</span> feature${fCount===1?'':'s'}`);
+        if (dCount) cParts.push(`<span class="accent">${dCount}</span> demo${dCount===1?'':'s'}`);
+        return `<div class="project-group" data-project="${pid}">
+          <div class="pcard">
+            <div class="pcard-h">
+              <span class="glyph">$_</span>
+              <span class="nname">${p.name}</span>
+              <span class="caret">▾</span>
+              <span class="ntag">project</span>
+            </div>
+            <div class="pcard-body">
+              <p class="ndesc">${p.desc}</p>
+              <div class="nmeta">
+                <span>${p.meta}</span>
+                ${cParts.length ? `<span>·</span><span>${cParts.join(' · ')}</span>` : ''}
+              </div>
+            </div>
+          </div>
+          <div class="expand-children">${buildExpandChildren(pid)}</div>
+        </div>`;
+      }).join('');
+    }
+
+    if (origin) {
+      const r = techPanel.parentElement.getBoundingClientRect();
+      techPanel.style.transformOrigin = `${origin.x - r.left}px ${origin.y - r.top}px`;
+    } else techPanel.style.transformOrigin = '50% 50%';
+    requestAnimationFrame(() => {
+      techPanel.classList.add('open');
+      techPanel.setAttribute('aria-hidden','false');
+    });
+  }
+  function closeTechPanel() {
+    techPanel.classList.remove('open');
+    techPanel.setAttribute('aria-hidden','true');
+  }
+
+  /* ===== events ===== */
+  document.getElementById('home').addEventListener('click', e => {
+    const tile = e.target.closest('.tile');
+    if (!tile) return;
+    const r = tile.getBoundingClientRect();
+    openTechPanel(tile.dataset.tech, { x: r.left + r.width/2, y: r.top + r.height/2 });
+  });
+  document.getElementById('techBack').addEventListener('click', closeTechPanel);
+  techPanelBody.addEventListener('click', e => {
+    /* ignore clicks inside the expanded section — those have their own targets (episode links etc.) */
+    if (e.target.closest('.expand-children')) return;
+    /* tap anywhere on the project card to expand / collapse */
+    const pcard = e.target.closest('.pcard');
+    if (!pcard) return;
+    const group = pcard.closest('.project-group');
+    group.classList.toggle('expanded');
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && techPanel.classList.contains('open')) closeTechPanel();
+  });
+
+  /* stuck topbar on scroll */
+  document.getElementById('home').addEventListener('scroll', e => {
+    document.getElementById('topbar').classList.toggle('stuck', (e.currentTarget.scrollTop||0) > 6);
+  });
+
+  /* theme */
+  function toggleTheme() {
+    const h = document.documentElement;
+    const t = h.dataset.theme === 'light' ? 'dark' : 'light';
+    h.dataset.theme = t;
+    try { localStorage.setItem('artlu-theme', t); } catch(e) {}
+  }
+  window.toggleTheme = toggleTheme;
+</script>
+</body>
+</html>

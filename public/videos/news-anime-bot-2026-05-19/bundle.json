@@ -1,0 +1,222 @@
+{
+  "id": "news-anime-bot-2026-05-19",
+  "format": "short",
+  "show": "news-anime-bot",
+  "title": "OpenAI launches a self-serve ChatGPT Ads Manager",
+  "desc": "Daily AI news satire. OpenAI opens a self-serve Ads Manager inside ChatGPT, after years of arguing that paying for ChatGPT meant the answers weren't shaped by advertisers.",
+  "shippedAt": "2026-05-19",
+  "durationSec": 65,
+  "topicTier": "GREEN",
+  "video": {
+    "youtubeId": "4pmazLei5pM",
+    "tiktokId": "7641677511809715486",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7641677511809715486",
+    "mp4Url": null,
+    "thumbnailUrl": "https://i.ytimg.com/vi/4pmazLei5pM/oardefault.jpg"
+  },
+  "preRoll": {
+    "burnedText": "⚠ SATIRE — AI-GENERATED PARODY — NOT REAL",
+    "voiceTag": "FAUX7 News. Satire."
+  },
+  "characters": [
+    {
+      "name": "altman",
+      "kind": "character",
+      "imageUrl": "/videos/news-anime-bot-2026-05-19/assets/characters/altman.webp",
+      "description": "",
+      "usedInBeats": [
+        1,
+        3,
+        5,
+        12
+      ]
+    }
+  ],
+  "beats": [
+    {
+      "n": 1,
+      "name": "keeper-at-the-gate",
+      "durationSec": 6,
+      "narration": "For years, the promise of ChatGPT was a simple one - you came to it for a straight answer.",
+      "character": "altman",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-19/assets/beats/01-keeper-at-the-gate.webp"
+    },
+    {
+      "n": 2,
+      "name": "the-pure-oracle",
+      "durationSec": 5,
+      "narration": "The company argued that was the whole point. You paid for it, so the answers weren't shaped by advertisers.",
+      "character": "-",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-19/assets/beats/02-the-pure-oracle.webp"
+    },
+    {
+      "n": 3,
+      "name": "the-no-gold-tablet",
+      "durationSec": 5,
+      "narration": "Advertising, by that logic, was a last resort.",
+      "character": "altman",
+      "sourceChyron": "LAST RESORT",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-19/assets/beats/03-the-no-gold-tablet.webp"
+    },
+    {
+      "n": 4,
+      "name": "a-single-merchant-lantern",
+      "durationSec": 5,
+      "narration": "This year, the last resort arrived.",
+      "character": "-",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-19/assets/beats/04-a-single-merchant-lantern.webp"
+    },
+    {
+      "n": 5,
+      "name": "the-keeper-opens-the-gate",
+      "durationSec": 6,
+      "narration": "In January, OpenAI began testing ads inside ChatGPT's free tier.",
+      "character": "altman",
+      "sourceChyron": "ADS TESTING - JAN 2026",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-19/assets/beats/05-the-keeper-opens-the-gate.webp"
+    },
+    {
+      "n": 6,
+      "name": "stalls-bloom-in-the-courtyard",
+      "durationSec": 6,
+      "narration": "This month, it went further and launched a self-serve ad platform.",
+      "character": "-",
+      "sourceChyron": "SELF-SERVE AD PLATFORM",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-19/assets/beats/06-stalls-bloom-in-the-courtyard.webp"
+    },
+    {
+      "n": 7,
+      "name": "the-bazaar-floods-the-hall",
+      "durationSec": 6,
+      "narration": "Any business can now buy ads inside ChatGPT directly, without going through an agency.",
+      "character": "-",
+      "sourceChyron": "OPEN TO ALL BUSINESSES",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-19/assets/beats/07-the-bazaar-floods-the-hall.webp"
+    },
+    {
+      "n": 8,
+      "name": "coins-rain-on-the-altar",
+      "durationSec": 5,
+      "narration": "OpenAI is reportedly targeting two and a half billion dollars in advertising revenue this year.",
+      "character": "-",
+      "sourceChyron": "TARGET ~$2.5B IN 2026",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-19/assets/beats/08-coins-rain-on-the-altar.webp"
+    },
+    {
+      "n": 9,
+      "name": "the-oracle-turns-gold",
+      "durationSec": 7,
+      "narration": "And one hundred billion dollars a year by the end of the decade.",
+      "character": "-",
+      "sourceChyron": "GOAL ~$100B BY 2030",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-19/assets/beats/09-the-oracle-turns-gold.webp"
+    },
+    {
+      "n": 10,
+      "name": "the-vow-recarved",
+      "durationSec": 5,
+      "narration": "The product millions trusted for answers untouched by advertising now sits inside an advertising marketplace.",
+      "character": "-",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-19/assets/beats/10-the-vow-recarved.webp"
+    },
+    {
+      "n": 11,
+      "name": "the-open-gate",
+      "durationSec": 5,
+      "narration": "It is courting everyone from global ad agencies to small businesses that never advertised before.",
+      "character": "-",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-19/assets/beats/11-the-open-gate.webp"
+    },
+    {
+      "n": 12,
+      "name": "keeper-behind-the-counter",
+      "durationSec": 7,
+      "narration": "For years, the case for ChatGPT was that no one was buying influence over its answers. Now there is a sales team.",
+      "character": "altman",
+      "sourceChyron": "THE LAST RESORT, NOW THE STORE",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-19/assets/beats/12-keeper-behind-the-counter.webp"
+    }
+  ],
+  "sources": [
+    {
+      "fact": "",
+      "attribution": "OpenAI launches self-serve ad platform (Axios)",
+      "url": "https://www.axios.com/2026/05/05/openai-self-serve-ad-platform"
+    },
+    {
+      "fact": "",
+      "attribution": "New ways to buy ChatGPT ads (OpenAI)",
+      "url": "https://openai.com/index/new-ways-to-buy-chatgpt-ads/"
+    },
+    {
+      "fact": "",
+      "attribution": "OpenAI Opens ChatGPT Ads to Self-Service Platform (Adweek)",
+      "url": "https://www.adweek.com/media/openai-opens-chatgpt-ads-to-self-service-platform/"
+    },
+    {
+      "fact": "",
+      "attribution": "OpenAI Launches Self-Serve Ads Manager for ChatGPT (Search Engine Journal)",
+      "url": "https://www.searchenginejournal.com/openai-launches-self-serve-ads-manager-for-chatgpt/573971/"
+    },
+    {
+      "fact": "",
+      "attribution": "OpenAI opens ChatGPT Ads Manager to all US businesses with CPC bidding (PPC Land)",
+      "url": "https://ppc.land/openai-opens-chatgpt-ads-manager-to-all-us-businesses-with-cpc-bidding/"
+    },
+    {
+      "fact": "Sam Altman's ChatGPT pivot",
+      "attribution": "From 'I hate ads' to 'maybe they don't suck' (Search Engine Land)",
+      "url": "https://searchengineland.com/sam-altman-chatgpt-ads-pivot-463150"
+    },
+    {
+      "fact": "",
+      "attribution": "OpenAI's CEO said ads were a \"last resort\" business model (Tubefilter)",
+      "url": "https://www.tubefilter.com/2026/01/26/openais-ceo-said-ads-were-a-last-resort-business-model-now-chatgpt-is-getting-ads-and-asking-brands-to-pay-a-lot-for-them/"
+    }
+  ],
+  "transcript": "For years, the promise of ChatGPT was a simple one - you came to it for a straight answer. The company argued that was the whole point. You paid for it, so the answers weren't shaped by advertisers. Advertising, by that logic, was a last resort. This year, the last resort arrived. In January, OpenAI began testing ads inside ChatGPT's free tier. This month, it went further and launched a self-serve ad platform. Any business can now buy ads inside ChatGPT directly, without going through an agency. OpenAI is reportedly targeting two and a half billion dollars in advertising revenue this year. And one hundred billion dollars a year by the end of the decade. The product millions trusted for answers untouched by advertising now sits inside an advertising marketplace. It is courting everyone from global ad agencies to small businesses that never advertised before. For years, the case for ChatGPT was that no one was buying influence over its answers. Now there is a sales team.",
+  "summary": {
+    "writing": {
+      "author": "Claude",
+      "role": "script · beat plan · narration · sources audit"
+    },
+    "videoClips": {
+      "platform": "kie.ai",
+      "models": [
+        "Seedance 2.0 Fast"
+      ],
+      "clipCount": 12
+    },
+    "audio": {
+      "tts": "Google Cloud TTS",
+      "voice": "Schedar",
+      "beatCount": 12
+    },
+    "render": {
+      "engine": "ffmpeg",
+      "passed": true
+    },
+    "cost": "~$5.30"
+  },
+  "showcase": {
+    "hiddenBeatNs": [],
+    "notes": "Aninews ep 12. Tracker entry exists (niJM37WPfYSMIXNYjS20), guidebookStatus: pending — backfilling shipment row so ship-video.mjs can flip it to ready."
+  }
+}

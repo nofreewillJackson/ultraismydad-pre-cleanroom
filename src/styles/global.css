@@ -208,9 +208,29 @@ button { -webkit-tap-highlight-color:transparent; }
 .r-card.active { border-color:var(--green-border); box-shadow:0 0 0 2px var(--green-border), var(--node-shadow); }
 .r-card.min { display:none; }
 .r-strip.solo { justify-content:center; }
+.research-list-wrap .strip-fade { display:none; }
+.research-list {
+  display:grid;
+  grid-template-columns:minmax(0, 860px);
+  justify-content:center;
+  overflow:visible;
+  gap:14px;
+}
+.research-list .r-card {
+  flex:initial;
+  width:100%;
+  display:grid;
+  grid-template-columns:minmax(220px, 32%) 1fr;
+}
 .pvis,
 .plogo,
 .rc-visual { height:150px; position:relative; background:#000; border-bottom:1px solid var(--border); overflow:hidden; }
+.research-list .rc-visual {
+  height:100%;
+  min-height:172px;
+  border-bottom:0;
+  border-right:1px solid var(--border);
+}
 .pvis,
 .plogo,
 .pmod-body { z-index:2; pointer-events:none; }
@@ -1153,22 +1173,31 @@ a.pill:hover { border-color:var(--green); }
 
 @media (max-width:720px) {
   body { font-size:13px; }
-  .topbar { height:auto; min-height:54px; gap:10px 14px; padding:9px 13px; flex-wrap:wrap; }
-  .brandwrap { gap:12px; }
-  .brand { font-size:22px; }
+  .topbar { height:54px; min-height:54px; gap:8px; padding:9px 12px; flex-wrap:nowrap; }
+  .brandwrap { gap:0; flex:0 0 auto; min-width:0; }
+  .brand { font-size:22px; white-space:nowrap; }
   .cursor-bl { width:7px; height:19px; }
   .identity,
   .progress { display:none; }
-  .hright { margin-left:auto; gap:10px; }
-  .navgroup { margin-left:0; gap:6px; flex-wrap:wrap; }
+  .hright { margin-left:auto; gap:0; min-width:0; flex:0 1 auto; }
+  .navgroup { margin-left:0; gap:5px; flex-wrap:nowrap; min-width:0; }
   .seg a,
-  .seg button { padding:6px 11px; font-size:11px; }
-  .seg .seg-theme { padding:6px 9px; }
+  .seg button { padding:6px 9px; font-size:11px; white-space:nowrap; }
+  .seg .seg-theme { padding:6px 7px; }
+  .seg a.mobile-hide-map { display:none; }
   .page { padding:12px 13px 88px; }
   .sec-h.mt { margin-top:16px; }
   .strip-btn { display:none !important; }
   .pmod,
   .r-card { flex-basis:286px; }
+  .research-list { grid-template-columns:1fr; }
+  .research-list .r-card { display:block; }
+  .research-list .rc-visual {
+    height:132px;
+    min-height:132px;
+    border-right:0;
+    border-bottom:1px solid var(--border);
+  }
   .pvis,
   .plogo,
   .rc-visual { height:132px; }

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Header from "../components/Header.astro";
+import MobileStackView from "../components/MobileStackView.astro";
 import {
   getMainProjects,
   getPublicProjects,
@@ -104,6 +105,7 @@ const rawRolodexes = mains.map((main) => {
     const techIds = canonicalTechIds(entry);
     const stack = techIds.map((id) => techById.get(id)?.name).filter(Boolean);
     const artifactHtml = entry.project?.artifactHtml?.trim() || "";
+    const thumbnailUrl = entry.thumbnailUrl || entry.project?.screenshots?.[0] || "";
     const card = {
       id: entry.id,
       kind: entry.kind,
@@ -115,8 +117,8 @@ const rawRolodexes = mains.map((main) => {
       route: entry.route,
       status: entry.status || "launched",
       embedType: entry.embedType || (entry.kind === "video" ? "h" : "d"),
-      thumbnailUrl: entry.thumbnailUrl || entry.project?.screenshots?.[0] || "",
-      thumbnailMode: entry.thumbnailMode || "",
+      thumbnailUrl,
+      thumbnailMode: entry.thumbnailMode || (thumbnailUrl ? "static" : ""),
       artifactHtml,
       stack,
       techIds,
@@ -316,10 +318,157 @@ const stackData = {
   })),
   rolodexes: showcaseRolodexes,
 };
+
+const mobileCategoryOrder = ["frontend", "api", "data", "infra", "media"];
+function mobileCategory(category?: string) {
+  if (category === "backend" || category === "agents") return "api";
+  if (category === "other") return "infra";
+  return category || "infra";
+}
+
+const mobileTechs = technologies
+  .map((tech, index) => ({
+    id: tech.id,
+    name: tech.name,
+    category: mobileCategory(tech.category),
+    count: tech.count,
+    sortOrder: index,
+  }))
+  .sort((a, b) => {
+    const catA = mobileCategoryOrder.indexOf(a.category);
+    const catB = mobileCategoryOrder.indexOf(b.category);
+    return (catA === -1 ? 99 : catA) - (catB === -1 ? 99 : catB)
+      || a.sortOrder - b.sortOrder
+      || a.name.localeCompare(b.name);
+  });
+
+const mobileTechById = Object.fromEntries(mobileTechs.map((tech) => [tech.id, tech]));
+const mobileBaseProjects = Object.fromEntries(mains.map((main) => [main.id, {
+  id: main.id,
+  name: main.name,
+  desc: main.desc,
+  meta: main.meta,
+  mark: main.markText || "$_",
+}]));
+
+function mobileProjectId(entry: any) {
+  const projectId = entryProjectId(entry);
+  return projectId === "other" || projectId === "research" ? `entry:${entry.id}` : projectId;
+}
+
+function mobileCommon(entry: any) {
+  return {
+    id: entry.id,
+    title: entry.title,
+    desc: entry.desc || "",
+    date: entry.date || "",
+    dateLabel: fmtDate(entry.date) || entry.date || "",
+    dateValue: dateValue(entry.date),
+    status: entry.status || "launched",
+    route: entry.route || "",
+    projectId: mobileProjectId(entry),
+    techIds: canonicalTechIds(entry).filter((id) => mobileTechById[id]),
+  };
+}
+
+const mobileEntries = entries.map((entry) => {
+  const common = mobileCommon(entry);
+  const artifactHtml = entry.project?.artifactHtml?.trim() || "";
+  const link = entry.project?.link || entry.embedUrl || "";
+  const demoUrl = !artifactHtml && link && isEmbeddable(link) ? link : "";
+  const isDemo = entry.kind !== "video" && Boolean(artifactHtml || demoUrl);
+  const isEpisode = entry.kind === "video" || Boolean(entry.videoId);
+  return {
+    ...common,
+    type: isDemo ? "demo" : isEpisode ? "episode" : "update",
+    seriesId: entry.seriesId || "",
+    meta: entry.kind === "video" ? "episode" : common.dateLabel,
+    artifactHtml,
+    demoUrl,
+    thumbnailUrl: entry.thumbnailUrl || entry.project?.screenshots?.[0] || "",
+    youtubeId: entry.youtubeId || entry.video?.youtubeId || "",
+    orient: entry.embedType === "v" || entry.video?.format === "short" ? "v" : "h",
+  };
+}).filter((entry) => entry.techIds.length && (mainIds.has(entry.projectId) || entry.projectId.startsWith("entry:")));
+
+const mobileProjects = { ...mobileBaseProjects };
+for (const entry of mobileEntries) {
+  if (!entry.projectId.startsWith("entry:")) continue;
+  mobileProjects[entry.projectId] = {
+    id: entry.projectId,
+    name: entry.title,
+    desc: entry.desc,
+    meta: entry.dateLabel,
+    mark: "•",
+  };
+}
+
+const mobileChildrenByProject: Record<string, any> = {};
+function mobileProjectBucket(projectId: string) {
+  if (!mobileChildrenByProject[projectId]) mobileChildrenByProject[projectId] = { demos: [], updates: [], series: [] };
+  return mobileChildrenByProject[projectId];
+}
+
+for (const entry of mobileEntries) {
+  const bucket = mobileProjectBucket(entry.projectId);
+  if (entry.type === "demo") {
+    bucket.demos.push(entry);
+  } else if (!entry.seriesId) {
+    bucket.updates.push(entry);
+  }
+}
+
+for (const series of seriesRecords) {
+  const episodes = mobileEntries
+    .filter((entry) => entry.type === "episode" && entry.seriesId === series.id)
+    .sort((a, b) => b.dateValue - a.dateValue || a.title.localeCompare(b.title));
+  if (!episodes.length) continue;
+  const projectId = series.mainProjectId && mainIds.has(series.mainProjectId) ? series.mainProjectId : episodes[0].projectId;
+  const techIds = [...new Set(episodes.flatMap((entry) => entry.techIds || []))];
+  mobileProjectBucket(projectId).series.push({
+    id: series.id,
+    title: series.name,
+    desc: series.desc,
+    meta: series.meta || `${episodes.length} episodes`,
+    dateLabel: episodes[0].dateLabel,
+    dateValue: episodes[0].dateValue,
+    projectId,
+    techIds,
+    episodes,
+  });
+}
+
+Object.values(mobileChildrenByProject).forEach((bucket: any) => {
+  bucket.demos.sort((a: any, b: any) => b.dateValue - a.dateValue || a.title.localeCompare(b.title));
+  bucket.updates.sort((a: any, b: any) => b.dateValue - a.dateValue || a.title.localeCompare(b.title));
+  bucket.series.sort((a: any, b: any) => b.dateValue - a.dateValue || a.title.localeCompare(b.title));
+});
+
+const mobilePanelItems = [
+  ...mobileEntries,
+  ...Object.values(mobileChildrenByProject).flatMap((bucket: any) => bucket.series.map((series: any) => ({
+    id: `series-${series.id}`,
+    title: series.title,
+    dateValue: series.dateValue,
+    dateLabel: series.dateLabel,
+    projectId: series.projectId,
+    techIds: series.techIds,
+    type: "series",
+  }))),
+];
+
+const mobileStackData = {
+  techs: mobileTechs,
+  techById: mobileTechById,
+  projects: mobileProjects,
+  items: mobilePanelItems,
+  childrenByProject: mobileChildrenByProject,
+};
 ---
 <BaseLayout title="artlu.ai — stack spectrum" description="The artlu.ai stack view: a crawlable map of shipped projects, videos, and research across the 100 day build.">
   <Header active="stack" stats={stats} sticky="canvas" />
-  <div class="canvas-fallback page">
+  <MobileStackView data={mobileStackData} />
+  <div class="canvas-fallback page stack-mobile-fallback">
     <div class="col">
       <h2 class="sec-h">stack view</h2>
       <p class="muted">The stack canvas is desktop-first. Use the list view on smaller screens.</p>
@@ -465,29 +614,29 @@ const stackData = {
       from { opacity:0; transform:translateY(-9px); filter:blur(2px); }
       to { opacity:var(--stack-opacity); transform:translateY(0); filter:blur(0); }
     }
-    .stack-world .node.hidden-work { display:none; }
-    .stack-world .node.hidden-tech { display:none; }
+    .stack-world .node.hidden-work,
+    .stack-world .node.hidden-tech,
+    .stack-world .node.hidden-project,
+    .stack-world .node.hidden-rolodex { display:none; }
     .stack-world .node.focus-tech {
       z-index:8;
       border-color:var(--green-border);
       box-shadow:var(--node-shadow), 0 0 0 1px var(--green-border);
     }
     .stack-world .node.tech { width:206px; }
-    .stack-world .node.work { width:272px; min-height:270px; }
-    .stack-world .node.work .nhead { min-height:78px; align-items:flex-start; }
+    .stack-world .node.work { width:272px; }
+    .stack-world .node.work .nhead { align-items:flex-start; }
     .stack-world .node.work .nname {
       display:-webkit-box;
       -webkit-line-clamp:2;
       -webkit-box-orient:vertical;
       overflow:hidden;
-      min-height:38.64px;
     }
     .stack-world .node.work .ndesc {
       display:-webkit-box;
       -webkit-line-clamp:6;
       -webkit-box-orient:vertical;
       overflow:hidden;
-      min-height:120.9px;
     }
     .stack-world .node.project { width:300px; }
     .stack-world .node.rolodex { width:492px; }
@@ -849,7 +998,8 @@ const stackData = {
     @media (max-width:720px) {
       body { overflow:auto; }
       .topbar { position:sticky; }
-      .hud { display:none; }
+      .hud,
+      .zoomctl { display:none; }
     }
   </style>
   <script define:vars={{ stackData }}>
@@ -919,8 +1069,7 @@ const stackData = {
     }
     function card(entry) {
       const vertical = entry.embedType === "v";
-      const preferStaticThumbnail = entry.thumbnailMode === "static" && entry.thumbnailUrl;
-      const thumb = preferStaticThumbnail
+      const thumb = entry.thumbnailUrl
         ? `<img src="${esc(entry.thumbnailUrl)}" alt="" loading="lazy">`
         : entry.artifactHtml
         ? `<iframe class="vframe" srcdoc="${esc(previewSrcDoc(entry.artifactHtml))}" loading="lazy" tabindex="-1" scrolling="no" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>`
@@ -1055,6 +1204,19 @@ const stackData = {
       if (selectionTechOrder) return new Set(selectionTechOrder);
       return new Set(activeNodeId ? techIdsForNode(activeNodeId) : (focusWorkId ? nodes[focusWorkId]?.source?.techIds || [] : []));
     }
+    function activeTechnologyId() {
+      return activeNodeId?.startsWith("t_") ? activeNodeId.slice(2) : "";
+    }
+    function entriesForTechnology(techId) {
+      if (!techId) return [];
+      return data.entries
+        .filter((entry) => entry.techIds.includes(techId))
+        .sort((a, b) => {
+          const byDate = b.dateValue - a.dateValue;
+          if (byDate) return byDate;
+          return a.title.localeCompare(b.title);
+        });
+    }
     function viewportWorldBox() {
       const width = vp.clientWidth || window.innerWidth || 1200;
       const height = vp.clientHeight || window.innerHeight || 760;
@@ -1091,7 +1253,7 @@ const stackData = {
       const focusIds = focusedTechIds();
       if (showAllTech) {
         return {
-          ids: orderTechIds(data.techs.map((tech) => tech.id), focusIds),
+          ids: orderTechIds(data.techs.map((tech) => tech.id)),
         };
       }
       if (selectionTechOrder?.length) {
@@ -1194,13 +1356,36 @@ const stackData = {
     }
     function syncVisibility() {
       let hidden = 0;
+      const activeTech = activeTechnologyId();
+      const activeTechEntries = entriesForTechnology(activeTech);
+      const activeTechEntryIds = new Set(activeTechEntries.map((entry) => entry.id));
+      const activeTechProjectIds = new Set(activeTechEntries.map((entry) => entry.projectId).filter(Boolean));
       data.entries.forEach((entry) => {
         const node = nodes[`w_${entry.id}`];
         if (!node) return;
-        const isHidden = !!entry.hiddenDefault && !expanded;
+        const isHidden = activeTech
+          ? !activeTechEntryIds.has(entry.id)
+          : !!entry.hiddenDefault && !expanded;
         node.visible = !isHidden;
         node.el.classList.toggle("hidden-work", isHidden);
-        if (isHidden) hidden += 1;
+        if (!activeTech && isHidden) hidden += 1;
+      });
+      data.projects.forEach((project) => {
+        const node = nodes[`pr_${project.id}`];
+        if (!node) return;
+        const isHidden = !!activeTech && !activeTechProjectIds.has(project.id);
+        node.visible = !isHidden;
+        node.el.classList.toggle("hidden-project", isHidden);
+      });
+      data.rolodexes.forEach((rolo) => {
+        const node = nodes[`ro_${rolo.id}`];
+        if (!node) return;
+        const hasMatchingCard = !activeTech || rolo.rows.some((row) =>
+          (row.entries || []).some((entry) => entry.techIds?.includes(activeTech))
+        );
+        const isHidden = !!activeTech && (!activeTechProjectIds.has(rolo.id) || !hasMatchingCard);
+        node.visible = !isHidden;
+        node.el.classList.toggle("hidden-rolodex", isHidden);
       });
       const focusIds = focusedTechIds();
       data.techs.forEach((tech) => {
@@ -1213,7 +1398,7 @@ const stackData = {
         node.el.classList.toggle("focus-tech", focused);
       });
       if (showMoreBtn) {
-        showMoreBtn.style.display = hidden ? "block" : "none";
+        showMoreBtn.style.display = !activeTech && hidden ? "block" : "none";
         showMoreBtn.textContent = `show ${hidden} more line${hidden === 1 ? "" : "s"}`;
       }
     }
@@ -1279,6 +1464,7 @@ const stackData = {
       let py = 192;
       data.projects.forEach((project) => {
         const node = nodes[`pr_${project.id}`];
+        if (!node || node.visible === false) return;
         node.x = PROJ_X;
         node.y = py;
         py += node.h + 56;
@@ -1286,7 +1472,7 @@ const stackData = {
       let ry = 178;
       data.rolodexes
         .map((rolo) => nodes[`ro_${rolo.id}`])
-        .filter(Boolean)
+        .filter((node) => node && node.visible !== false)
         .forEach((node) => {
           node.x = ROLO_X;
           node.y = ry;
@@ -1296,7 +1482,9 @@ const stackData = {
         node.el.style.left = `${node.x}px`;
         node.el.style.top = `${node.y}px`;
       });
-      const bottom = Object.values(nodes).reduce((max, node) => Math.max(max, node.y + node.h + 240), 1400);
+      const bottom = Object.values(nodes)
+        .filter((node) => node.visible !== false)
+        .reduce((max, node) => Math.max(max, node.y + node.h + 240), 1400);
       world.style.height = `${bottom}px`;
       updateRowNavs();
     }
@@ -1455,11 +1643,22 @@ const stackData = {
       let route = source.route || "#";
       if (id.startsWith("t_")) {
         route = "#";
-        const users = data.entries.filter((entry) => entry.techIds.includes(source.id));
+        const users = entriesForTechnology(source.id);
+        const projectGroups = data.projects
+          .map((project) => ({
+            project,
+            entries: users.filter((entry) => entry.projectId === project.id),
+          }))
+          .filter((group) => group.entries.length);
+        const groupedEntryIds = new Set(projectGroups.flatMap((group) => group.entries.map((entry) => entry.id)));
+        const looseEntries = users.filter((entry) => !groupedEntryIds.has(entry.id));
         kind = "technology";
         sub = `${source.category} · ${users.length} entries`;
         lead = `${source.name} appears in ${users.length} shipped entries.`;
-        sections = `<div class="p-sec"><h4>features using ${esc(source.name)}</h4>${users.slice(0, 10).map((entry) => lineRow(`w_${entry.id}`, entry.title, entry.kind, "var(--green)")).join("")}</div>`;
+        sections = projectGroups.map((group) => `<div class="p-sec"><h4>${esc(group.project.name)}</h4>${group.entries.slice(0, 10).map((entry) => lineRow(`w_${entry.id}`, entry.title, entry.kind, "var(--green)")).join("")}</div>`).join("");
+        if (looseEntries.length) {
+          sections += `<div class="p-sec"><h4>unassigned entries</h4>${looseEntries.slice(0, 10).map((entry) => lineRow(`w_${entry.id}`, entry.title, entry.kind, "var(--green)")).join("")}</div>`;
+        }
       } else if (node.kind === "work") {
         const project = data.projects.find((item) => item.id === source.projectId);
         sub = `${source.kind} · latest ${source.dateLabel || source.date}`;

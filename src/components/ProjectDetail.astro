@@ -92,8 +92,8 @@ const day = dayNum(project.date);
   {hasDemo && (
     <section class:list={["panel", defaultTab === "demo" && "on"]} data-tab-panel="demo">
       {project.artifactHtml
-        ? <iframe class="demo-frame" srcdoc={project.artifactHtml} loading="lazy" title={`${project.name} live demo`}></iframe>
-        : <iframe class="demo-frame" src={embedUrl} loading="lazy" title={`${project.name} live demo`}></iframe>}
+        ? <iframe class="demo-frame" srcdoc={project.artifactHtml} loading="lazy" sandbox="allow-scripts allow-forms allow-popups" title={`${project.name} live demo`}></iframe>
+        : <iframe class="demo-frame" src={embedUrl} loading="lazy" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" title={`${project.name} live demo`}></iframe>}
     </section>
   )}
 

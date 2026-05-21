@@ -3,6 +3,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import { getPublicJournalEntries, getPublicProjects, getStats } from "../../lib/data";
 import { fmtDateFull, renderMarkdownLite } from "../../lib/format";
+import { createProjectRefResolver } from "../../lib/projectRefs";
 
 export async function getStaticPaths() {
   const entries = await getPublicJournalEntries();
@@ -15,6 +16,7 @@ export async function getStaticPaths() {
 const { entry, prev, next } = Astro.props;
 const projects = await getPublicProjects();
 const stats = getStats(projects);
+const resolveProjectRef = createProjectRefResolver(projects);
 ---
 <BaseLayout title={`artlu.ai — ${entry.title}`} description={entry.body?.slice(0, 155) || entry.title}>
   <Header active="log" stats={stats} />
@@ -26,7 +28,10 @@ const stats = getStats(projects);
       <div class="md" set:html={renderMarkdownLite(entry.body || "")}></div>
       <div class="e-foot">
         <div class="refs">
-          {(entry.projectRefs || []).map((ref) => <a class="ref" href={`/project/${ref}`}>↗ {ref}</a>)}
+          {(entry.projectRefs || []).map((ref) => {
+            const link = resolveProjectRef(ref);
+            return link.href ? <a class="ref" href={link.href}>↗ {link.label}</a> : <span class="ref">↗ {link.label}</span>;
+          })}
           {(entry.tags || []).map((tag) => <span class="tag">{tag}</span>)}
         </div>
       </div>
