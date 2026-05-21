@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { firebaseConfig } from "../lib/firebaseConfig";
 
 type Props = {
   title?: string;
@@ -16,6 +17,7 @@ const {
 } = Astro.props;
 
 const url = canonical || new URL(Astro.url.pathname, "https://artlu.ai").toString();
+const firebaseMeasurementId = firebaseConfig.measurementId;
 ---
 <!doctype html>
 <html lang="en" data-theme="dark">
@@ -40,6 +42,19 @@ const url = canonical || new URL(Astro.url.pathname, "https://artlu.ai").toStrin
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex,nofollow" />}
     <link rel="canonical" href={url} />
+    <script is:inline define:vars={{ firebaseMeasurementId }}>
+      (function(){
+        if (window.location.hostname !== "artlu.ai") return;
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = window.gtag || function(){ window.dataLayer.push(arguments); };
+        window.gtag("js", new Date());
+        window.gtag("config", firebaseMeasurementId);
+        var script = document.createElement("script");
+        script.async = true;
+        script.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(firebaseMeasurementId);
+        document.head.appendChild(script);
+      })();
+    </script>
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="artlu.ai" />
     <meta property="og:title" content={title} />
