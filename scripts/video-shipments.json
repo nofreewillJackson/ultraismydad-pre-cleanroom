@@ -1,5 +1,17 @@
 [
   {
+    "videoId": "spoolcast-dev-log-09",
+    "trackerDocId": "8Q7Ddi7ZDE4KFaXzNExB",
+    "format": "long",
+    "title": "My AI Video Maker Followed the Wrong Rules Perfectly",
+    "desc": "I built an AI video maker, then watched it make a video that confused me. The scary part: it wasn't ignoring the rules. It was following the wrong ones perfectly.",
+    "youtubeId": "UgNTXg42xgI",
+    "shippedAt": "2026-05-25",
+    "durationSec": 323,
+    "hiddenChunkIds": [],
+    "notes": "Spoolcast dev log 9. YouTube video is published; script should build the guidebook and create one tracker entry."
+  },
+  {
     "videoId": "spoolcast-dev-log-07",
     "trackerDocId": "5wKVNWOCn7B5DvXNs5ID",
     "format": "long",

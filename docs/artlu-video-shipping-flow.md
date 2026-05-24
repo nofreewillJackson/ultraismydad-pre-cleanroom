@@ -112,9 +112,10 @@ That one command should do the internal work:
 3. Update or insert the matching row in `scripts/shipped-videos.json`.
 4. Run or reuse the existing `scripts/sync-video.mjs <videoId>` guidebook builder.
 5. Confirm `public/videos/<videoId>/bundle.json` exists.
-6. Update the existing Firestore tracker entry by `trackerDocId`, or create one only when no existing entry is supplied.
-7. Set video tracker fields.
-8. Mark the site dirty for rebuild.
+6. Confirm the thumbnail URL renders a real image, not a YouTube placeholder.
+7. Update the existing Firestore tracker entry by `trackerDocId`, or create one only when no existing entry is supplied.
+8. Set video tracker fields.
+9. Mark the site dirty for rebuild.
 
 Optional checks, like `npm run build`, can happen inside the script or after it. They are validation, not the shipping action.
 
@@ -123,6 +124,8 @@ Dry-run first when adding a new video:
 ```bash
 node scripts/ship-video.mjs <videoId> --dry-run
 ```
+
+Thumbnail check: open the local guidebook/card before commit. If YouTube `maxresdefault.jpg` is missing or shows the gray placeholder, switch the bundle/index thumbnail to a working URL such as `hqdefault.jpg` or a curated local thumbnail.
 
 ## Firestore Fields
 

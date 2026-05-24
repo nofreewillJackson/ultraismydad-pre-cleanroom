@@ -1,5 +1,15 @@
 [
   {
+    "id": "spoolcast-dev-log-09",
+    "title": "My AI Video Maker Followed the Wrong Rules Perfectly",
+    "desc": "I built an AI video maker, then watched it make a video that confused me. The scary part: it wasn't ignoring the rules. It was following the wrong ones perfectly.",
+    "youtubeId": "UgNTXg42xgI",
+    "shippedAt": "2026-05-25",
+    "durationSec": 323,
+    "notes": "Spoolcast dev log 9. YouTube video is published; script should build the guidebook and create one tracker entry.",
+    "hiddenChunkIds": []
+  },
+  {
     "id": "news-anime-bot-2026-05-21",
     "title": "Anthropic buys Stainless, the toolmaker behind every major AI company",
     "desc": "Daily AI news satire. Anthropic acquires Stainless, the small dev-tools vendor that quietly generated the SDKs and MCP connectors used by OpenAI, Google, Cloudflare, Replicate, Runway and Anthropic itself.",

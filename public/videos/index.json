@@ -1,5 +1,18 @@
 [
   {
+    "id": "spoolcast-dev-log-09",
+    "format": "long",
+    "show": null,
+    "title": "My AI Video Maker Followed the Wrong Rules Perfectly",
+    "desc": "I built an AI video maker, then watched it make a video that confused me. The scary part: it wasn't ignoring the rules. It was following the wrong ones perfectly.",
+    "shippedAt": "2026-05-25",
+    "durationSec": 323,
+    "youtubeId": "UgNTXg42xgI",
+    "tiktokId": null,
+    "tiktokUrl": null,
+    "thumbnailUrl": "https://img.youtube.com/vi/UgNTXg42xgI/hqdefault.jpg"
+  },
+  {
     "id": "news-anime-bot-2026-05-21",
     "format": "short",
     "show": "news-anime-bot",

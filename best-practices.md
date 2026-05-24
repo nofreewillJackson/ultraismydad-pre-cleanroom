@@ -132,8 +132,9 @@ Order matters:
 5. script marks the site dirty
 6. run `npm run sync:data`
 7. run `npm run build:strict`
-8. commit and push with GitHub Desktop
-9. Netlify publishes the guidebook files and the refreshed tracker snapshot
+8. open the local guidebook/card and confirm the thumbnail renders
+9. commit and push with GitHub Desktop
+10. Netlify publishes the guidebook files and the refreshed tracker snapshot
 
 Build the guidebook package before updating Firestore as ready. The dirty flag is expected: the static Astro site needs a new build so the guidebook page, video card, and tracker entry are published together.
 
@@ -144,6 +145,8 @@ Use a dry run before a real ship when adding new metadata:
 ```bash
 node scripts/ship-video.mjs <videoId> --dry-run
 ```
+
+Before shipping, verify the thumbnail URL used in `public/videos/index.json` and `public/videos/<videoId>/bundle.json` loads a real image. If YouTube `maxresdefault.jpg` shows the gray placeholder or returns 404, use a working thumbnail URL such as `hqdefault.jpg` or a curated local thumbnail.
 
 Full handoff: [docs/artlu-video-shipping-flow.md](docs/artlu-video-shipping-flow.md)
 
