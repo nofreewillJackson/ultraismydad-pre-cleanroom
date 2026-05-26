@@ -1,5 +1,20 @@
 [
   {
+    "videoId": "news-anime-bot-2026-05-22",
+    "trackerDocId": "1UwypUmBeOIJjT669oaM",
+    "format": "short",
+    "show": "news-anime-bot",
+    "sessionDate": "2026-05-22",
+    "title": "SpaceX Files Plans For A $119 Billion Chip Factory To Feed Musk's Four Other Companies — Aninews ep 14",
+    "desc": "Daily AI news satire. SpaceX disclosed in a federal filing that Terafab, its planned chip factory outside Austin, could cost up to $119B across all phases — and every customer of the fab (SpaceX rockets, Tesla cars, Tesla robots, xAI data centers) is also an owner.",
+    "youtubeId": "OrQhzNEhnYc",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7644319994288803102",
+    "shippedAt": "2026-05-22",
+    "durationSec": 69,
+    "hiddenBeatNs": [],
+    "notes": "Aninews ep 14. New entry — script will create the tracker doc. Follow-up update_project sets longDesc + link to TikTok URL. First episode using the new fast multi-strike + no-slow-motion Seedance prompt pattern."
+  },
+  {
     "videoId": "spoolcast-dev-log-09",
     "trackerDocId": "8Q7Ddi7ZDE4KFaXzNExB",
     "format": "long",

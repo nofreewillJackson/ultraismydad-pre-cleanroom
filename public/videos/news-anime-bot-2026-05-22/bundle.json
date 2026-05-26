@@ -1,0 +1,212 @@
+{
+  "id": "news-anime-bot-2026-05-22",
+  "format": "short",
+  "show": "news-anime-bot",
+  "title": "SpaceX Files Plans For A $119 Billion Chip Factory To Feed Musk's Four Other Companies — Aninews ep 14",
+  "desc": "Daily AI news satire. SpaceX disclosed in a federal filing that Terafab, its planned chip factory outside Austin, could cost up to $119B across all phases — and every customer of the fab (SpaceX rockets, Tesla cars, Tesla robots, xAI data centers) is also an owner.",
+  "shippedAt": "2026-05-22",
+  "durationSec": 69,
+  "topicTier": "GREEN",
+  "video": {
+    "youtubeId": "OrQhzNEhnYc",
+    "tiktokId": "7644319994288803102",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7644319994288803102",
+    "mp4Url": null,
+    "thumbnailUrl": "https://i.ytimg.com/vi/OrQhzNEhnYc/oardefault.jpg"
+  },
+  "preRoll": {
+    "burnedText": "⚠ SATIRE — AI-GENERATED PARODY — NOT REAL",
+    "voiceTag": "FAUX7 News. Satire."
+  },
+  "characters": [
+    {
+      "name": "altman",
+      "kind": "character",
+      "imageUrl": "/videos/news-anime-bot-2026-05-22/assets/characters/altman.webp",
+      "description": "",
+      "usedInBeats": []
+    }
+  ],
+  "beats": [
+    {
+      "n": 1,
+      "name": "musk-hammers-the-chip",
+      "durationSec": 6,
+      "narration": "For most of the history of the chip industry, the largest factories cost tens of billions of dollars to build.",
+      "character": "musk",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-22/assets/beats/01-musk-hammers-the-chip.webp"
+    },
+    {
+      "n": 2,
+      "name": "the-federal-filing",
+      "durationSec": 5,
+      "narration": "In a federal filing this month, SpaceX disclosed plans for one that could cost as much as a hundred and nineteen billion.",
+      "character": "-",
+      "sourceChyron": "FILED MAY 6, 2026",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-22/assets/beats/02-the-federal-filing.webp"
+    },
+    {
+      "n": 3,
+      "name": "the-blueprint-unfurls",
+      "durationSec": 6,
+      "narration": "The factory is called Terafab. It is being built outside Austin, in the Texas desert.",
+      "character": "-",
+      "sourceChyron": "OUTSIDE AUSTIN, TX",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-22/assets/beats/03-the-blueprint-unfurls.webp"
+    },
+    {
+      "n": 4,
+      "name": "the-four-towers-stand",
+      "durationSec": 6,
+      "narration": "The project is jointly developed by SpaceX, Tesla, xAI, and Intel.",
+      "character": "-",
+      "sourceChyron": "SPACEX, TESLA, XAI, INTEL",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-22/assets/beats/04-the-four-towers-stand.webp"
+    },
+    {
+      "n": 5,
+      "name": "the-furnace-pours-chips",
+      "durationSec": 6,
+      "narration": "By the project's own description, the goal is the most epic chip-building effort ever attempted.",
+      "character": "-",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-22/assets/beats/05-the-furnace-pours-chips.webp"
+    },
+    {
+      "n": 6,
+      "name": "the-river-of-chips-splits",
+      "durationSec": 5,
+      "narration": "The plant is engineered to produce more than one terawatt of artificial intelligence compute capacity per year.",
+      "character": "-",
+      "sourceChyron": "DESIGN TARGET 1 TERAWATT PER YEAR",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-22/assets/beats/06-the-river-of-chips-splits.webp"
+    },
+    {
+      "n": 7,
+      "name": "the-rocket-stream",
+      "durationSec": 5,
+      "narration": "A terawatt is one trillion watts.",
+      "character": "-",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-22/assets/beats/07-the-rocket-stream.webp"
+    },
+    {
+      "n": 8,
+      "name": "the-autonomous-car-stream",
+      "durationSec": 5,
+      "narration": "The chips Terafab is designed to produce will go to four customers.",
+      "character": "-",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-22/assets/beats/08-the-autonomous-car-stream.webp"
+    },
+    {
+      "n": 9,
+      "name": "the-humanoid-robot-stream",
+      "durationSec": 5,
+      "narration": "SpaceX rockets. Tesla self-driving cars. Tesla humanoid robots. And xAI's data centers.",
+      "character": "-",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-22/assets/beats/09-the-humanoid-robot-stream.webp"
+    },
+    {
+      "n": 10,
+      "name": "the-server-rack-stream",
+      "durationSec": 6,
+      "narration": "All four are owned by the man at the center of the project.",
+      "character": "-",
+      "sourceChyron": "TOTAL ALL PHASES UP TO $119B",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-22/assets/beats/10-the-server-rack-stream.webp"
+    },
+    {
+      "n": 11,
+      "name": "musk-on-the-balcony",
+      "durationSec": 6,
+      "narration": "Vertical integration, at this scale, is unusual. Vertical integration where every customer is also the supplier is something else.",
+      "character": "musk",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-22/assets/beats/11-musk-on-the-balcony.webp"
+    },
+    {
+      "n": 12,
+      "name": "the-terawatt-citadel",
+      "durationSec": 7,
+      "narration": "Terafab breaks ground this year. The forge, in the end, mostly feeds itself.",
+      "character": "-",
+      "sourceChyron": "THE FORGE FEEDS ITSELF",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-05-22/assets/beats/12-the-terawatt-citadel.webp"
+    }
+  ],
+  "sources": [
+    {
+      "fact": "",
+      "attribution": "Elon Musk's Terafab chip factory in Texas could cost up to $119 billion, filing shows (CNBC)",
+      "url": "https://www.cnbc.com/2026/05/06/elon-musks-spacex-chip-fab-in-texas-to-cost-up-to-119-billion.html"
+    },
+    {
+      "fact": "",
+      "attribution": "SpaceX Proposes $55 Billion to Begin Terafab Project in Texas (Bloomberg)",
+      "url": "https://www.bloomberg.com/news/articles/2026-05-06/spacex-proposes-55-billion-to-begin-terafab-project-in-texas"
+    },
+    {
+      "fact": "",
+      "attribution": "SpaceX Files Plan for $55 Billion Terafab Chip Facility in Texas (US News)",
+      "url": "https://www.usnews.com/news/top-news/articles/2026-05-06/spacex-files-plan-for-55-billion-terafab-chip-facility-in-texas"
+    },
+    {
+      "fact": "",
+      "attribution": "SpaceX Files Plans for $55B Semiconductor Fab in Texas (Basenor)",
+      "url": "https://www.basenor.com/blogs/news/spacex-files-plans-for-55b-semiconductor-fab-in-texas"
+    },
+    {
+      "fact": "SpaceX $55B Terafab",
+      "attribution": "Musk's In-House AI Chip Factory Plan (Memeburn)",
+      "url": "https://memeburn.com/spacex-55-billion-terafab-ai-chip-factory-texas/"
+    },
+    {
+      "fact": "",
+      "attribution": "Terafab (Wikipedia)",
+      "url": "https://en.wikipedia.org/wiki/Terafab"
+    }
+  ],
+  "transcript": "For most of the history of the chip industry, the largest factories cost tens of billions of dollars to build. In a federal filing this month, SpaceX disclosed plans for one that could cost as much as a hundred and nineteen billion. The factory is called Terafab. It is being built outside Austin, in the Texas desert. The project is jointly developed by SpaceX, Tesla, xAI, and Intel. By the project's own description, the goal is the most epic chip-building effort ever attempted. The plant is engineered to produce more than one terawatt of artificial intelligence compute capacity per year. A terawatt is one trillion watts. The chips Terafab is designed to produce will go to four customers. SpaceX rockets. Tesla self-driving cars. Tesla humanoid robots. And xAI's data centers. All four are owned by the man at the center of the project. Vertical integration, at this scale, is unusual. Vertical integration where every customer is also the supplier is something else. Terafab breaks ground this year. The forge, in the end, mostly feeds itself.",
+  "summary": {
+    "writing": {
+      "author": "Claude",
+      "role": "script · beat plan · narration · sources audit"
+    },
+    "videoClips": {
+      "platform": "kie.ai",
+      "models": [
+        "Seedance 2.0 Fast"
+      ],
+      "clipCount": 12
+    },
+    "audio": {
+      "tts": "Google Cloud TTS",
+      "voice": "Schedar",
+      "beatCount": 12
+    },
+    "render": {
+      "engine": "ffmpeg",
+      "passed": true
+    },
+    "cost": "~$119"
+  },
+  "showcase": {
+    "hiddenBeatNs": [],
+    "notes": "Aninews ep 14. New entry — script will create the tracker doc. Follow-up update_project sets longDesc + link to TikTok URL. First episode using the new fast multi-strike + no-slow-motion Seedance prompt pattern."
+  }
+}
