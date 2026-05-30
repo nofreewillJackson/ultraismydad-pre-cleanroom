@@ -1,5 +1,18 @@
 [
   {
+    "id": "news-anime-bot-2026-05-28",
+    "format": "short",
+    "show": "news-anime-bot",
+    "title": "Locked Out Of EUV, Huawei Says Lithography Was Never The Point — Aninews ep 15",
+    "desc": "Daily AI news satire. Huawei announced the Tau (τ) Scaling Law at IEEE ISCAS Shanghai on May 25, 2026 — measuring chip progress by signal travel time instead of transistor size, with 381 chips already produced and a 1.4nm-equivalent density target by 2031, without using a 1.4nm process.",
+    "shippedAt": "2026-05-29",
+    "durationSec": 81,
+    "youtubeId": "QjKbfh0zO5Y",
+    "tiktokId": "7645053598333717791",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7645053598333717791",
+    "thumbnailUrl": "https://i.ytimg.com/vi/QjKbfh0zO5Y/oardefault.jpg"
+  },
+  {
     "id": "spoolcast-dev-log-09",
     "format": "long",
     "show": null,
