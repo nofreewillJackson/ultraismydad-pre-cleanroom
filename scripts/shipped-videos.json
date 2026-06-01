@@ -1,5 +1,19 @@
 [
   {
+    "id": "news-anime-bot-2026-06-02",
+    "title": "Nvidia Declares A New Era Of The PC, In Which The PC Is Also Nvidia — Aninews ep 16",
+    "desc": "Daily AI news satire. At Computex, Nvidia unveiled its first Windows-laptop chip — a 20-core CPU with a desktop-class GPU — and declared 'a new era of PC'; it already supplies most of the AI industry, so the new era still runs on Nvidia.",
+    "youtubeId": "oG10TOPQldY",
+    "shippedAt": "2026-06-02",
+    "durationSec": 71,
+    "notes": "Aninews ep 16. New entry — script creates the tracker doc. Nvidia N1X / RTX Spark laptop chip. Reused locked huang.png ref; Seedance 720p.",
+    "format": "short",
+    "show": "news-anime-bot",
+    "sessionDate": "2026-06-02",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7646535610345327902",
+    "hiddenBeatNs": []
+  },
+  {
     "id": "spoolcast-dev-log-09",
     "title": "My AI Video Maker Followed the Wrong Rules Perfectly",
     "desc": "I built an AI video maker, then watched it make a video that confused me. The scary part: it wasn't ignoring the rules. It was following the wrong ones perfectly.",

@@ -1,0 +1,219 @@
+{
+  "id": "news-anime-bot-2026-06-02",
+  "format": "short",
+  "show": "news-anime-bot",
+  "title": "Nvidia Declares A New Era Of The PC, In Which The PC Is Also Nvidia — Aninews ep 16",
+  "desc": "Daily AI news satire. At Computex, Nvidia unveiled its first Windows-laptop chip — a 20-core CPU with a desktop-class GPU — and declared 'a new era of PC'; it already supplies most of the AI industry, so the new era still runs on Nvidia.",
+  "shippedAt": "2026-06-02",
+  "durationSec": 71,
+  "topicTier": "GREEN",
+  "video": {
+    "youtubeId": "oG10TOPQldY",
+    "tiktokId": "7646535610345327902",
+    "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7646535610345327902",
+    "mp4Url": null,
+    "thumbnailUrl": "https://i.ytimg.com/vi/oG10TOPQldY/oardefault.jpg"
+  },
+  "preRoll": {
+    "burnedText": "⚠ SATIRE — AI-GENERATED PARODY — NOT REAL",
+    "voiceTag": "FAUX7 News. Satire."
+  },
+  "characters": [
+    {
+      "name": "huang",
+      "kind": "character",
+      "imageUrl": "/videos/news-anime-bot-2026-06-02/assets/characters/huang.webp",
+      "description": "",
+      "usedInBeats": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    }
+  ],
+  "beats": [
+    {
+      "n": 1,
+      "name": "cold-open-inside-your-pc",
+      "durationSec": 6,
+      "narration": "On Monday in Taipei, Nvidia revealed it now wants to be inside your personal computer.",
+      "character": "huang",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-06-02/assets/beats/01-cold-open-inside-your-pc.webp"
+    },
+    {
+      "n": 2,
+      "name": "the-fortress-hoard",
+      "durationSec": 5,
+      "narration": "For two years, nearly every artificial-intelligence company has paid Nvidia to do almost anything.",
+      "character": "huang",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-06-02/assets/beats/02-the-fortress-hoard.webp"
+    },
+    {
+      "n": 3,
+      "name": "the-last-land",
+      "durationSec": 5,
+      "narration": "Its chips sit beneath the data centers, the models, and the race to replace everyone.",
+      "character": "huang",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-06-02/assets/beats/03-the-last-land.webp"
+    },
+    {
+      "n": 4,
+      "name": "the-march",
+      "durationSec": 6,
+      "narration": "Having sold the industry its shovels, it eyed the one market left. The computer on your lap.",
+      "character": "huang",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-06-02/assets/beats/04-the-march.webp"
+    },
+    {
+      "n": 5,
+      "name": "chip-on-your-lap",
+      "durationSec": 7,
+      "narration": "This week it unveiled its first Windows-laptop chip — twenty cores and a desktop gaming card's graphics.",
+      "character": "huang",
+      "sourceChyron": "20-CORE ARM - DESKTOP-CLASS GPU",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-06-02/assets/beats/05-chip-on-your-lap.webp"
+    },
+    {
+      "n": 6,
+      "name": "a-new-era-of-pc",
+      "durationSec": 6,
+      "narration": "Nvidia, Microsoft, and Arm all posted the same three words. A new era of PC.",
+      "character": "huang",
+      "sourceChyron": "A NEW ERA OF PC",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-06-02/assets/beats/06-a-new-era-of-pc.webp"
+    },
+    {
+      "n": 7,
+      "name": "the-smartphone-claim",
+      "durationSec": 5,
+      "narration": "Per his keynote, the company's chief likened the moment to the birth of the smartphone.",
+      "character": "-",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-06-02/assets/beats/07-the-smartphone-claim.webp"
+    },
+    {
+      "n": 8,
+      "name": "the-reveal",
+      "durationSec": 8,
+      "narration": "It ships this fall in laptops from Dell, HP, Asus, Lenovo, and Microsoft.",
+      "character": "huang",
+      "sourceChyron": "SHIPS FALL 2026",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-06-02/assets/beats/08-the-reveal.webp"
+    },
+    {
+      "n": 9,
+      "name": "every-surface",
+      "durationSec": 5,
+      "narration": "Observers noted the chip's graphics are the desktop card Nvidia already sells, now on your lap.",
+      "character": "huang",
+      "sourceChyron": "RTX 5070-CLASS - 6144 CUDA CORES",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-06-02/assets/beats/09-every-surface.webp"
+    },
+    {
+      "n": 10,
+      "name": "the-toll",
+      "durationSec": 6,
+      "narration": "The laptops are expected to start near two thousand dollars, about where the premium ones do.",
+      "character": "huang",
+      "sourceChyron": "EXPECTED FROM ~$2000",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-06-02/assets/beats/10-the-toll.webp"
+    },
+    {
+      "n": 11,
+      "name": "a-new-dynasty",
+      "durationSec": 5,
+      "narration": "Analysts called it a company politely declining to leave any computer unsold to itself.",
+      "character": "huang",
+      "sourceChyron": "PER INDUSTRY ANALYSTS",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-06-02/assets/beats/11-a-new-dynasty.webp"
+    },
+    {
+      "n": 12,
+      "name": "runs-on-nvidia",
+      "durationSec": 6,
+      "narration": "A new era of the personal computer. One that, like the last, runs on Nvidia.",
+      "character": "huang",
+      "sourceChyron": "-",
+      "cinematography": null,
+      "clipImageUrl": "/videos/news-anime-bot-2026-06-02/assets/beats/12-runs-on-nvidia.webp"
+    }
+  ],
+  "sources": [
+    {
+      "fact": "Nvidia jumps into PCs with new Arm-based chip debuting in laptops from Microsoft, Dell, HP",
+      "attribution": "CNBC",
+      "url": "https://www.cnbc.com/2026/05/31/nvidias-new-chip-to-power-fresh-line-of-windows-laptops-by-dell-hp.html"
+    },
+    {
+      "fact": "Nvidia Computex 2026 keynote",
+      "attribution": "RTX Spark announced to take on Apple, Intel, and Qualcomm — TechRadar",
+      "url": "https://www.techradar.com/news/live/nvidia-computex-2026"
+    },
+    {
+      "fact": "Nvidia's N1X specs leak in full, showing what's next for Windows on Arm",
+      "attribution": "XDA",
+      "url": "https://www.xda-developers.com/mere-days-before-computex-2026-information-on-the-nvidia-n1-chip-leaked-online/"
+    },
+    {
+      "fact": "Nvidia ARM Laptop Chip N1X Confirmed for Computex",
+      "attribution": "CUDA and RTX 5070 GPU Onboard — TechTimes",
+      "url": "https://www.techtimes.com/articles/317428/20260530/nvidia-arm-laptop-chip-n1x-confirmed-computex-cuda-rtx-5070-gpu-onboard.htm"
+    },
+    {
+      "fact": "A new era of PC",
+      "attribution": "Microsoft and NVIDIA tease major announcement — Windows Central",
+      "url": "https://www.windowscentral.com/hardware/surface/a-new-era-of-pc-microsoft-and-nvidia-tease-major-announcement-experts-predict-to-be-the-fabled-n1x-chip"
+    }
+  ],
+  "transcript": "On Monday in Taipei, Nvidia revealed it now wants to be inside your personal computer. For two years, nearly every artificial-intelligence company has paid Nvidia to do almost anything. Its chips sit beneath the data centers, the models, and the race to replace everyone. Having sold the industry its shovels, it eyed the one market left. The computer on your lap. This week it unveiled its first Windows-laptop chip — twenty cores and a desktop gaming card's graphics. Nvidia, Microsoft, and Arm all posted the same three words. A new era of PC. Per his keynote, the company's chief likened the moment to the birth of the smartphone. It ships this fall in laptops from Dell, HP, Asus, Lenovo, and Microsoft. Observers noted the chip's graphics are the desktop card Nvidia already sells, now on your lap. The laptops are expected to start near two thousand dollars, about where the premium ones do. Analysts called it a company politely declining to leave any computer unsold to itself. A new era of the personal computer. One that, like the last, runs on Nvidia.",
+  "summary": {
+    "writing": {
+      "author": "Claude",
+      "role": "script · beat plan · narration · sources audit"
+    },
+    "videoClips": {
+      "platform": "kie.ai",
+      "models": [
+        "Seedance 2.0 Fast"
+      ],
+      "clipCount": 12
+    },
+    "audio": {
+      "tts": "Google Cloud TTS",
+      "voice": "Schedar",
+      "beatCount": 12
+    },
+    "render": {
+      "engine": "ffmpeg",
+      "passed": true
+    },
+    "cost": null
+  },
+  "showcase": {
+    "hiddenBeatNs": [],
+    "notes": "Aninews ep 16. New entry — script creates the tracker doc. Nvidia N1X / RTX Spark laptop chip. Reused locked huang.png ref; Seedance 720p."
+  }
+}
