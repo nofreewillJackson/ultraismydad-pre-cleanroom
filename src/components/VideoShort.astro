@@ -82,7 +82,7 @@ const rows = [
           <div class="source-grid">
             {sources.map((source: any) => (
               <a class="source-card" href={source.url} target="_blank" rel="noreferrer">
-                <div class="source-title">{source.title || source.publisher || source.url}</div>
+                <div class="source-title">{source.attribution || source.title || source.publisher || source.url}</div>
                 <div class="source-url">{source.url}</div>
               </a>
             ))}

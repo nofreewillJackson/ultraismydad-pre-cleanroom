@@ -748,7 +748,7 @@ export function inferSeries(input: { name?: string; id?: string; show?: string |
   if (hay.includes("aninews") || hay.includes("news-anime") || hay.includes("faux7")) return "aninews";
   if (hay.includes("dev-log") || hay.includes("dev log")) return "spoolcast-dev-log";
   if (hay.includes("chat to video workflow") || hay.includes("session to video")) return "videos";
-  if (hay.includes("spoolcast")) return "videos";
+  if (hay.includes("spoolcast")) return "spoolcast-features";
   return undefined;
 }
 
