@@ -1,0 +1,207 @@
+{
+  "id": "news-anime-bot-2026-06-05",
+  "format": "short",
+  "show": "news-anime-bot",
+  "title": "Anthropic Files For IPO, Public Markets Asked Not To Read Too Much Into It — Aninews ep 17",
+  "desc": "Daily AI news satire. Anthropic confidentially files for IPO at a ~$965B private valuation — the safety company walks its carefully-worded S-1 into the least careful machine in finance.",
+  "shippedAt": "2026-06-05",
+  "durationSec": 80,
+  "topicTier": "GREEN",
+  "video": {
+    "youtubeId": "QnK5bxGAgdI",
+    "tiktokId": null,
+    "tiktokUrl": null,
+    "mp4Url": null,
+    "thumbnailUrl": "https://i.ytimg.com/vi/QnK5bxGAgdI/oardefault.jpg"
+  },
+  "preRoll": {
+    "burnedText": "⚠ SATIRE — AI-GENERATED PARODY — NOT REAL",
+    "voiceTag": "FAUX7 News. Satire."
+  },
+  "characters": [
+    {
+      "name": "altman",
+      "kind": "character",
+      "imageUrl": "/videos/news-anime-bot-2026-06-05/assets/characters/altman.webp",
+      "description": "",
+      "usedInBeats": []
+    }
+  ],
+  "beats": [
+    {
+      "n": 1,
+      "name": "openai-rival-arrives-late",
+      "durationSec": 5,
+      "narration": "On Monday, Anthropic confidentially filed paperwork to go public.",
+      "character": "altman, SEC intake hall, S-1 capsule",
+      "sourceChyron": "CONFIDENTIAL S-1",
+      "cinematography": null,
+      "clipImageUrl": null
+    },
+    {
+      "n": 2,
+      "name": "confidential-intake-machine",
+      "durationSec": 5,
+      "narration": "Officially, this gives the company the option to IPO after SEC review.",
+      "character": "SEC intake hall, S-1 capsule",
+      "sourceChyron": "SEC FILING",
+      "cinematography": null,
+      "clipImageUrl": null
+    },
+    {
+      "n": 3,
+      "name": "not-an-offer-warning",
+      "durationSec": 5,
+      "narration": "The number of shares is not set. The price is not set. The hype, however, arrived early.",
+      "character": "SEC intake hall, warning strips, investors",
+      "sourceChyron": "NOT AN OFFER",
+      "cinematography": null,
+      "clipImageUrl": null
+    },
+    {
+      "n": 4,
+      "name": "valuation-tower-rises",
+      "durationSec": 6,
+      "narration": "Days earlier, reports put Anthropic's private valuation at nine hundred sixty-five billion dollars.",
+      "character": "trading floor, valuation tower",
+      "sourceChyron": "$965B VALUATION",
+      "cinematography": null,
+      "clipImageUrl": null
+    },
+    {
+      "n": 5,
+      "name": "market-conditions-weather",
+      "durationSec": 5,
+      "narration": "That is close enough to a trillion dollars that Wall Street had to pretend not to notice.",
+      "character": "market-weather deck",
+      "sourceChyron": "MARKET CONDITIONS",
+      "cinematography": null,
+      "clipImageUrl": null
+    },
+    {
+      "n": 6,
+      "name": "ipo-race-queue",
+      "durationSec": 5,
+      "narration": "Axios framed Anthropic, OpenAI, and SpaceX as a race toward public markets at trillion-dollar scale.",
+      "character": "altman, IPO queue rail",
+      "sourceChyron": "IPO RACE",
+      "cinematography": null,
+      "clipImageUrl": null
+    },
+    {
+      "n": 7,
+      "name": "financial-data-door",
+      "durationSec": 5,
+      "narration": "Anthropic's announcement added that the offering depends on market conditions and other factors.",
+      "character": "sealed disclosure room, S-1 capsule",
+      "sourceChyron": "DETAILS NOT PUBLIC",
+      "cinematography": null,
+      "clipImageUrl": null
+    },
+    {
+      "n": 8,
+      "name": "wall-street-conveyor",
+      "durationSec": 5,
+      "narration": "Market conditions, in this case, are a room full of people trying very hard to create market conditions.",
+      "character": "trading floor, S-1 capsule",
+      "sourceChyron": "PUBLIC MARKETS",
+      "cinematography": null,
+      "clipImageUrl": null
+    },
+    {
+      "n": 9,
+      "name": "safety-lab-invasion",
+      "durationSec": 6,
+      "narration": "The company best known for saying careful things about safety is now approaching the least careful machine in finance.",
+      "character": "safety-lab couriers, trading floor",
+      "sourceChyron": "SAFETY MEETS MARKETS",
+      "cinematography": null,
+      "clipImageUrl": null
+    },
+    {
+      "n": 10,
+      "name": "trillion-dollar-gantry",
+      "durationSec": 6,
+      "narration": "If it moves forward, public investors may eventually get risk factors, financials, and a very large price tag.",
+      "character": "IPO launch gantry, S-1 capsule",
+      "sourceChyron": "NEAR $1T",
+      "cinematography": null,
+      "clipImageUrl": null
+    },
+    {
+      "n": 11,
+      "name": "quiet-procedure-hype-machine",
+      "durationSec": 5,
+      "narration": "Until then, the filing remains confidential, which is convenient for everyone already loudly valuing it.",
+      "character": "trading floor, warning strips",
+      "sourceChyron": "SUBJECT TO REVIEW",
+      "cinematography": null,
+      "clipImageUrl": null
+    },
+    {
+      "n": 12,
+      "name": "launch-with-caveat",
+      "durationSec": 7,
+      "narration": "Anthropic is not offering shares yet. It is merely asking Wall Street to remain calm near the launch button.",
+      "character": "launch gantry, market-conditions gate, S-1 capsule",
+      "sourceChyron": "MARKET CONDITIONS",
+      "cinematography": null,
+      "clipImageUrl": null
+    }
+  ],
+  "sources": [
+    {
+      "fact": "",
+      "attribution": "Anthropic confidentially submits draft S-1 to the SEC",
+      "url": "https://www.anthropic.com/news/confidential-draft-s1-sec"
+    },
+    {
+      "fact": "",
+      "attribution": "Anthropic files for its IPO - Axios",
+      "url": "https://www.axios.com/2026/06/01/anthropic-ipo-openai"
+    },
+    {
+      "fact": "",
+      "attribution": "AI companies are barreling toward huge Wall Street debuts - AP",
+      "url": "https://apnews.com/article/2694431c5cf8850cad940731a38eb188"
+    },
+    {
+      "fact": "",
+      "attribution": "Anthropic vaults to a $965 billion valuation with new funding as Claude demand surges - AP",
+      "url": "https://apnews.com/article/86c432fa375548fd4f111f8164d6ffc1"
+    },
+    {
+      "fact": "",
+      "attribution": "Anthropic raises $65B in Series H funding at $965B post-money valuation",
+      "url": "https://www.anthropic.com/news/series-h"
+    }
+  ],
+  "transcript": "On Monday, Anthropic confidentially filed paperwork to go public. Officially, this gives the company the option to IPO after SEC review. The number of shares is not set. The price is not set. The hype, however, arrived early. Days earlier, reports put Anthropic's private valuation at nine hundred sixty-five billion dollars. That is close enough to a trillion dollars that Wall Street had to pretend not to notice. Axios framed Anthropic, OpenAI, and SpaceX as a race toward public markets at trillion-dollar scale. Anthropic's announcement added that the offering depends on market conditions and other factors. Market conditions, in this case, are a room full of people trying very hard to create market conditions. The company best known for saying careful things about safety is now approaching the least careful machine in finance. If it moves forward, public investors may eventually get risk factors, financials, and a very large price tag. Until then, the filing remains confidential, which is convenient for everyone already loudly valuing it. Anthropic is not offering shares yet. It is merely asking Wall Street to remain calm near the launch button.",
+  "summary": {
+    "writing": {
+      "author": "Claude",
+      "role": "script · beat plan · narration · sources audit"
+    },
+    "videoClips": {
+      "platform": "kie.ai",
+      "models": [
+        "Seedance 2.0 Fast"
+      ],
+      "clipCount": 12
+    },
+    "audio": {
+      "tts": "Google Cloud TTS",
+      "voice": "Schedar",
+      "beatCount": 12
+    },
+    "render": {
+      "engine": "ffmpeg",
+      "passed": true
+    },
+    "cost": null
+  },
+  "showcase": {
+    "hiddenBeatNs": [],
+    "notes": "Aninews ep 17. New entry — script creates the tracker doc. Anthropic IPO S-1 filing. Cyberpunk public-market launch facility trope with SEC intake hall, valuation tower, market-conditions gate. 12 beats, Seedance 720p, Schedar voice."
+  }
+}

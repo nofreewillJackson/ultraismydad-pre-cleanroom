@@ -1,18 +1,31 @@
 [
   {
+    "videoId": "news-anime-bot-2026-06-05",
+    "format": "short",
+    "show": "news-anime-bot",
+    "sessionDate": "2026-06-05",
+    "title": "Anthropic Files For IPO, Public Markets Asked Not To Read Too Much Into It \u2014 Aninews ep 17",
+    "desc": "Daily AI news satire. Anthropic confidentially files for IPO at a ~$965B private valuation \u2014 the safety company walks its carefully-worded S-1 into the least careful machine in finance.",
+    "youtubeId": "QnK5bxGAgdI",
+    "shippedAt": "2026-06-05",
+    "durationSec": 80,
+    "hiddenBeatNs": [],
+    "notes": "Aninews ep 17. New entry \u2014 script creates the tracker doc. Anthropic IPO S-1 filing. Cyberpunk public-market launch facility trope with SEC intake hall, valuation tower, market-conditions gate. 12 beats, Seedance 720p, Schedar voice."
+  },
+  {
     "videoId": "news-anime-bot-2026-06-02",
     "trackerDocId": "P7ezhTGYhK2ivs0o5K7A",
     "format": "short",
     "show": "news-anime-bot",
     "sessionDate": "2026-06-02",
-    "title": "Nvidia Declares A New Era Of The PC, In Which The PC Is Also Nvidia — Aninews ep 16",
-    "desc": "Daily AI news satire. At Computex, Nvidia unveiled its first Windows-laptop chip — a 20-core CPU with a desktop-class GPU — and declared 'a new era of PC'; it already supplies most of the AI industry, so the new era still runs on Nvidia.",
+    "title": "Nvidia Declares A New Era Of The PC, In Which The PC Is Also Nvidia \u2014 Aninews ep 16",
+    "desc": "Daily AI news satire. At Computex, Nvidia unveiled its first Windows-laptop chip \u2014 a 20-core CPU with a desktop-class GPU \u2014 and declared 'a new era of PC'; it already supplies most of the AI industry, so the new era still runs on Nvidia.",
     "youtubeId": "oG10TOPQldY",
     "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7646535610345327902",
     "shippedAt": "2026-06-02",
     "durationSec": 71,
     "hiddenBeatNs": [],
-    "notes": "Aninews ep 16. New entry — script creates the tracker doc. Nvidia N1X / RTX Spark laptop chip. Reused locked huang.png ref; Seedance 720p."
+    "notes": "Aninews ep 16. New entry \u2014 script creates the tracker doc. Nvidia N1X / RTX Spark laptop chip. Reused locked huang.png ref; Seedance 720p."
   },
   {
     "videoId": "news-anime-bot-2026-05-22",
@@ -20,14 +33,14 @@
     "format": "short",
     "show": "news-anime-bot",
     "sessionDate": "2026-05-22",
-    "title": "SpaceX Files Plans For A $119 Billion Chip Factory To Feed Musk's Four Other Companies — Aninews ep 14",
-    "desc": "Daily AI news satire. SpaceX disclosed in a federal filing that Terafab, its planned chip factory outside Austin, could cost up to $119B across all phases — and every customer of the fab (SpaceX rockets, Tesla cars, Tesla robots, xAI data centers) is also an owner.",
+    "title": "SpaceX Files Plans For A $119 Billion Chip Factory To Feed Musk's Four Other Companies \u2014 Aninews ep 14",
+    "desc": "Daily AI news satire. SpaceX disclosed in a federal filing that Terafab, its planned chip factory outside Austin, could cost up to $119B across all phases \u2014 and every customer of the fab (SpaceX rockets, Tesla cars, Tesla robots, xAI data centers) is also an owner.",
     "youtubeId": "OrQhzNEhnYc",
     "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7644319994288803102",
     "shippedAt": "2026-05-22",
     "durationSec": 69,
     "hiddenBeatNs": [],
-    "notes": "Aninews ep 14. New entry — script will create the tracker doc. Follow-up update_project sets longDesc + link to TikTok URL. First episode using the new fast multi-strike + no-slow-motion Seedance prompt pattern."
+    "notes": "Aninews ep 14. New entry \u2014 script will create the tracker doc. Follow-up update_project sets longDesc + link to TikTok URL. First episode using the new fast multi-strike + no-slow-motion Seedance prompt pattern."
   },
   {
     "videoId": "spoolcast-dev-log-09",
@@ -45,25 +58,25 @@
     "videoId": "spoolcast-dev-log-07",
     "trackerDocId": "5wKVNWOCn7B5DvXNs5ID",
     "format": "long",
-    "title": "three-ai AdsMetri build story — spoolcast dev log 7",
+    "title": "three-ai AdsMetri build story \u2014 spoolcast dev log 7",
     "desc": "devlog about building AdsMetri across Codex, Manus, and Claude, and why role clarity mattered more than raw AI output.",
     "youtubeId": "21zjy7BDEI0",
     "shippedAt": "2026-05-13",
     "durationSec": 773,
     "hiddenChunkIds": [],
-    "notes": "Tracker entry exists. Long form. Already on YouTube — script can ship the guidebook."
+    "notes": "Tracker entry exists. Long form. Already on YouTube \u2014 script can ship the guidebook."
   },
   {
     "videoId": "spoolcast-dev-log-08",
     "trackerDocId": "WZ8xT1ZbxRxNceMNTxFd",
     "format": "long",
-    "title": "giving an AI agent a key to your wallet — spoolcast dev log 8",
+    "title": "giving an AI agent a key to your wallet \u2014 spoolcast dev log 8",
     "desc": "devlog about letting AI agents spend real money in PipelineCPC, and the fences that keep it from going wrong.",
     "youtubeId": "vwqv8VIc2fA",
     "shippedAt": "2026-05-18",
     "durationSec": 344,
     "hiddenChunkIds": [],
-    "notes": "Tracker entry exists. Long form. Already on YouTube — script can ship the guidebook."
+    "notes": "Tracker entry exists. Long form. Already on YouTube \u2014 script can ship the guidebook."
   },
   {
     "videoId": "news-anime-bot-2026-05-12",
@@ -78,7 +91,7 @@
     "shippedAt": "2026-05-12",
     "durationSec": 58,
     "hiddenBeatNs": [],
-    "notes": "Aninews ep 8. Tracker entry exists, guidebookStatus: pending. Ready to ship — script can build the guidebook."
+    "notes": "Aninews ep 8. Tracker entry exists, guidebookStatus: pending. Ready to ship \u2014 script can build the guidebook."
   },
   {
     "videoId": "news-anime-bot-2026-05-19",
@@ -93,7 +106,7 @@
     "shippedAt": "2026-05-19",
     "durationSec": 65,
     "hiddenBeatNs": [],
-    "notes": "Aninews ep 12. Tracker entry exists (niJM37WPfYSMIXNYjS20), guidebookStatus: pending — backfilling shipment row so ship-video.mjs can flip it to ready."
+    "notes": "Aninews ep 12. Tracker entry exists (niJM37WPfYSMIXNYjS20), guidebookStatus: pending \u2014 backfilling shipment row so ship-video.mjs can flip it to ready."
   },
   {
     "videoId": "news-anime-bot-2026-05-21",
@@ -108,6 +121,6 @@
     "shippedAt": "2026-05-21",
     "durationSec": 78,
     "hiddenBeatNs": [],
-    "notes": "Aninews ep 13. Tracker entry exists (OGQhwO5B5cO2b4Fy1Y47), guidebookStatus: pending — backfilling shipment row so ship-video.mjs can flip it to ready. First episode using the dual-character CHARACTER_LABELS overlay system."
+    "notes": "Aninews ep 13. Tracker entry exists (OGQhwO5B5cO2b4Fy1Y47), guidebookStatus: pending \u2014 backfilling shipment row so ship-video.mjs can flip it to ready. First episode using the dual-character CHARACTER_LABELS overlay system."
   }
 ]
