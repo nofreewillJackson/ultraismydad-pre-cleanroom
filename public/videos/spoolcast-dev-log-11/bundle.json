@@ -1,0 +1,503 @@
+{
+  "id": "spoolcast-dev-log-11",
+  "format": "long",
+  "title": "The $100 AI Agent Failed. The $2 One Shipped It — spoolcast dev log 11",
+  "desc": "My $100/month AI coding agent kept failing mid-ship — not because it was dumb, but because the VPN connection kept dropping during context compaction. Every time it tried to save its work, the session died. Three times in a row from a Shenzhen hotel room at midnight. I switched to Hermes, an open-source agent that runs entirely on my laptop, and the same session that cost $30 became $2.",
+  "shippedAt": "2026-06-09",
+  "durationSec": 274,
+  "coreMessage": "The model matters. But the harness — what lets the AI reach your files, your terminal, your internet — matters more.",
+  "video": {
+    "youtubeId": "-yP9xFwY-80",
+    "mp4Url": null,
+    "thumbnailUrl": "https://img.youtube.com/vi/-yP9xFwY-80/maxresdefault.jpg"
+  },
+  "style": {
+    "name": "wojak-gpt2",
+    "description": "Modern wojak / doomer-chad meme comic style, built natively on GPT Image 2 (text-to-image + image-to-image). Sister library to wojak-comic (which was built on nano-banana-2). Use this when the session's preferred_model is the GPT Image 2 family.",
+    "anchorImageUrl": "/videos/spoolcast-dev-log-11/assets/style/anchor.webp",
+    "anchorDescription": "Modern wojak / doomer-chad meme comic style, built natively on GPT Image 2 (text-to-image + image-to-image). Sister library to wojak-comic (which was built on nano-banana-2). Use this when the session's preferred_model is the GPT Image 2 family.",
+    "references": [
+      {
+        "name": "builder",
+        "kind": "character",
+        "imageUrl": "/videos/spoolcast-dev-log-11/assets/style/references/builder.webp",
+        "description": "the main hooded figure — mid-register wojak (not fully doomer, not fully chad). Alias for the style anchor; serves double-duty as both the style anchor and the builder character reference."
+      },
+      {
+        "name": "ai-figure",
+        "kind": "character",
+        "imageUrl": "/videos/spoolcast-dev-log-11/assets/style/references/ai-figure.webp",
+        "description": "a wojak-universe AI figure that is slowly breaking down from overuse. Full-body standing. EMOTIONAL REGISTER: flat-affect, NO displayed emotion, NO smile, NO frown — a dead expressionless stare. Depression is the absence of emotion, not the display of sadness. FACE LINEWORK: brows, nose, mouth drawn in the classic rough / jagged / slightly-disjointed wojak linework (uneven strokes, hand-drawn imperfections). EYES: replaced with hollow loading-spinner icons (dashed rings) set in dark-shadowed sockets. CRACKS: visible hairline cracks spider across the face and forehead as if the outer shell is fracturing from overuse. At least one crack wide enough to reveal a glimpse of AI circuitry underneath — thin circuit-trace lines, a small exposed chip pattern. Fractures read as structural fatigue, not injury. FOREHEAD: a crooked rectangular ink-stamp reading 'AI' in bold capital letters, partially crossed by a crack. HOODIE: pale cream / off-white hoodie, hood down, noticeably lighter than the weary narrator's gray hoodie. POSTURE: slight slouch, arms hanging at sides. PLAIN background, no environment, no other characters, no other text. Single clear readable subject."
+      },
+      {
+        "name": "meme-chad",
+        "kind": "character",
+        "imageUrl": "/videos/spoolcast-dev-log-11/assets/style/references/meme-chad.webp",
+        "description": "the exact meme-Chad identity used by earlier Spoolcast devlogs: clean-shaven confident Chad with signature yellow pointed mohawk-spike hair, strong jawline, pronounced cheekbones, smug half-smile, muscular arms, and a red ripped-sleeve OUCH! shirt. He is comedic contrast by default: confident, slightly too pleased with himself, and visually brighter than the weary builder. Do not turn him into a bearded worker, lumberjack, security guard, producer, stagehand, engineer, inspector, or generic muscular man."
+      }
+    ]
+  },
+  "chunks": [
+    {
+      "id": "C001",
+      "order": 1,
+      "sceneTitle": "Cold Open - Agent Failure",
+      "summary": "Agent failed mid-ship. VPN drops. Three compaction attempts, all dead.",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-11/assets/scenes/IMG01.webp",
+      "imageSource": null,
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Builder slams machine shut in frustration at a dimly-lit airport gate at midnight. Departure board behind them shows every flight as CANCELLED in red. The builder's face shows exhausted frustration.\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "001A",
+          "narration": "I was in the middle of shipping a video when my AI agent failed."
+        },
+        {
+          "id": "001B",
+          "narration": "Not because it crashed. Not because it ran out of tokens. Because the VPN connection to the server it was running on kept dropping. Every time the agent tried to compress the conversation, the connection cut out and the session died. Three failed attempts in a row. After the third, I gave up."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C002",
+      "order": 2,
+      "sceneTitle": "Promise + Spoolcast Intro",
+      "summary": "Promise what viewer will learn. Introduce Spoolcast pipeline.",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-11/assets/scenes/IMG07.webp",
+      "imageSource": null,
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Video-making machine on a bright TV-show set surrounded by stage lights. The machine is compact but clearly complex — visible gears and glass chambers. Builder stands beside it, one hand resting on a large lever. A clean glowing video reel sits at the output end, ready. The mood is confident and inviting.\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "002A",
+          "narration": "By the end, you will understand why I switched tools mid-project, and why the software that wraps around an AI model matters as much as the model itself."
+        },
+        {
+          "id": "002B",
+          "narration": "Quick context. Spoolcast is my AI video pipeline. I give it messy source material, build notes, screenshots, chat logs, and agents help turn that into videos. Understand the source, write the story, plan what appears on screen, make the narration and visuals, render the final video."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C003",
+      "order": 3,
+      "sceneTitle": "Episode Premise",
+      "summary": "Tool stopped working. Hotel room in China. Ep 17 almost done.",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-11/assets/scenes/IMG12.webp",
+      "imageSource": null,
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Factory conveyor belt carrying three completed packages. SCRIPT with green checkmark. CLIPS with green checkmark. RENDER with green checkmark. Builder walks alongside the belt, checking each package with a clipboard. The belt moves toward a distant launch pad area. Everything looks on track.\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "003A",
+          "narration": "This episode is about what happened when the tool I was using stopped working, and I had to find a new one from a hotel room in China."
+        },
+        {
+          "id": "003B",
+          "narration": "The video was episode seventeen of a daily AI news show. Script done, clips generated, final render complete. One command left to publish. And the tool that was supposed to run that command could no longer finish a sentence."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C004",
+      "order": 4,
+      "sceneTitle": "Codex - Remote Server Problem",
+      "summary": "Codex was the tool. Remote server. Desktop is just a window.",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-11/assets/scenes/IMG14.webp",
+      "imageSource": null,
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Builder sits at a table with an open notebook showing a Codex interface — recognizable code-diff panels, a chat sidebar. Behind the notebook, a giant transparent screen fills the background, showing a distant server room across a dark ocean. A thin glowing cable stretches from the notebook across the water to the server. Builder types, unaware of the distance.\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "004A",
+          "narration": "The tool was Codex, OpenAI's coding agent. For months, it was how I shipped everything."
+        },
+        {
+          "id": "004B",
+          "narration": "But it runs on a remote server. Your desktop is just a window. When the connection drops, you feel every mile between you and the machine doing the work."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C005",
+      "order": 5,
+      "sceneTitle": "Context Compaction Explained",
+      "summary": "What compaction is. One interrupted call = dead session.",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-11/assets/scenes/IMG16.webp",
+      "imageSource": null,
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Ai-figure character feeds a giant scroll of handwritten chat messages into a funnel labeled CONTEXT WINDOW. The funnel is overflowing — paper spills over the sides. The ai-figure works methodically, face flat and expressionless, feeding more scroll into the already-full funnel. The scroll behind them stretches far into the background, seemingly endless.\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "005A",
+          "narration": "Here is what context compaction means. Every message stays in the chat history. After hours, that is tens of thousands of words. The model can only hold so much, so the agent summarizes the early parts and keeps going."
+        },
+        {
+          "id": "005B",
+          "narration": "But that summary needs one uninterrupted call. If your connection drops, the compaction fails, the context window fills up, and the session dies. I watched a four-second drop destroy hours of work three times. I didn't try a fourth."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C006",
+      "order": 6,
+      "sceneTitle": "Shenzhen Context",
+      "summary": "Builder in Shenzhen. VPS via VPN from China. Failure context.",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-11/assets/scenes/IMG18.webp",
+      "imageSource": null,
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Builder at a busy Shenzhen night market food stall. Chopsticks in one hand hovering over a bowl of noodles. Phone held at arm's length in the other hand. Phone screen shows: a server rack icon with giant red X and a VPN shield icon cracked in half. Behind the builder, neon signs in Chinese characters glow in pink, blue, and green. Builder looks at the phone with exhausted flat disbelief — not angry, just done. The contrast between the vibrant market and the dead server on the tiny screen is the joke.\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "006A",
+          "narration": "I was in Shenzhen, on vacation, shipping a daily news show through a VPN from mainland China at midnight."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C007",
+      "order": 7,
+      "sceneTitle": "Infrastructure Gap",
+      "summary": "AI agents ranked by code, not network reliability. But software needs infrastructure.",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-11/assets/scenes/IMG19.webp",
+      "imageSource": null,
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: A giant glowing AI brain the size of a hot air balloon floats majestically inside a pristine glass server room suspended over a dark ocean. A single frayed network cable dangles from the bottom of the room into the water below, sparking where it touches the waves. Builder stands on a tiny wooden raft beneath, holding the severed other end of the cable, looking up at the brain. The brain is brilliant, intricate, and completely unreachable. The scale contrast — massive brain, tiny raft — makes the absurdity physical.\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "007A",
+          "narration": "This is the problem you don't anticipate when picking a tool. AI agents are ranked by benchmarks and code quality. Nobody ranks them by what happens when the network is unreliable."
+        },
+        {
+          "id": "007B",
+          "narration": "But they are software, and software needs infrastructure. If that infrastructure is a server across the world and your connection is fragile, you have a very smart program that cannot finish a sentence."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C008",
+      "order": 8,
+      "sceneTitle": "Looking for Local",
+      "summary": "Went looking for something that runs on my machine.",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-11/assets/scenes/IMG21.webp",
+      "imageSource": null,
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Builder in a completely dark room lit only by the glow of a notebook screen. The search query on screen reads: 'AI coding agent runs locally no server'. The screen casts a beam of white light straight ahead across the dark room toward a distant rectangular opening. In the shadows between builder and the opening, dark silhouettes shaped like server racks and cloud icons lurk — monsters left behind. Builder leans forward toward the screen, squinting at the light ahead. The mood is hopeful, not desperate.\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "008A",
+          "narration": "So I went looking for something that runs on my machine."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C009",
+      "order": 9,
+      "sceneTitle": "Hermes Discovery",
+      "summary": "Found Hermes. Open-source, same category. Three differences.",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-11/assets/scenes/IMG22.webp",
+      "imageSource": null,
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Builder kicks open a heavy stone vault door, light from behind the camera flooding into the dark vault. Inside, three stone pedestals. Left pedestal: an open terminal screen with a blinking green cursor and a checkmark. Center pedestal: three glowing abstract provider shapes (square, circle, triangle) connected by glowing arrows to one central hub. Right pedestal: a notebook radiating warm light with a small house icon on its screen. Builder strides into the vault, one hand already reaching for the terminal. Stone walls, iron door swinging open. The mood is discovery — something valuable was found.\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "009A",
+          "narration": "What I found was Hermes, an open-source agent from Nous Research. Same category. Three differences turned out to matter."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C010",
+      "order": 10,
+      "sceneTitle": "Terminal Access - Sandbox vs Shell",
+      "summary": "First difference: sandbox vs shell. Agent directions from back seat vs driver's seat.",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-11/assets/scenes/IMG23.webp",
+      "imageSource": null,
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Left half of a split screen. A character pounds both fists against the inside of a transparent glass box labeled SANDBOX. Outside the box, on shelves: a database server with blinking lights, an API endpoint icon with a glowing plug, and a build tool with a gear icon — all bright, active, and completely unreachable. The character's hands are pressed flat against the glass, face desperate. The glass shows impact cracks from the pounding.\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "010A",
+          "narration": "First: terminal access. Desktop agents run inside a sandbox. They can read files, but they cannot run commands or make network requests. To reach anything outside the file system, you need a separate bridge server. That is a lot of work just to run git push."
+        },
+        {
+          "id": "010B",
+          "narration": "Hermes has a shell. Anything you would type into a terminal, it can run. In a sandbox, the agent gives directions from the back seat. With a shell, it is in the driver's seat."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C011",
+      "order": 11,
+      "sceneTitle": "Model Choice + Pricing",
+      "summary": "Second difference: model-agnostic. 87¢ vs $14. Real numbers.",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-11/assets/scenes/IMG25.webp",
+      "imageSource": null,
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Bright game-show set with two podiums under stage lights. Left podium: a comically tiny stack of three silver coins with a label reading '87¢/M' on a card in front. Builder stands behind it, looking right with jaw visibly dropped in disbelief. Right podium: a tower of gold coins so tall it goes off the top of the frame, with wooden scaffolding holding it up. A card in front reads '$14/M'. The visual scale makes the 16x difference absurd. Render exactly this text on the frame, hand-lettered in the session style: \"87¢/M\" | \"$14/M\".\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "011A",
+          "narration": "Second: model choice. Most agents are locked to one provider. Hermes works with any of them. I switched to DeepSeek, about eighty-seven cents per million output tokens. The model I was using before costs fourteen dollars. Sixteen times more."
+        },
+        {
+          "id": "011B",
+          "narration": "A heavy session on the old tool: thirty dollars. Same session on DeepSeek: two dollars. Ship every day and that is nine hundred a month versus sixty. For someone building on their own, that difference is real."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C012",
+      "order": 12,
+      "sceneTitle": "Local-First",
+      "summary": "Third difference: everything on laptop. No VPS, no VPN. WiFi drops, nothing dies.",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-11/assets/scenes/IMG27.webp",
+      "imageSource": null,
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Builder sits cross-legged on a mountaintop at golden sunrise. A MacBook rests open on their lap, screen glowing warmly. From the screen radiate five glowing constellation lines, each connecting to an orbiting label floating around the notebook like small moons: AGENT, MODEL, MEMORY, TOOLS, MCP. The landscape is vast and empty — no server racks, no cloud icons, no VPN tunnels anywhere. In the corner of the notebook screen, a tiny WiFi icon has a red X through it, and the builder hasn't noticed or doesn't care. Builder types with one hand and gestures at the orbiting labels with the other, calm and in control. The mood is peaceful freedom.\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "012A",
+          "narration": "Third: it runs entirely on my laptop. No virtual private server, no remote server, no VPN. The agent, the model calls, the tools, the memory, everything lives on the machine in front of me. I lose Wi-Fi, nothing dies."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C013",
+      "order": 13,
+      "sceneTitle": "MCP Bridge Test",
+      "summary": "First test: MCP server bridge. Built for Codex. Would it work with Hermes?",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-11/assets/scenes/IMG28.webp",
+      "imageSource": null,
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: A universal power strip with a glowing MCP label sits center frame on a surface. Two plugs are already connected: a square plug with a small 'Codex' tag and a round plug with a 'Claude Code' tag. On the other end of the strip, a database icon labeled PROJECTS glows steady green. Builder kneels beside the surface, holding a triangular plug with a 'Hermes' tag, examining it thoughtfully — about to connect it. The two existing connections imply the strip works. The third plug is the test.\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "013A",
+          "narration": "The first real test was the bridge to my project tracker. I built a small server that lets AI agents write directly to my project database. Built it for Codex. Worked with another agent I use. Would it work with something completely different?"
+        },
+        {
+          "id": "013B",
+          "narration": "Plugged it into Hermes. Same config. Same protocol. Zero changes."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C014",
+      "order": 14,
+      "sceneTitle": "Success - Four Changes",
+      "summary": "One hour, four changes. Stuck video shipped. No drops.",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-11/assets/scenes/IMG30.webp",
+      "imageSource": null,
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: A victory parade float on a sunny street. Four giant fabric banners hang from the float, each with an animated emblem. Banner 1: 'EPISODE 17 SHIPPED' — a small rocket launching upward. Banner 2: 'DEV-LOG SHIPPED' — a film reel spinning. Banner 3: 'CATEGORIES FIXED' — a puzzle piece clicking into place. Banner 4: 'LINKS FIXED' — chain links connecting. Three banners are already lit and glowing. The fourth is mid-illumination, activating as the narration reaches it. Builder stands on the float platform, watching each banner activate.\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "014A",
+          "narration": "Within an hour, I finished shipping the video stuck behind three dead sessions. Then another video stuck for a week. Then I fixed where videos were miscategorized on my project site. Then I fixed how source links display."
+        },
+        {
+          "id": "014B",
+          "narration": "Four changes, one session. No drops. No dead compactions."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C015",
+      "order": 15,
+      "sceneTitle": "The Lesson - Comparable Models",
+      "summary": "Not that Hermes is better. Models are comparable. Difference is access.",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-11/assets/scenes/IMG32.webp",
+      "imageSource": null,
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Two identical glowing brains sit side by side on a stone table against a dark background. The left brain has a transparent glass dome lowered over it — a small label at the base reads 'CODEX'. The right brain has no dome — label reads 'HERMES'. Both brains glow with exactly the same intensity and color — they are visibly equal. Between them, a set of keys on a steel ring rests on the table. Builder stands behind the table, one hand resting on each brain's pedestal, looking directly at the viewer with a calm, direct expression. The image states the thesis without words.\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "015A",
+          "narration": "Here is what I actually learned. It is not that Hermes is better than Codex. The models are comparable."
+        },
+        {
+          "id": "015B",
+          "narration": "The difference is what the model is allowed to do. Put any of these systems in a sandbox with no terminal and no network, and you get a knowledgeable chatbot. Give them the keys to the machine, and they can actually build."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C016",
+      "order": 16,
+      "sceneTitle": "Closing Thesis",
+      "summary": "The harness matters as much as the model. Maybe more.",
+      "sceneImageUrl": "/videos/spoolcast-dev-log-11/assets/scenes/IMG34.webp",
+      "imageSource": null,
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: Builder walks away from the camera down a long, empty road at golden hour. Over one shoulder: a shoulder bag, practical and worn. In one hand, held at waist level: a single key, glinting sharply in the warm sunset light. Far behind in the distance, small but visible: a giant glass cage sits shattered and empty on the roadside, already being left behind. No text. No labels. No speech bubbles. Just the road ahead, the key in hand, and the broken cage receding into the past. The mood is earned optimism — not triumphant, but free.\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "016A",
+          "narration": "The harness matters as much as the model. Maybe more."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    }
+  ],
+  "transcript": "I was in the middle of shipping a video when my AI agent failed. Not because it crashed. Not because it ran out of tokens. Because the VPN connection to the server it was running on kept dropping. Every time the agent tried to compress the conversation, the connection cut out and the session died. Three failed attempts in a row. After the third, I gave up. By the end, you will understand why I switched tools mid-project, and why the software that wraps around an AI model matters as much as the model itself. Quick context. Spoolcast is my AI video pipeline. I give it messy source material, build notes, screenshots, chat logs, and agents help turn that into videos. Understand the source, write the story, plan what appears on screen, make the narration and visuals, render the final video. This episode is about what happened when the tool I was using stopped working, and I had to find a new one from a hotel room in China. The video was episode seventeen of a daily AI news show. Script done, clips generated, final render complete. One command left to publish. And the tool that was supposed to run that command could no longer finish a sentence. The tool was Codex, OpenAI's coding agent. For months, it was how I shipped everything. But it runs on a remote server. Your desktop is just a window. When the connection drops, you feel every mile between you and the machine doing the work. Here is what context compaction means. Every message stays in the chat history. After hours, that is tens of thousands of words. The model can only hold so much, so the agent summarizes the early parts and keeps going. But that summary needs one uninterrupted call. If your connection drops, the compaction fails, the context window fills up, and the session dies. I watched a four-second drop destroy hours of work three times. I didn't try a fourth. I was in Shenzhen, on vacation, shipping a daily news show through a VPN from mainland China at midnight. This is the problem you don't anticipate when picking a tool. AI agents are ranked by benchmarks and code quality. Nobody ranks them by what happens when the network is unreliable. But they are software, and software needs infrastructure. If that infrastructure is a server across the world and your connection is fragile, you have a very smart program that cannot finish a sentence. So I went looking for something that runs on my machine. What I found was Hermes, an open-source agent from Nous Research. Same category. Three differences turned out to matter. First: terminal access. Desktop agents run inside a sandbox. They can read files, but they cannot run commands or make network requests. To reach anything outside the file system, you need a separate bridge server. That is a lot of work just to run git push. Hermes has a shell. Anything you would type into a terminal, it can run. In a sandbox, the agent gives directions from the back seat. With a shell, it is in the driver's seat. Second: model choice. Most agents are locked to one provider. Hermes works with any of them. I switched to DeepSeek, about eighty-seven cents per million output tokens. The model I was using before costs fourteen dollars. Sixteen times more. A heavy session on the old tool: thirty dollars. Same session on DeepSeek: two dollars. Ship every day and that is nine hundred a month versus sixty. For someone building on their own, that difference is real. Third: it runs entirely on my laptop. No virtual private server, no remote server, no VPN. The agent, the model calls, the tools, the memory, everything lives on the machine in front of me. I lose Wi-Fi, nothing dies. The first real test was the bridge to my project tracker. I built a small server that lets AI agents write directly to my project database. Built it for Codex. Worked with another agent I use. Would it work with something completely different? Plugged it into Hermes. Same config. Same protocol. Zero changes. Within an hour, I finished shipping the video stuck behind three dead sessions. Then another video stuck for a week. Then I fixed where videos were miscategorized on my project site. Then I fixed how source links display. Four changes, one session. No drops. No dead compactions. Here is what I actually learned. It is not that Hermes is better than Codex. The models are comparable. The difference is what the model is allowed to do. Put any of these systems in a sandbox with no terminal and no network, and you get a knowledgeable chatbot. Give them the keys to the machine, and they can actually build. The harness matters as much as the model. Maybe more.",
+  "summary": {
+    "writing": {
+      "author": "Claude",
+      "role": "screenplay, shot-list, scene prompts"
+    },
+    "images": {
+      "platform": "kie.ai",
+      "models": [
+        "gpt-image-2-image-to-image",
+        "gpt-image-2-text-to-image"
+      ],
+      "sceneCount": 85
+    },
+    "audio": {
+      "tts": "Google Cloud TTS",
+      "voice": "en-US-AndrewNeural",
+      "playbackRate": 1.1,
+      "beatCount": 32
+    },
+    "render": {
+      "engine": "Remotion",
+      "passed": false
+    },
+    "audit": {
+      "narrationModel": "claude",
+      "narrationFlags": 0
+    }
+  },
+  "showcase": {
+    "hiddenChunkIds": [],
+    "notes": "Spoolcast dev log 11. Codex→Hermes switch after VPN drops. 16 audio segments, 34 base layer images, AndrewNeural 1.1x, Edge TTS. First dev-log with base_layer+overlay_layer architecture. $30→$2 per session."
+  }
+}

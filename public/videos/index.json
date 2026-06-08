@@ -1,5 +1,18 @@
 [
   {
+    "id": "spoolcast-dev-log-11",
+    "format": "long",
+    "show": null,
+    "title": "The $100 AI Agent Failed. The $2 One Shipped It — spoolcast dev log 11",
+    "desc": "My $100/month AI coding agent kept failing mid-ship — not because it was dumb, but because the VPN connection kept dropping during context compaction. Every time it tried to save its work, the session died. Three times in a row from a Shenzhen hotel room at midnight. I switched to Hermes, an open-source agent that runs entirely on my laptop, and the same session that cost $30 became $2.",
+    "shippedAt": "2026-06-09",
+    "durationSec": 274,
+    "youtubeId": "-yP9xFwY-80",
+    "tiktokId": null,
+    "tiktokUrl": null,
+    "thumbnailUrl": "https://img.youtube.com/vi/-yP9xFwY-80/maxresdefault.jpg"
+  },
+  {
     "id": "news-anime-bot-2026-06-05",
     "format": "short",
     "show": "news-anime-bot",
@@ -24,6 +37,19 @@
     "tiktokId": "7646535610345327902",
     "tiktokUrl": "https://www.tiktok.com/@artlu.ai/video/7646535610345327902",
     "thumbnailUrl": "https://i.ytimg.com/vi/oG10TOPQldY/oardefault.jpg"
+  },
+  {
+    "id": "spoolcast-dev-log-10",
+    "format": "long",
+    "show": null,
+    "title": "The Dashboard Lied — spoolcast dev-log 10",
+    "desc": "I added Google Analytics to an ad dashboard and the basic question broke: how many sales did the ads create? Meta, GA4, and the store all reported different numbers — and matching records without guessing turned out to be the real problem.",
+    "shippedAt": "2026-05-29",
+    "durationSec": 509,
+    "youtubeId": "imfhsDkHLtQ",
+    "tiktokId": null,
+    "tiktokUrl": null,
+    "thumbnailUrl": "https://img.youtube.com/vi/imfhsDkHLtQ/maxresdefault.jpg"
   },
   {
     "id": "spoolcast-dev-log-09",
