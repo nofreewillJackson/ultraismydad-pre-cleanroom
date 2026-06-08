@@ -1,0 +1,695 @@
+{
+  "id": "spoolcast-dev-log-10",
+  "format": "long",
+  "title": "The Dashboard Lied — spoolcast dev-log 10",
+  "desc": "I added Google Analytics to an ad dashboard and the basic question broke: how many sales did the ads create? Meta, GA4, and the store all reported different numbers — and matching records without guessing turned out to be the real problem.",
+  "shippedAt": "2026-05-29",
+  "durationSec": 509,
+  "coreMessage": "When ad platforms, website analytics, and store orders disagree, the hard part is not just collecting the data. The hard part is matching records without guessing, then deciding which source is useful for each business decision.",
+  "video": {
+    "youtubeId": "imfhsDkHLtQ",
+    "mp4Url": null,
+    "thumbnailUrl": "https://img.youtube.com/vi/imfhsDkHLtQ/maxresdefault.jpg"
+  },
+  "style": {
+    "name": "wojak-gpt2",
+    "description": "Modern wojak / doomer-chad meme comic style, built natively on GPT Image 2 (text-to-image + image-to-image). Sister library to wojak-comic (which was built on nano-banana-2). Use this when the session's preferred_model is the GPT Image 2 family.",
+    "anchorImageUrl": "/videos/spoolcast-dev-log-10/assets/style/anchor.webp",
+    "anchorDescription": "Modern wojak / doomer-chad meme comic style, built natively on GPT Image 2 (text-to-image + image-to-image). Sister library to wojak-comic (which was built on nano-banana-2). Use this when the session's preferred_model is the GPT Image 2 family.",
+    "references": [
+      {
+        "name": "builder",
+        "kind": "character",
+        "imageUrl": "/videos/spoolcast-dev-log-10/assets/style/references/builder.webp",
+        "description": "the main hooded figure — mid-register wojak (not fully doomer, not fully chad). Alias for the style anchor; serves double-duty as both the style anchor and the builder character reference."
+      },
+      {
+        "name": "ai-figure",
+        "kind": "character",
+        "imageUrl": "/videos/spoolcast-dev-log-10/assets/style/references/ai-figure.webp",
+        "description": "a wojak-universe AI figure that is slowly breaking down from overuse. Full-body standing. EMOTIONAL REGISTER: flat-affect, NO displayed emotion, NO smile, NO frown — a dead expressionless stare. Depression is the absence of emotion, not the display of sadness. FACE LINEWORK: brows, nose, mouth drawn in the classic rough / jagged / slightly-disjointed wojak linework (uneven strokes, hand-drawn imperfections). EYES: replaced with hollow loading-spinner icons (dashed rings) set in dark-shadowed sockets. CRACKS: visible hairline cracks spider across the face and forehead as if the outer shell is fracturing from overuse. At least one crack wide enough to reveal a glimpse of AI circuitry underneath — thin circuit-trace lines, a small exposed chip pattern. Fractures read as structural fatigue, not injury. FOREHEAD: a crooked rectangular ink-stamp reading 'AI' in bold capital letters, partially crossed by a crack. HOODIE: pale cream / off-white hoodie, hood down, noticeably lighter than the weary narrator's gray hoodie. POSTURE: slight slouch, arms hanging at sides. PLAIN background, no environment, no other characters, no other text. Single clear readable subject."
+      },
+      {
+        "name": "meme-chad",
+        "kind": "character",
+        "imageUrl": "/videos/spoolcast-dev-log-10/assets/style/references/meme-chad.webp",
+        "description": "the exact meme-Chad identity used by earlier Spoolcast devlogs: clean-shaven confident Chad with signature yellow pointed mohawk-spike hair, strong jawline, pronounced cheekbones, smug half-smile, muscular arms, and a red ripped-sleeve OUCH! shirt. He is comedic contrast by default: confident, slightly too pleased with himself, and visually brighter than the weary builder. Do not turn him into a bearded worker, lumberjack, security guard, producer, stagehand, engineer, inspector, or generic muscular man."
+      }
+    ]
+  },
+  "chunks": [
+    {
+      "id": "C001",
+      "order": 1,
+      "sceneTitle": "Cold Open - Sales Count Breaks",
+      "summary": "The basic sales question breaks across three reporting systems.",
+      "sceneImageUrl": null,
+      "imageSource": "generated",
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: A checkout counter has three giant counting machines dumping different colored number blocks into separate bins labeled Meta, Google Analytics, and Store Orders. The builder braces both hands against the counter as the machines clatter out incompatible totals. The ai-figure feeds blank ad cards into one machine while the store register calmly prints a different total. The image reads as a business measurement problem, not a software screen. Render exactly this text on the frame, hand-lettered in the session style: \"Meta\" | \"Google Analytics\" | \"Store Orders\".\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "001A",
+          "narration": "I was adding Google Analytics to an ecommerce ad dashboard when the basic question broke: how many sales did the ads create?"
+        },
+        {
+          "id": "001B",
+          "narration": "The store runs ads on Facebook and Instagram through Meta. Meta had one sales number. Google Analytics, which tracks website behavior, had another. The store backend, where actual orders live, had a third."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C002",
+      "order": 2,
+      "sceneTitle": "Cold Open - Money Decision Still Happens",
+      "summary": "The mismatch matters, then the narration bridges into why this build is being shown through Spoolcast.",
+      "sceneImageUrl": null,
+      "imageSource": "generated",
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: A game-show stage turns the ad budget decision into a tense lever choice. One lever says Spend More, one says Hold Back, and the floor between them is covered with mismatched number blocks from the prior scene. A compact Spoolcast machine beside the stage converts messy chat bubbles, screenshots, and code cards into a glowing video reel while the builder chooses carefully instead of yanking a lever. Render exactly this text on the frame, hand-lettered in the session style: \"Spend More\" | \"Hold Back\" | \"Spoolcast\".\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "002A",
+          "narration": "The decision was still practical: whether to put more money behind campaigns or hold back."
+        },
+        {
+          "id": "002B",
+          "narration": "By the end, you will understand why connecting data is the easy part, and matching it without guessing is the hard part."
+        },
+        {
+          "id": "002C",
+          "narration": "I am turning that build session into this video, so quick context on how the video is being made."
+        },
+        {
+          "id": "002D",
+          "narration": "Spoolcast is my AI video pipeline. I can give it messy source material, like build notes, screenshots, code changes, or a chat, and the agents help turn that into videos."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C003",
+      "order": 3,
+      "sceneTitle": "Spoolcast Process Map",
+      "summary": "Spoolcast is framed as a broad production process before the build story continues.",
+      "sceneImageUrl": null,
+      "imageSource": "generated",
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: A miniature factory line turns a messy pile of inputs into a finished video reel. Each station performs a clear action: a sorter groups chat bubbles, a story press shapes them into a single ribbon, a staging table places simple scene tokens, a sound booth records narration, and a projector outputs the final reel. At the end, two colored data pipes collide into one reporting surface without merging cleanly. Render exactly this text on the frame, hand-lettered in the session style: \"Input\" | \"Story\" | \"Visuals\" | \"Narration\" | \"Video\".\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "003A",
+          "narration": "In simple terms, Spoolcast moves through a few broad steps: understand the source material, write the story, plan what appears on screen, make the narration and visuals, then render the final video."
+        },
+        {
+          "id": "003B",
+          "narration": "And this episode is about the exact kind of problem that sounds simple until you build it: take two systems that report the same business from different angles, put them in one dashboard, and do not accidentally lie to yourself."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C004",
+      "order": 4,
+      "sceneTitle": "Ad Decision Surface",
+      "summary": "The product exists to support campaign budget decisions.",
+      "sceneImageUrl": null,
+      "imageSource": "generated",
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: A campaign triage bay shows three large conveyor lanes labeled Campaign A, Campaign B, and Campaign C. Budget tokens roll toward the lanes while the Meta machine stamps spend, delivery, and attributed purchase tags onto the tokens. The builder catches one token before it drops into the wrong lane, emphasizing that this is about decisions, not decoration. Render exactly this text on the frame, hand-lettered in the session style: \"Campaign A\" | \"Campaign B\" | \"Campaign C\".\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "004A",
+          "narration": "The dashboard I was working on is for ad decisions. In plain English, it helps answer questions like: which campaign is working, which one is wasting money, and where should the next budget change go?"
+        },
+        {
+          "id": "004B",
+          "narration": "At first, the dashboard mostly used Meta data. That means it was asking the Facebook and Instagram ad system for spend, campaign names, delivery metrics, and the purchases Meta believes came from those ads."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C005",
+      "order": 5,
+      "sceneTitle": "Meta Is One Witness",
+      "summary": "Meta is useful, but only sees the ad-side story.",
+      "sceneImageUrl": null,
+      "imageSource": "generated",
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: A courtroom set turns Meta into one witness at a brightly lit witness chair. The witness feeds colored ad tokens through a small evidence scanner labeled spend, ad set, ad, click, and attributed purchase. The builder arranges the tokens on a rail but leaves two empty witness chairs visible for the website analytics and store order perspectives. Render exactly this text on the frame, hand-lettered in the session style: \"One Witness\".\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "005A",
+          "narration": "That is useful. It is also only one witness."
+        },
+        {
+          "id": "005B",
+          "narration": "Meta sees the ad side of the story. It knows what campaign spent money, which ad set ran, which ad was shown, who clicked, and what Meta thinks happened afterward."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C006",
+      "order": 6,
+      "sceneTitle": "Three Viewpoints",
+      "summary": "Google Analytics and the store backend see different parts of the same business.",
+      "sceneImageUrl": null,
+      "imageSource": "generated",
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: A cutaway ecommerce warehouse shows three observation balconies aimed at the same purchase path. One balcony tracks ad tokens entering the building, one tracks website footprints moving through product shelves and checkout, and one counts packed order boxes leaving through the shipping door. Colored spotlights overlap on the same path but never become one color. Render exactly this text on the frame, hand-lettered in the session style: \"Ad Side\" | \"Website Side\" | \"Orders\".\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "006A",
+          "narration": "Google Analytics sees the website side of the story. It watches visits, traffic sources, page views, events, carts, checkouts, purchases, and revenue."
+        },
+        {
+          "id": "006B",
+          "narration": "The store backend sees the order side of the story. It knows the actual orders and actual money collected. Those are three different viewpoints. They overlap, but they are not the same thing."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C007",
+      "order": 7,
+      "sceneTitle": "Wrong First Question",
+      "summary": "The global question of which dashboard is correct is replaced with metric-specific truth.",
+      "sceneImageUrl": null,
+      "imageSource": "generated",
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: A kitchen judging table compares three measuring cups pouring into different bowls: orders, spend, and website behavior. The builder uses the right cup for each bowl instead of dumping everything into one pot. A big wrong-choice pot bubbles over with mixed colors, making the danger of one universal answer readable. Render exactly this text on the frame, hand-lettered in the session style: \"Orders\" | \"Spend\" | \"Behavior\".\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "007A",
+          "narration": "This is why the question \"which dashboard is correct?\" is already a little dangerous. A better question is: what decision are we making, and which system has the cleanest version of that specific fact?"
+        },
+        {
+          "id": "007B",
+          "narration": "If you want to know how much money was actually paid, the store backend is the cleanest source. If you want to know how much was spent on ads, Meta is the cleanest source. If you want to understand website-side purchases and behavior, Google Analytics is often useful."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C008",
+      "order": 8,
+      "sceneTitle": "Expensive Spreadsheet With Anxiety",
+      "summary": "Simply showing every number is not intelligence.",
+      "sceneImageUrl": null,
+      "imageSource": "generated",
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: A carnival prize booth launches number blocks from three cannons into a transparent sorting machine. The unsorted blocks pile up and make the machine visibly vibrate, while a tiny premium price tag swings from the side. The builder slams a large MATCH button that starts separating blocks into identity lanes. Render exactly this text on the frame, hand-lettered in the session style: \"MATCH\".\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "008A",
+          "narration": "But the dashboard cannot just throw all three numbers on the screen and call it intelligence. That is how you build a very expensive spreadsheet with anxiety."
+        },
+        {
+          "id": "008B",
+          "narration": "The hard part is matching."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C009",
+      "order": 9,
+      "sceneTitle": "Different Languages",
+      "summary": "Meta, Google Analytics, and the store backend organize business data differently.",
+      "sceneImageUrl": null,
+      "imageSource": "generated",
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: A translation hall contains three conveyor belts using different shapes. Meta sends nested boxes labeled Campaign, Ad Set, and Ad. Google Analytics sends footprints with colored route tags. The store system sends sealed order boxes. The builder operates a translator machine that accepts only exact matching tokens, not shape guesses. Render exactly this text on the frame, hand-lettered in the session style: \"Campaign\" | \"Ad Set\" | \"Ad\" | \"Orders\".\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "009A",
+          "narration": "Meta organizes the world as campaigns, ad sets, and ads. A campaign is the big container. An ad set is the targeting or delivery setup inside it. An ad is the actual creative people see."
+        },
+        {
+          "id": "009B",
+          "narration": "Google Analytics organizes the world more like website sessions and traffic labels. Someone came from a source, with a medium, maybe a campaign field, then did events on the site. The store backend organizes the world as orders."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C010",
+      "order": 10,
+      "sceneTitle": "Campaign-Looking Thing",
+      "summary": "A GA field may point to a campaign, ad set, ad, or random label.",
+      "sceneImageUrl": null,
+      "imageSource": "generated",
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: A lost-and-found counter is full of tags that look official but belong to different objects: a campaign crate, an ad set toolbox, an ad poster tube, and one mystery tag stuck to a dusty beach ball. The builder slides each tag under a scanner while the mystery tag triggers a small sad trombone light. Render exactly this text on the frame, hand-lettered in the session style: \"Campaign?\" | \"Ad Set?\" | \"Ad?\".\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "010A",
+          "narration": "So when Google Analytics says, \"this purchase came from this campaign-looking thing,\" AdsMetri still has to answer: is that the same campaign Meta knows about? Is it an ad set? Is it an ad?"
+        },
+        {
+          "id": "010B",
+          "narration": "Is it just a random label someone typed into a URL three years ago and then emotionally moved on from?"
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C011",
+      "order": 11,
+      "sceneTitle": "No Vibes Matching",
+      "summary": "Campaign identity must not be guessed by a language model.",
+      "sceneImageUrl": null,
+      "imageSource": "generated",
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: A courtroom scale compares a glowing exact ID token against a flashy fortune-teller crystal ball labeled vibes. The ai-figure tries to slide the crystal ball onto the scale, but the builder reroutes it into a comedy chute while the exact token lands cleanly on the evidence tray. A clean-shaven meme chad with yellow spike hair and red OUCH shirt gives an overconfident thumbs-up to the crystal ball from the side, clearly as comedic chad contrast. Render exactly this text on the frame, hand-lettered in the session style: \"Exact ID\" | \"Vibes\".\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "011A",
+          "narration": "This is where I had to be very clear about one rule: no language model guessing the match."
+        },
+        {
+          "id": "011B",
+          "narration": "The AI can help explain the system, help build the interface, help write the workflow, and help catch mistakes. But it should not decide that \"Summer Sale Video Maybe Final Final\" is probably the same thing as \"Campaign B.\" Trusting vibes is not an accounting method."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C012",
+      "order": 12,
+      "sceneTitle": "Exact ID Ladder",
+      "summary": "The deterministic match checks campaign ID, ad set ID, then ad ID.",
+      "sceneImageUrl": null,
+      "imageSource": "generated",
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: An airport baggage system sorts three kinds of glowing ID tags. Campaign tags go directly to a large campaign bin. Ad set tags ride an escalator up into the campaign bin. Ad tags ride through a smaller ad set connector and then up to the campaign bin. The builder monitors the conveyor while rejected name tags bounce harmlessly into a foam pit. Render exactly this text on the frame, hand-lettered in the session style: \"Campaign ID\" | \"Ad Set ID\" | \"Ad ID\".\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "012A",
+          "narration": "The match has to be deterministic. That means a script follows exact rules. The safest rule is an exact ID match."
+        },
+        {
+          "id": "012B",
+          "narration": "If Google Analytics has a Meta campaign ID, AdsMetri can compare that ID against the official campaign list from Meta."
+        },
+        {
+          "id": "012C",
+          "narration": "If Google Analytics has an ad set ID, AdsMetri can compare it against the official ad set list from Meta, then roll it up to the parent campaign."
+        },
+        {
+          "id": "012D",
+          "narration": "If Google Analytics has an ad ID, AdsMetri can compare it against the official ad list from Meta, then roll that up through the ad set to the campaign."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C013",
+      "order": 13,
+      "sceneTitle": "Evidence Chain",
+      "summary": "The match becomes an auditable chain rather than a name guess.",
+      "sceneImageUrl": null,
+      "imageSource": "generated",
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: A transparent marble-run connects a Google Analytics tag, a Meta object, and a parent campaign container. The marble only advances when each connector clicks into the exact matching socket. Nearby, a fake close-name shortcut collapses like a flimsy cardboard bridge, while the builder opens two clean doors labeled Decision View and Diagnostic View. Render exactly this text on the frame, hand-lettered in the session style: \"Decision View\" | \"Diagnostic View\".\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "013A",
+          "narration": "That gives the dashboard a real chain of evidence. Not \"this name looks close.\" Not \"the model seemed confident.\" Exact ID in Google Analytics, exact object from Meta, known parent relationship."
+        },
+        {
+          "id": "013B",
+          "narration": "That also creates two different experiences in the product."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C014",
+      "order": 14,
+      "sceneTitle": "Decision View And Diagnostic View",
+      "summary": "The dashboard should stay focused, while the attribution page explains matches.",
+      "sceneImageUrl": null,
+      "imageSource": "generated",
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: A split workshop shows two different stations. The left station is a clean cockpit with only a few large gauges for spend, purchases, revenue, and trust. The right station is a testing bench where colored ID tokens pass through labeled scanners for campaign, ad set, ad, manual, estimated, and unmatched. The builder moves a matched token from the testing bench to the cockpit gauge. Render exactly this text on the frame, hand-lettered in the session style: \"Decision\" | \"Diagnostic\".\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "014A",
+          "narration": "The dashboard is the decision view. It should stay focused. It should show the numbers people need to act on: spend, purchases, revenue, cost per result, return on ad spend, and whether the data is strong enough to trust."
+        },
+        {
+          "id": "014B",
+          "narration": "The attribution page is the diagnostic view. That is where the system explains why the dashboard believes a number. Was it matched by campaign ID? By ad set ID? By ad ID? Was it manual? Estimated? Unmatched?"
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C015",
+      "order": 15,
+      "sceneTitle": "Zero Is Not Unmatched",
+      "summary": "A matched campaign with zero purchases is different from an unmatched campaign.",
+      "sceneImageUrl": null,
+      "imageSource": "generated",
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: A medical-style scan room shows two campaign patients on separate beds. One has a bright identity wristband and a zero-purchase meter, clearly found but quiet. The other has no wristband and several scanners aiming at the wrong shape. The builder places a green found label on the first bed and a red identity unknown cone beside the second. Render exactly this text on the frame, hand-lettered in the session style: \"Found\" | \"Unknown\".\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "015A",
+          "narration": "That distinction matters because a zero is not always a failure. If a campaign is matched by exact ID and Google Analytics says it has zero purchases for the selected day, that is different from a campaign that could not be matched at all."
+        },
+        {
+          "id": "015B",
+          "narration": "One means, \"we found the campaign, and there were no attributed purchases in this window.\" The other means, \"we are not confident we are looking at the right thing.\" Those should not feel the same in a dashboard."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C016",
+      "order": 16,
+      "sceneTitle": "Truth Is Metric-Specific",
+      "summary": "Source of truth cannot be one global setting.",
+      "sceneImageUrl": null,
+      "imageSource": "generated",
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: A relay race uses three runners carrying different batons: Store Orders carries a money baton, Meta carries a spend baton, and Google Analytics carries a website behavior baton. Instead of one winner taking every lane, each runner drops the right baton into a different metric slot. The builder prevents a giant one-size-fits-all trophy from landing on the track. Render exactly this text on the frame, hand-lettered in the session style: \"Orders\" | \"Spend\" | \"Attribution\".\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "016A",
+          "narration": "The other important product decision was that source of truth is not one global setting. It would be easy to say, \"always use Google Analytics,\" or \"always use Meta,\" or \"always use the store backend.\" That sounds clean, and it is wrong."
+        },
+        {
+          "id": "016B",
+          "narration": "For actual account-level order count and revenue, the store backend wins when it is available, because it is where the orders live. For ad spend, delivery, budget, status, clicks, and other ad-platform metrics, Meta wins, because Google Analytics does not know how much Meta spent."
+        },
+        {
+          "id": "016C",
+          "narration": "For website-side attribution, Google Analytics can give a useful second view, especially when Meta undercounts or attribution windows differ. So AdsMetri needs to choose the best source per metric, not per dashboard."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C017",
+      "order": 17,
+      "sceneTitle": "Show The Selected Number",
+      "summary": "The UI should show the selected source as primary while keeping comparisons visible.",
+      "sceneImageUrl": null,
+      "imageSource": "generated",
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: A theater lighting rig spotlights one large number tile while a muted comparison tile sits nearby in softer light. A tiny confidence badge clips onto the selected tile like a name tag. In the background, a ridiculous oversized warning banner tries to unfurl over the whole stage, and the builder shoves it back into a compact label dispenser. Render exactly this text on the frame, hand-lettered in the session style: \"Selected\" | \"Compare\" | \"Confidence\".\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "017A",
+          "narration": "That is more annoying to build, which is usually how you know you are near the real product. The interface then has to make that visible without turning the dashboard into a legal deposition."
+        },
+        {
+          "id": "017B",
+          "narration": "The main number should be the selected number: dark, readable, treated as the number the dashboard is using for that decision. The comparison number should still be visible, but muted, so you can see when Meta and Google Analytics disagree."
+        },
+        {
+          "id": "017C",
+          "narration": "And when the system is not confident, that needs to show up as a small confidence label, not as a giant warning banner that makes the dashboard look like it is applying for a mortgage."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C018",
+      "order": 18,
+      "sceneTitle": "Timing And Freshness",
+      "summary": "Today and yesterday need separate freshness because systems update at different speeds.",
+      "sceneImageUrl": null,
+      "imageSource": "generated",
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: A laundry line turns data freshness into wet paint timing. Today tiles hang dripping with wet paint from three different colored stations, while Yesterday tiles are dry and ready to inspect. The builder flips a Today or Yesterday switch while small clocks above Meta, Google Analytics, and Store show different update times. Render exactly this text on the frame, hand-lettered in the session style: \"Today\" | \"Yesterday\".\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "018A",
+          "narration": "There is also a timing problem. Google Analytics can lag. Meta can refresh on a different schedule. The store backend can have its own cutoff and timezone. So the dashboard needs Today and Yesterday views, plus source-specific freshness."
+        },
+        {
+          "id": "018B",
+          "narration": "That way, if yesterday is more settled than today, the user can make that choice intentionally instead of staring at a number that is still drying."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C019",
+      "order": 19,
+      "sceneTitle": "Integration Is More Than Access",
+      "summary": "Access, matching, auditing, and display all matter.",
+      "sceneImageUrl": null,
+      "imageSource": "generated",
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: A four-stage bridge carries a campaign token across a gap. The first span plugs in access cables, the second aligns exact ID gears, the third weighs the token on a trust scale, and the fourth places the selected number beside a muted comparison number. At the far end, a cautious recommendation robot waits behind a rope until the token arrives with all four checks complete. Render exactly this text on the frame, hand-lettered in the session style: \"Access\" | \"Match\" | \"Trust\" | \"Decide\".\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "019A",
+          "narration": "The real lesson from this build is that data integration is not just connecting APIs. Connecting the data source gets you access. Matching gives you meaning. Auditing gives you trust."
+        },
+        {
+          "id": "019B",
+          "narration": "And showing the selected number with the comparison number gives you a dashboard that can admit uncertainty without becoming useless."
+        },
+        {
+          "id": "019C",
+          "narration": "That matters even more for the next step: an operator that can eventually recommend actions, like increasing budget, holding steady, investigating tracking, or leaving a campaign alone until the data is better."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C020",
+      "order": 20,
+      "sceneTitle": "Boring Evidence Beats Confident Nonsense",
+      "summary": "The ending returns to the need for exact evidence before recommendations.",
+      "sceneImageUrl": null,
+      "imageSource": "generated",
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: A recommendation robot tries to sprint forward carrying a giant confident stamp, but the builder blocks the path with a turnstile that only accepts four boring evidence tokens: exact ID, parent link, source label, and freshness date. Once the tokens drop in, the stamp shrinks into a sensible action card instead of a giant dramatic seal. Render exactly this text on the frame, hand-lettered in the session style: \"Exact ID\" | \"Parent Link\" | \"Source\" | \"Freshness\".\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "020A",
+          "narration": "You do not want that operator making decisions from made-up matches. You want boring evidence."
+        },
+        {
+          "id": "020B",
+          "narration": "Exact IDs. Known parent relationships. Clear source labels. Freshness by date. Diagnostic pages for the messy parts. The kind of product work that does not look dramatic in a demo, but prevents a lot of very confident nonsense later."
+        },
+        {
+          "id": "020C",
+          "narration": "So the useful question at the end is not, \"which dashboard was right?\" The useful question is: for this decision, which source can actually know the answer, and how sure are we that the records are matched?"
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "C021",
+      "order": 21,
+      "sceneTitle": "Reports Explain Themselves",
+      "summary": "The ending reframes the original mismatch as a demand for explainable reports.",
+      "sceneImageUrl": null,
+      "imageSource": "generated",
+      "model": "gpt-image-2-image-to-image",
+      "prompt": "Flat-shaded cartoon illustration in the modern wojak-comic style, matching the provided wojak-gpt2 reference when one is supplied. Keep classic wojak meme-comic anatomy: pale gray or muted skin, rough hand-drawn facial linework, simple expressive faces, hollow eyes when the beat calls for a doomer reaction, and confident meme-comic contrast only when the prompt asks for it. Avoid glossy anime, heroic superhero posters, polished corporate illustration, semi-realistic concept art, cinematic fantasy art, manga styling, and generic webcomic polish. Use soft cel shading with deliberate color contrast and at least one scene-motivated accent color when the beat supports it. Stage the frame as a memorable set-piece with visible action, physical consequence, expressive reaction, absurd prop, or specific joke. Do not default to desks, monitors, paperwork, brown rooms, gray rooms, or generic control panels. Backgrounds should be detailed enough to make the moment feel specific, while the main action remains readable. Composition is a single readable comic-style frame with one focal idea, not a comic page. Do not split the image into panels, grids, storyboards, or several mini-scenes unless the scene prompt explicitly requests a before/after or A/B comparison. Avoid dense readable text inside the generated image; screens, papers, and boards should use abstract marks unless exact on-screen text is explicitly declared. Visual digestibility guard: render ONE single-scene illustration with one clear focal idea. Do NOT create a multi-panel comic page, triptych, grid, storyboard, timeline strip, collage, or several mini-scenes in one image unless the scene prompt explicitly asks for a before/after or A/B comparison. Avoid text-heavy posters, dense checklists, whiteboards, document pages, speech bubbles, and dashboards full of tiny readable labels. Use zero extra legible text beyond the declared on_screen_text. Any screens, papers, sticky notes, code editors, charts, or dashboards should show simple abstract marks, blocks, icons, or unreadable texture unless declared text is the whole point of the shot. The viewer should understand the image in about two seconds while narration carries the details. Scene: The original three counting machines return, but now each number block carries a small chain tag showing where it came from and how it matched. The builder flips on a calm inspection light, and the chaotic pile becomes three readable lanes feeding one cautious action card. The ai-figure lowers the giant guess button and swaps it for a small explanation tag. Render exactly this text on the frame, hand-lettered in the session style: \"Explain The Number\".\n\nReference-image scope: use any image_input ONLY for recurring character identity AND drawing-detail quality: face shape, body type, clothing silhouette, rough wojak linework, handmade prop rendering, layered object density, small physical details, texture, and soft cel-shaded depth. Do NOT copy the reference image's room, desk setup, monitors, exact props, background layout, lighting mood, color palette, camera angle, text, or workplace setting. The Scene text controls the environment, action, palette accents, props, and joke.",
+      "beats": [
+        {
+          "id": "021A",
+          "narration": "That is the foundation I wanted in AdsMetri before the recommendations get smarter. Because if two dashboards disagree, the answer is not to ask an AI which one feels correct."
+        },
+        {
+          "id": "021B",
+          "narration": "The answer is to make the reports explain themselves."
+        },
+        {
+          "id": "021C",
+          "narration": "If this made sense, you should now be a little more suspicious of any dashboard that shows one confident number without explaining where it came from."
+        }
+      ],
+      "audits": {
+        "narration": {
+          "passed": true
+        },
+        "render": {
+          "passed": true
+        }
+      }
+    }
+  ],
+  "transcript": "I was adding Google Analytics to an ecommerce ad dashboard when the basic question broke: how many sales did the ads create? The store runs ads on Facebook and Instagram through Meta. Meta had one sales number. Google Analytics, which tracks website behavior, had another. The store backend, where actual orders live, had a third. The decision was still practical: whether to put more money behind campaigns or hold back. By the end, you will understand why connecting data is the easy part, and matching it without guessing is the hard part. I am turning that build session into this video, so quick context on how the video is being made. Spoolcast is my AI video pipeline. I can give it messy source material, like build notes, screenshots, code changes, or a chat, and the agents help turn that into videos. In simple terms, Spoolcast moves through a few broad steps: understand the source material, write the story, plan what appears on screen, make the narration and visuals, then render the final video. And this episode is about the exact kind of problem that sounds simple until you build it: take two systems that report the same business from different angles, put them in one dashboard, and do not accidentally lie to yourself. The dashboard I was working on is for ad decisions. In plain English, it helps answer questions like: which campaign is working, which one is wasting money, and where should the next budget change go? At first, the dashboard mostly used Meta data. That means it was asking the Facebook and Instagram ad system for spend, campaign names, delivery metrics, and the purchases Meta believes came from those ads. That is useful. It is also only one witness. Meta sees the ad side of the story. It knows what campaign spent money, which ad set ran, which ad was shown, who clicked, and what Meta thinks happened afterward. Google Analytics sees the website side of the story. It watches visits, traffic sources, page views, events, carts, checkouts, purchases, and revenue. The store backend sees the order side of the story. It knows the actual orders and actual money collected. Those are three different viewpoints. They overlap, but they are not the same thing. This is why the question \"which dashboard is correct?\" is already a little dangerous. A better question is: what decision are we making, and which system has the cleanest version of that specific fact? If you want to know how much money was actually paid, the store backend is the cleanest source. If you want to know how much was spent on ads, Meta is the cleanest source. If you want to understand website-side purchases and behavior, Google Analytics is often useful. But the dashboard cannot just throw all three numbers on the screen and call it intelligence. That is how you build a very expensive spreadsheet with anxiety. The hard part is matching. Meta organizes the world as campaigns, ad sets, and ads. A campaign is the big container. An ad set is the targeting or delivery setup inside it. An ad is the actual creative people see. Google Analytics organizes the world more like website sessions and traffic labels. Someone came from a source, with a medium, maybe a campaign field, then did events on the site. The store backend organizes the world as orders. So when Google Analytics says, \"this purchase came from this campaign-looking thing,\" AdsMetri still has to answer: is that the same campaign Meta knows about? Is it an ad set? Is it an ad? Is it just a random label someone typed into a URL three years ago and then emotionally moved on from? This is where I had to be very clear about one rule: no language model guessing the match. The AI can help explain the system, help build the interface, help write the workflow, and help catch mistakes. But it should not decide that \"Summer Sale Video Maybe Final Final\" is probably the same thing as \"Campaign B.\" Trusting vibes is not an accounting method. The match has to be deterministic. That means a script follows exact rules. The safest rule is an exact ID match. If Google Analytics has a Meta campaign ID, AdsMetri can compare that ID against the official campaign list from Meta. If Google Analytics has an ad set ID, AdsMetri can compare it against the official ad set list from Meta, then roll it up to the parent campaign. If Google Analytics has an ad ID, AdsMetri can compare it against the official ad list from Meta, then roll that up through the ad set to the campaign. That gives the dashboard a real chain of evidence. Not \"this name looks close.\" Not \"the model seemed confident.\" Exact ID in Google Analytics, exact object from Meta, known parent relationship. That also creates two different experiences in the product. The dashboard is the decision view. It should stay focused. It should show the numbers people need to act on: spend, purchases, revenue, cost per result, return on ad spend, and whether the data is strong enough to trust. The attribution page is the diagnostic view. That is where the system explains why the dashboard believes a number. Was it matched by campaign ID? By ad set ID? By ad ID? Was it manual? Estimated? Unmatched? That distinction matters because a zero is not always a failure. If a campaign is matched by exact ID and Google Analytics says it has zero purchases for the selected day, that is different from a campaign that could not be matched at all. One means, \"we found the campaign, and there were no attributed purchases in this window.\" The other means, \"we are not confident we are looking at the right thing.\" Those should not feel the same in a dashboard. The other important product decision was that source of truth is not one global setting. It would be easy to say, \"always use Google Analytics,\" or \"always use Meta,\" or \"always use the store backend.\" That sounds clean, and it is wrong. For actual account-level order count and revenue, the store backend wins when it is available, because it is where the orders live. For ad spend, delivery, budget, status, clicks, and other ad-platform metrics, Meta wins, because Google Analytics does not know how much Meta spent. For website-side attribution, Google Analytics can give a useful second view, especially when Meta undercounts or attribution windows differ. So AdsMetri needs to choose the best source per metric, not per dashboard. That is more annoying to build, which is usually how you know you are near the real product. The interface then has to make that visible without turning the dashboard into a legal deposition. The main number should be the selected number: dark, readable, treated as the number the dashboard is using for that decision. The comparison number should still be visible, but muted, so you can see when Meta and Google Analytics disagree. And when the system is not confident, that needs to show up as a small confidence label, not as a giant warning banner that makes the dashboard look like it is applying for a mortgage. There is also a timing problem. Google Analytics can lag. Meta can refresh on a different schedule. The store backend can have its own cutoff and timezone. So the dashboard needs Today and Yesterday views, plus source-specific freshness. That way, if yesterday is more settled than today, the user can make that choice intentionally instead of staring at a number that is still drying. The real lesson from this build is that data integration is not just connecting APIs. Connecting the data source gets you access. Matching gives you meaning. Auditing gives you trust. And showing the selected number with the comparison number gives you a dashboard that can admit uncertainty without becoming useless. That matters even more for the next step: an operator that can eventually recommend actions, like increasing budget, holding steady, investigating tracking, or leaving a campaign alone until the data is better. You do not want that operator making decisions from made-up matches. You want boring evidence. Exact IDs. Known parent relationships. Clear source labels. Freshness by date. Diagnostic pages for the messy parts. The kind of product work that does not look dramatic in a demo, but prevents a lot of very confident nonsense later. So the useful question at the end is not, \"which dashboard was right?\" The useful question is: for this decision, which source can actually know the answer, and how sure are we that the records are matched? That is the foundation I wanted in AdsMetri before the recommendations get smarter. Because if two dashboards disagree, the answer is not to ask an AI which one feels correct. The answer is to make the reports explain themselves. If this made sense, you should now be a little more suspicious of any dashboard that shows one confident number without explaining where it came from.",
+  "summary": {
+    "writing": {
+      "author": "Claude",
+      "role": "screenplay, shot-list, scene prompts"
+    },
+    "images": {
+      "platform": "kie.ai",
+      "models": [
+        "gpt-image-2-image-to-image"
+      ],
+      "sceneCount": 109
+    },
+    "audio": {
+      "tts": "Google Cloud TTS",
+      "voice": "Puck",
+      "playbackRate": 1.1,
+      "beatCount": 51
+    },
+    "render": {
+      "engine": "Remotion",
+      "passed": true
+    },
+    "audit": null
+  },
+  "showcase": {
+    "hiddenChunkIds": [],
+    "notes": "Spoolcast dev-log 10. AdsMetri attribution. Meta vs GA4 vs store sales matching. Wojak-gpt2 style, Puck voice, 11 chunks."
+  }
+}

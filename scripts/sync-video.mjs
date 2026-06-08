@@ -311,6 +311,14 @@ async function buildLongBundle(shipped) {
   }
 
   // ── copy scene images ──────────────────────────────────────────────────
+  // Build IMGxx → chunk_id map from base_layer when present (post-refactor
+  // sessions use IMG01-IMGN naming instead of C001-C0NN).
+  const imgToChunk = new Map();
+  if (shotList?.base_layer) {
+    for (const entry of shotList.base_layer) {
+      if (entry.id && entry.chunk_id) imgToChunk.set(entry.id, entry.chunk_id);
+    }
+  }
   const scenesOutDir = path.join(assetsDir, "scenes");
   const sceneUrlByChunk = new Map();
   if (existsSync(path.join(sessionDir, "source", "generated-assets", "scenes"))) {
@@ -321,8 +329,15 @@ async function buildLongBundle(shipped) {
       if (!RASTER_EXT.test(f) && !SVG_EXT.test(f)) continue;
       const outName = await importAsset(path.join(srcDir, f), scenesOutDir, f);
       if (!outName) continue;
-      const chunkId = path.basename(f).replace(/\.[^.]+$/, "");
-      sceneUrlByChunk.set(chunkId, `/videos/${id}/assets/scenes/${outName}`);
+      let chunkId = path.basename(f).replace(/\.[^.]+$/, "");
+      // IMGxx naming: resolve to parent chunk via base_layer, keep the
+      // first image for each chunk as its guidebook scene image.
+      if (imgToChunk.has(chunkId) && !sceneUrlByChunk.has(imgToChunk.get(chunkId))) {
+        chunkId = imgToChunk.get(chunkId);
+      }
+      if (!sceneUrlByChunk.has(chunkId)) {
+        sceneUrlByChunk.set(chunkId, `/videos/${id}/assets/scenes/${outName}`);
+      }
       count++;
     }
     log(id, `imported ${count} scene image(s) (webp ${THUMB_WIDTH}px q${THUMB_QUALITY})`);
