@@ -1,3 +1,5 @@
+# THIS IS A STALE DOCUMENT FROM ARTLU.AI'S ORIGINAL. It serves as my testing playground.
+
 # (STALE) artluai — built with ai tracker(STALE)
 
 Track everything you build with AI. Terminal-style project tracker with Firebase backend.
