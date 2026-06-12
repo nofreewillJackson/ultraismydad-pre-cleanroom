@@ -11,7 +11,7 @@ A technology-agnostic, conceptual blueprint of this application, written for a c
 
 ## Part 0 — The system in one breath
 
-This is a **personal build-archive and showcase**. One author ships a stream of *work items* — software projects, narrated videos, research writeups, and dated log entries — over a fixed 100-day campaign. The system catalogs that stream, groups it into product lines, cross-references it by technology and by narrative, and publishes it as a fast, crawlable public website plus machine-readable feeds.
+This is a **personal build-archive and showcase**. One author ships a stream of *work items* — software projects, narrated videos, research writeups, and dated log entries — over time. The system catalogs that stream, groups it into product lines, cross-references it by technology and by narrative, and publishes it as a fast, crawlable public website plus machine-readable feeds. The original 100-day campaign is one presentation frame for that archive, not a domain rule: the same system should also work as a permanent portfolio that documents thoughts and projects for years.
 
 Architecturally, the one invariant the domain actually demands is a **hard wall between authoring and reading**:
 
@@ -29,8 +29,10 @@ This distinction matters because *most of the machinery the current codebase tre
 This document exists to extract the **domain** (the *what* and the *why*) and discard the **implementation accidents** (the *how* a single solo author happened to ship it). Treating the original execution as immutable law would just port technical debt into a new language. So every claim below is held to one test:
 
 > **Would this survive if the author had picked a different stack on day one?**
-> - **Yes → domain.** Keep it; it constrains any rebuild. (The 100-day framing, the privacy boundary, work-item-as-atom, the path-free public contracts.)
+> - **Yes → domain.** Keep it; it constrains any rebuild. (The privacy boundary, work-item-as-atom, explicit grouping, the path-free public contracts.)
 > - **No — it only exists because of the specific stack, free-tier limits, or the solo-vibecoder workflow → accident.** A cleanroom *deletes* it; it does not lovingly re-implement it.
+
+The 100-day framing fails this test as a domain invariant. It is a valuable editorial campaign and can remain as configurable presentation copy/counters, but the archive must not depend on a fixed 100-item limit, a countdown, or a campaign end date.
 
 Two failure modes this guards against:
 
@@ -322,10 +324,10 @@ One append-only record per authoring write: `{ actor, client, operation, targetT
 2. Exactly one identity is authorized to author. Authentication ≠ authorization: an authenticated non-operator is rejected and signed out.
 3. The privacy boundary is enforced **once, at export**. If a record isn't public, it must not exist in any downstream artifact.
 
-**The 100-day framing**
-4. There is a fixed campaign start date. A work item's "day number" is its date minus the start (1-indexed); dates before the start have no day number.
-5. Headline math is derived, never stored: `shipped = count of public items`, `to go = max(0, 100 − shipped)`, `active days = count of distinct ship dates`.
-6. The activity heatmap is computed from **ship dates of work items**, not from code-commit activity. (The author is explicitly non-coding; commit-based activity would misrepresent the work.)
+**Portfolio timeline**
+4. The archive is open-ended. A work item's date places it on the public timeline; campaign-specific labels such as "day number" are optional derived presentation, configured outside the domain model.
+5. Headline math is derived, never stored: `shipped = count of public items`, `active days = count of distinct ship dates`, and any campaign countdown only exists when an active campaign config supplies a target.
+6. The activity heatmap is computed from **ship dates of work items**, not from code-commit activity. Commit-based activity would misrepresent a portfolio that documents shipped artifacts, research, media, and notes, not only repository commits.
 
 **Classification & grouping**
 7. Every work item belongs to exactly one product line, **captured explicitly at authoring time** (a required FK). *(As-built, unresolved items fall to a catch-all bucket and empty lines are suppressed — both are accidents of runtime inference, §1.3/§2.5. With the FK required there are no unresolved items and no catch-all.)*
@@ -347,7 +349,7 @@ One append-only record per authoring write: `{ actor, client, operation, targetT
 A large fraction of system behavior is **derived at bake time** rather than stored. This is the system's true "business logic," and it splits into clean derivations and fragile heuristics.
 
 **Clean, deterministic derivations (keep):**
-- Day numbers, shipped/to-go/active-day counts, the windowed activity heatmap.
+- Timeline labels, shipped/active-day counts, optional campaign counters, and the windowed activity heatmap.
 - Slugs and slug de-duplication.
 - Embeddability decision from host allow/deny lists.
 - Sort orders: newest ship date first, then most-recently-updated, then an explicit manual order as tiebreak.
@@ -446,7 +448,7 @@ flowchart LR
 
 ## 3.3 Principles to carry into the rebuild
 
-1. **Store relationships, derive presentation.** Anything that joins records (line, series, video) is data captured at authoring time. Anything that's purely how things look or count (day numbers, heatmaps, rollups, sort order) stays derived. The current system inverts this for relationships — fix that.
+1. **Store relationships, derive presentation.** Anything that joins records (line, series, video) is data captured at authoring time. Anything that's purely how things look or count (timeline labels, optional campaign counters, heatmaps, rollups, sort order) stays derived. The current system inverts this for relationships — fix that.
 2. **One contract, many emitters.** The "database-shaped, path-free" bundle idea is the best instinct in the codebase. Generalize it: define the read-model contracts first, then let *any* source (datastore, files, a future CMS) emit them. Consumers never change.
 3. **Make the privacy boundary a single, testable gate.** Default-deny, uniform across all collections, enforced once, covered by a test that asserts no non-public record ever appears downstream.
 4. **The "stale static site" problem is self-inflicted — prefer dissolving it to automating it.** The dirty-flag + change journal are an impressive solution to a problem the domain never posed. First ask whether the rebuild even bakes; a cached server makes the whole question disappear. Keep the change journal only if you independently want an audit history — it's a fine event log, just not a load-bearing part of publishing. *(If you do keep baking, then yes, wire the journal to rebuild/deploy and reset the flag on success — §3.1 #7.)*
@@ -471,7 +473,7 @@ What does **not** dissolve — and is therefore the actual domain to carry forwa
 
 - the **privacy gate** (default-deny, enforced once — keep it as a query/serialization boundary rather than an export step),
 - the **path-free public contracts** (Contract B especially — the best instinct in the codebase),
-- the **derived presentation layer** (day numbers, heatmap, rollups, slugs),
+- the **derived presentation layer** (timeline labels, optional campaign counters, heatmap, rollups, slugs),
 - the **media-ingestion ETL** as a content-prep concern, independent of how pages are served.
 
 None of this mandates abandoning static generation — static-first is a perfectly good way to get cheap reads, and if chosen, §3.1 #7 still applies (make the bake event-driven). The point is to **stop treating the bake-and-its-ledger as *the architecture*.** It is a delivery tactic. Name the invariant, pick the tactic that fits the new stack, and let the rest fall away.
