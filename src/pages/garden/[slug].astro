@@ -1,0 +1,153 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import GardenGraph from "../../components/GardenGraph.astro";
+import { getPublicProjects, getStats } from "../../lib/data";
+import { getGardenData } from "../../lib/garden";
+import { fmtDateFull } from "../../lib/format";
+
+export async function getStaticPaths() {
+  const { notes } = await getGardenData();
+  return notes.map((note) => ({ params: { slug: note.slug }, props: { slug: note.slug } }));
+}
+
+const { slug } = Astro.props as { slug: string };
+const [projects, garden] = await Promise.all([getPublicProjects(), getGardenData()]);
+const stats = getStats(projects);
+const { bySlug, graph } = garden;
+const note = bySlug.get(slug)!;
+
+const backlinks = note.backlinks
+  .map((s) => bySlug.get(s))
+  .filter(Boolean)
+  .sort((a, b) => (b!.date || "").localeCompare(a!.date || ""));
+
+// Local subgraph: this note plus everything it links to or is linked from.
+const near = new Set<string>([note.slug, ...note.links, ...note.backlinks]);
+const subNodes = graph.nodes.filter((n) => near.has(n.slug));
+const subLink = graph.linkEdges.filter((e) => near.has(e.source) && near.has(e.target));
+const subTag = graph.tagEdges.filter((e) => near.has(e.source) && near.has(e.target));
+const subClusters = graph.clusters.filter((c) => subNodes.some((n) => n.community === c.id));
+const subSuggestions = graph.suggestions.filter((s) => near.has(s.a) && near.has(s.b));
+const subData = {
+  nodes: subNodes,
+  linkEdges: subLink,
+  tagEdges: subTag,
+  clusters: subClusters,
+  suggestions: subSuggestions,
+  stats: { notes: subNodes.length, links: subLink.length, clusters: subClusters.length, orphans: subNodes.filter((n) => n.orphan).length },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: note.title,
+  description: note.description,
+  ...(note.date ? { datePublished: note.date } : {}),
+  url: `https://artlu.ai/garden/${note.slug}`,
+};
+---
+<BaseLayout title={`artlu.ai — ${note.title}`} description={note.description || `A garden note: ${note.title}.`}>
+  <link
+    slot="head"
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/katex@0.17.0/dist/katex.min.css"
+    crossorigin="anonymous"
+  />
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+  <Header active="garden" stats={stats} heatmapTooltip={false} />
+  <main class="page">
+    <article class="narrow garden-note">
+      <a class="backlink" href="/garden">← the garden</a>
+      <div class="meta">
+        {note.date && <span>{fmtDateFull(note.date)}</span>}
+        {note.date && note.tags.length > 0 && <span> · </span>}
+        {note.tags.join(" · ")}
+      </div>
+      <h1 class="page-h1">{note.title}</h1>
+      {note.tags.length > 0 && (
+        <div class="pillrow">
+          {note.tags.map((t) => (
+            <a class="pill" href={`/garden?tag=${encodeURIComponent(t)}`}>#{t}</a>
+          ))}
+        </div>
+      )}
+
+      <div class="md gm-md" set:html={note.html}></div>
+
+      <section class="gm-backlinks">
+        <h2 class="gm-backlinks-h">linked mentions {backlinks.length > 0 && <span class="gm-bl-n">{backlinks.length}</span>}</h2>
+        {backlinks.length > 0 ? (
+          <ul class="gm-backlinks-list">
+            {backlinks.map((b) => (
+              <li>
+                <a href={`/garden/${b!.slug}`}>{b!.title}</a>
+                {b!.description && <span class="gm-bl-desc">{b!.description}</span>}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p class="gm-backlinks-empty">No notes link here yet.</p>
+        )}
+      </section>
+
+      {subNodes.length > 1 && (
+        <section class="gm-localgraph">
+          <h2 class="gm-backlinks-h">local graph</h2>
+          <GardenGraph data={subData} focus={note.slug} height={340} compact={true} />
+        </section>
+      )}
+    </article>
+  </main>
+
+  <script is:inline>
+    // Collapsible callouts (> [!type]-).
+    document.querySelectorAll(".gm-callout[data-collapsible]").forEach(function (callout) {
+      if (callout.getAttribute("data-collapsed") === "true") callout.classList.add("gm-collapsed");
+      var title = callout.querySelector(".gm-callout-title");
+      if (title)
+        title.addEventListener("click", function () {
+          callout.classList.toggle("gm-collapsed");
+        });
+    });
+
+    // Mermaid diagrams — rendered client-side, re-themed when the site theme toggles.
+    (function () {
+      var blocks = document.querySelectorAll(".gm-mermaid");
+      if (!blocks.length) return;
+      function decode(s) {
+        var t = document.createElement("textarea");
+        t.innerHTML = s;
+        return t.value;
+      }
+      var mermaidMod = null;
+      async function renderAll() {
+        if (!mermaidMod) {
+          mermaidMod = (await import("https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs")).default;
+        }
+        var dark = document.documentElement.dataset.theme === "dark";
+        mermaidMod.initialize({ startOnLoad: false, theme: dark ? "dark" : "default", securityLevel: "loose", fontFamily: "inherit" });
+        for (var i = 0; i < blocks.length; i++) {
+          var el = blocks[i];
+          var src = decode(el.getAttribute("data-mermaid-src") || "");
+          try {
+            var out = await mermaidMod.render("gm-mmd-" + i + "-" + Date.now(), src);
+            el.innerHTML = out.svg;
+            el.classList.add("gm-mermaid-done");
+          } catch (e) {
+            el.textContent = src;
+          }
+        }
+      }
+      renderAll();
+      var last = document.documentElement.dataset.theme;
+      new MutationObserver(function () {
+        var now = document.documentElement.dataset.theme;
+        if (now !== last) {
+          last = now;
+          renderAll();
+        }
+      }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    })();
+  </script>
+</BaseLayout>

@@ -1,0 +1,89 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import GardenGraph from "../../components/GardenGraph.astro";
+import { getPublicProjects, getStats } from "../../lib/data";
+import { getGardenData } from "../../lib/garden";
+import { fmtDateFull } from "../../lib/format";
+
+const [projects, garden] = await Promise.all([getPublicProjects(), getGardenData()]);
+const stats = getStats(projects);
+const { notes, tags, graph } = garden;
+const href = (tag: string) => (tag === "all" ? "/garden" : `/garden?tag=${encodeURIComponent(tag)}`);
+---
+<BaseLayout
+  title="artlu.ai — the garden"
+  description="A digital garden: interlinked notes rendered with full Obsidian-flavored markdown, backlinks, and a link graph."
+>
+  <Header active="garden" stats={stats} heatmapTooltip={false} />
+  <main class="page">
+    <div class="col">
+      <h1 class="page-h1">the garden <span class="gh-glyph" aria-hidden="true">❧</span></h1>
+      <p class="garden-intro">
+        A small, interlinked set of notes that grow over time. Follow a link, or wander the
+        graph. Everything here is rendered with full Obsidian-flavored markdown.
+      </p>
+
+      {graph.nodes.length > 0 && <GardenGraph data={graph} height={540} />}
+
+      <div class="filterbar" id="gardenFilter">
+        <span class="filter-l">tags</span>
+        <a class="fchip on" href={href("all")} data-tag-filter="all">all</a>
+        {tags.map((t) => (
+          <a class="fchip" href={href(t.tag)} data-tag-filter={t.tag}>#{t.tag} <span class="fchip-n">{t.count}</span></a>
+        ))}
+        <span class="fcount">{notes.length} {notes.length === 1 ? "note" : "notes"}</span>
+      </div>
+
+      <div class="empty" id="gardenEmpty" hidden>no notes match this tag.</div>
+
+      <div class="g-grid" id="gardenGrid">
+        {notes.map((note) => (
+          <a class="g-card" href={`/garden/${note.slug}`} data-garden-card data-tags={note.tags.join(" ")}>
+            <div class="g-card-title">{note.title}</div>
+            {note.description && <div class="g-card-desc">{note.description}</div>}
+            <div class="g-card-meta">
+              {note.date && <span>{fmtDateFull(note.date)}</span>}
+              {note.tags.length > 0 && <span class="g-card-tags">{note.tags.map((t) => `#${t}`).join(" · ")}</span>}
+              {note.backlinks.length > 0 && <span class="g-card-links">↩ {note.backlinks.length}</span>}
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function applyGardenFilter() {
+      const params = new URLSearchParams(window.location.search);
+      const tag = params.get("tag") || "all";
+      let visible = 0;
+      document.querySelectorAll("[data-garden-card]").forEach((card) => {
+        const tags = (card.getAttribute("data-tags") || "").split(/\s+/);
+        const show = tag === "all" || tags.includes(tag);
+        (card as HTMLElement).hidden = !show;
+        if (show) visible += 1;
+      });
+      document.querySelectorAll("[data-tag-filter]").forEach((chip) => {
+        chip.classList.toggle("on", chip.getAttribute("data-tag-filter") === tag);
+      });
+      const count = document.querySelector("#gardenFilter .fcount");
+      if (count) count.textContent = `${visible} ${visible === 1 ? "note" : "notes"}`;
+      const empty = document.getElementById("gardenEmpty");
+      if (empty) (empty as HTMLElement).hidden = visible !== 0;
+    }
+    document.querySelectorAll("[data-tag-filter]").forEach((chip) => {
+      chip.addEventListener("click", (event) => {
+        event.preventDefault();
+        const tag = chip.getAttribute("data-tag-filter") || "all";
+        const url = new URL(window.location.href);
+        if (tag === "all") url.searchParams.delete("tag");
+        else url.searchParams.set("tag", tag);
+        history.pushState({}, "", `${url.pathname}${url.search}`);
+        applyGardenFilter();
+      });
+    });
+    applyGardenFilter();
+    window.addEventListener("popstate", applyGardenFilter);
+  </script>
+</BaseLayout>

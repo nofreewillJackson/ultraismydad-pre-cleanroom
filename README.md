@@ -1,4 +1,4 @@
-# artluai — built with ai tracker
+# (STALE) artluai — built with ai tracker(STALE)
 
 Track everything you build with AI. Terminal-style project tracker with Firebase backend.
 

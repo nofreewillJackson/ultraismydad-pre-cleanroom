@@ -2,7 +2,7 @@
 import ActivityStrip from "./ActivityStrip.astro";
 
 type Props = {
-  active?: "list" | "map" | "stack" | "log" | "research" | "admin" | "settings";
+  active?: "list" | "map" | "stack" | "log" | "research" | "garden" | "admin" | "settings";
   stats?: any;
   variant?: "public" | "admin";
   heatmapTooltip?: boolean;
@@ -58,6 +58,9 @@ const adminClass = sticky === "none" || isAdmin ? "admin-static" : "";
           <div class="seg">
             <a class={active === "log" ? "on" : ""} href="/log">log</a>
             <a class={active === "research" ? "on" : ""} href="/research">research</a>
+          </div>
+          <div class="seg seg-garden">
+            <a class:list={["seg-garden-link", active === "garden" ? "on" : ""]} href="/garden" title="the digital garden"><span class="seg-garden-glyph" aria-hidden="true">❧</span><span class="seg-garden-text">garden</span></a>
           </div>
         </>
       )}

@@ -14,4 +14,20 @@ const research = defineCollection({
   }),
 });
 
-export const collections = { research };
+// The digital garden — Obsidian-flavored notes rendered by the dedicated, isolated
+// pipeline in src/lib/garden/. Deliberately NOT routed through Astro's global markdown
+// render (which the research channel uses); see src/lib/garden/render.ts.
+const garden = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/garden" }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string().default(""),
+    date: z.string().default(""),
+    tags: z.array(z.string()).default([]),
+    aliases: z.array(z.string()).default([]),
+    slug: z.string().optional(),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { research, garden };
