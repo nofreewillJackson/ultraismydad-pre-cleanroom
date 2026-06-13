@@ -1,180 +1,196 @@
-# TECH_STACK.md — the "how"
+# TECH_STACK.md — Physical Targets & Dead Code
 
-The concrete technology inventory for this repository: what's actually installed, what's wired into the live build, and (importantly) what's leftover dead code from a previous incarnation. This is the implementation-specific companion to `CLEANROOM_SPEC.md` — where that document deliberately abstracted the stack away, this one names everything.
-
-> **TL;DR:** The live site is **Astro 6, statically generated**, sourced from **Firebase Firestore** (exported to a JSON snapshot at build time), authored through a **vanilla-TypeScript admin** gated by **Firebase Auth (Google)**, with a separate **Node + ffmpeg + cwebp** media pipeline, deployed as static files on **Netlify**. A large set of **React + react-router-dom** files survive in the repo but are **not part of the build** — they are the previous React/Vite SPA.
+> Cleanroom extraction artifact. This document inventories the **physical** facts of the
+> legacy repo: framework versions, deployment target, the literal design tokens, and the
+> dead code. It is deliberately implementation-specific — it names hex codes and fonts so
+> the new UI can be rebuilt *blind* to the old components. It does **not** prescribe an
+> architecture for the rebuild.
+>
+> Everything below is read from the current working tree only (no git history).
 
 ---
 
-## 1. Stack at a glance
+## 1. Framework & Deployment Targets
 
-| Layer | Technology | Role |
+### Live build (the only thing that ships)
+
+| Concern | Concrete target | Source |
 |---|---|---|
-| Site framework | **Astro 6** (`output: "static"`) | File-based routing + static site generation. The build entry point. |
-| Build sitemap | `@astrojs/sitemap` | Generates `sitemap`, excluding `/admin`. |
-| Language | **TypeScript** + JavaScript (ESM, `"type": "module"`) | Data layer + admin in TS; scripts in `.mjs`. |
-| Operational database | **Google Firebase Firestore** | Mutable source of truth: `projects`, `journal`, `mainProjects`, `series`, `technologies`, `siteMeta`. |
-| Build-time DB access | **Firebase Admin SDK** (service account) | Privileged read for the snapshot export; also a build-time read fallback. |
-| Client DB access | **Firebase JS SDK** (incl. `firestore/lite`) | Admin console writes; build-time public-read fallback. |
-| Auth | **Firebase Auth** + Google provider | Admin sign-in, locked to one allow-listed email. |
-| Analytics | **Firebase Analytics** | Loaded in the legacy client config. |
-| Long-form content | **Astro Content Collections** + **Zod** schema | File-based `research/*.md` channel (not in Firestore). |
-| Markdown (build) | `react-markdown`, `remark-gfm`, `remark-breaks` *(legacy)* + a hand-rolled "markdown-lite" renderer *(live)* | Two renderers coexist; the live Astro pages use the hand-rolled one. |
-| Feeds | `rss` package; custom endpoints | `rss.xml`, `llms.txt`, `robots.txt`. |
-| Media pipeline | **Node.js** scripts + **ffmpeg** (frame extraction) + **cwebp** (`webp` downscale) | Converts a sibling content repo into public video bundles. |
-| Hosting / deploy | **Netlify** (static `dist/`, redirects, auto-deploy on git push) | CDN delivery; build command runs the full pipeline. |
-| Fonts | Google Fonts (IBM Plex Mono, Inter) via CDN | Dual-theme typography. |
-| Interactivity | **Vanilla JS/TS** in inline `<script>` + one TS module | Theme toggle, filter bars, the pan/zoom stack graph, admin. No client-side framework runtime. |
-| Runtime | **Node 24** (dev); pipeline docs target Node 22 | — |
+| Site framework | **Astro `^6.3.5`**, `output: "static"` | `package.json`, `astro.config.mjs` |
+| Sitemap | `@astrojs/sitemap ^3.7.2` (filters out `/admin`) | `astro.config.mjs:8-10` |
+| Language | **TypeScript** + JS, ESM (`"type": "module"`) | `package.json` |
+| Operational DB | **Firebase Firestore** (`firebase ^11`, `firebase-admin ^13.10`) | `src/lib/data.ts`, `scripts/sync-firestore-snapshot.mjs` |
+| Auth | **Firebase Auth** + Google provider (popup) | `src/scripts/admin.ts:1-19` |
+| Analytics | Google gtag (`measurementId` from firebase config), only on host `artlu.ai` | `src/layouts/BaseLayout.astro:45-57` |
+| Long-form content | **Astro Content Collections** + **Zod** | `src/content.config.ts` |
+| Garden markdown | `@astrojs/markdown-remark` processor (GFM, Shiki dual-theme, KaTeX, custom Obsidian plugins) | `src/lib/garden/render.ts` |
+| Math | `katex ^0.17`, `remark-math ^6`, `rehype-katex ^7` | `package.json`, `render.ts` |
+| Feeds / endpoints | `rss ^1.2`, plus hand-written `*.ts` endpoints | `src/pages/rss.xml.ts`, `llms.txt.ts`, `robots.txt.ts` |
+| Graph viz | `d3-force ^3` on a `<canvas>` (garden link graph) | `package.json`, `src/components/GardenGraph.astro` |
+| Hosting / deploy | **Netlify**, static `dist/`, redirects, auto-deploy on git push | `netlify.toml` |
+| Fonts | **Google Fonts CDN** — Inter + IBM Plex Mono | `src/layouts/BaseLayout.astro:37-39` |
+| Runtime | Node (dev on 24; pipeline docs target 22) | repo docs |
+
+### Build pipeline (Netlify)
+
+`netlify.toml` runs: `sync:data → validate:stack → build:strict`, publishing `dist/`.
+
+- **`sync:data`** — Firebase Admin SDK reads Firestore, filters to public records, writes the git-ignored `src/data/tracker-snapshot.json`.
+- **`validate:stack`** — referential integrity gate; **fails the build** if any public project's stack labels/refs don't resolve to a known technology (or use the `other` placeholder).
+- **`build:strict`** — `ARTLU_REQUIRE_SNAPSHOT=1 astro build`; errors out if the snapshot is missing rather than hitting live Firestore.
+- **Media pipeline** (`scripts/sync-video.mjs`, ffmpeg + cwebp) runs **on demand** when shipping a video; its output under `public/videos/` is committed.
+
+### Deployment surface
+
+- **Fully static.** No server, no runtime DB call on the read path. Visitors get pre-rendered HTML/JSON from a CDN.
+- **Redirects** (`netlify.toml`): `/journal → /log`, `/journal/* → /log/*`, `/dashboard → /admin` (all 301).
+- **Canonical site:** `https://artlu.ai`. Analytics + gtag only fire on that exact hostname.
+- **Routes that exist:** `/`, `/list`, `/map`, `/project/[slug]`, `/video/[id]`, `/log`, `/log/[slug]`, `/research`, `/research/[slug]`, `/garden`, `/garden/[slug]`, `/admin`, `/admin/settings`, `/rss.xml`, `/llms.txt`, `/robots.txt`, `/404`.
+
+### Data reads (build-time fallback chain)
+
+The data layer tries, in order: baked **snapshot JSON** → **Firestore Admin SDK** → **Firestore client SDK (`firestore/lite`)** → a **fixed-path local backup JSON** → bundled **`*-defaults.json`** seeds (`src/lib/data.ts:467-626`).
+
+### Secrets / config currently in the tree
+
+- `src/lib/firebaseConfig.ts` hard-codes the Firebase **web** config (apiKey, projectId `artluai-tracker`, etc.) and the single **admin email allow-list** (`bitbrandsagency@gmail.com`). Web API keys are public by design, but the admin email and project identifiers are baked into client bundles.
+- A **fixed absolute fallback path** to a previous author's machine is hard-coded: `/Users/ralphxu/Documents/Projects/artlu-tracker-mcp/backups/...` and `~/Documents/keys/artlu-tracker-sa.json` (`src/lib/data.ts:158-159`). Dead/unportable on any other machine.
 
 ---
 
-## 2. The build & runtime model
+## 2. Design Tokens
 
-The site is **fully static**. Visitors are served pre-rendered HTML/JSON from Netlify's CDN — there is no server and no runtime database call on the read path.
+The entire visual system is a **closed set of CSS custom properties** in `src/styles/global.css`, switched by a `data-theme` attribute on `<html>`. There is **no CSS framework** and **no named spacing scale** — spacing, radii, and font sizes are literal `px` values used inline. Both themes are given in full so the new UI can be rebuilt token-for-token.
 
-The Netlify build command chains the whole pipeline:
+### Color tokens — Dark theme (default)
+
+`html[data-theme="dark"]` (`global.css:1-14`). Origin note in source: a Dark Reader transform of the light theme.
 
 ```
-sync:data  →  validate:stack  →  build:strict
+--bg:            #21211d
+--surface:       #0f0f0e
+--surface-2:     #181816
+--border:        #42403a
+--border-strong: #514e47
+--border-hover:  #5c5b52
+--text:          #fff7d4
+--text-bright:   #fffff1
+--text-sub:      #eddbba
+--dim:           #d6c3a4
+--dimmer:        #ddcaab
+--green:         #6ad39e   --green-bg:  #1a291f   --green-border:  #45654c
+--blue:          #7da9d1
+--amber:         #ffffae   --amber-bg:  #2a210d   --amber-border:  #876e3d
+--pink:          #e58ab0   (token defined but unused)
+--port:          #2f2e2a   --wire:      #3b3934   --wire-on:  #6ad39e
+--grid-line:     transparent
+--timeline:      #3b3934
+--node-shadow:   0 8px 26px rgba(0,0,0,0.6)
 ```
 
-```mermaid
-flowchart LR
-  FS["npm run sync:data\n(Firestore Admin SDK\n-> src/data/tracker-snapshot.json)"]
-  VS["npm run validate:stack\n(taxonomy referential check\n-> fail build on error)"]
-  SV["scripts/sync-video.mjs\n(sibling repo + ffmpeg/cwebp\n-> public/videos/*)"]
-  BS["npm run build:strict\n(ARTLU_REQUIRE_SNAPSHOT=1\nastro build -> dist/)"]
-  NF["Netlify\n(publish dist/, apply redirects)"]
-  FS --> VS --> BS --> NF
-  SV -. "run separately when\nshipping a video" .-> BS
+### Color tokens — Light theme
+
+`html[data-theme="light"]` (`global.css:16-28`).
+
+```
+--bg:            #e9eaec
+--surface:       #ffffff
+--surface-2:     #f2f3f5
+--border:        #dcdfe2
+--border-strong: #b7bcc3
+--border-hover:  #9ba0a8
+--text:          #34373c
+--text-bright:   #15171a
+--text-sub:      #50545a
+--dim:           #676c74
+--dimmer:        #9298a0
+--green:         #0a7d5e   --green-bg:  #e6f4ee   --green-border:  #a9ddc9
+--blue:          #2563eb
+--amber:         #8a6300   --amber-bg:  #f3e9d2   --amber-border:  #d3b16d
+--pink:          #be185d
+--port:          #d7dce1   --wire:      #c8cdd3   --wire-on:  #0a7d5e
+--grid-line:     transparent
+--timeline:      #c8cdd3
+--node-shadow:   0 1px 2px rgba(22,24,27,0.07), 0 4px 14px rgba(22,24,27,0.06)
 ```
 
-- **`sync:data`** runs the Admin SDK against Firestore, filters to public records, and writes `src/data/tracker-snapshot.json`. That file is **git-ignored** — it's a build artifact, regenerated each build.
-- **`validate:stack`** loads the snapshot and asserts every public project's stack labels/refs resolve to a known technology (build fails otherwise).
-- **`build:strict`** sets `ARTLU_REQUIRE_SNAPSHOT=1` so Astro errors out if the snapshot is missing, rather than silently hitting live Firestore.
-- The **video pipeline (`sync-video.mjs`) is run on demand** (when shipping a video), not on every Netlify build — its output (`public/videos/`) is committed.
+### Semantic color meaning (carries domain intent)
 
-### npm scripts reference
+- **green** = the brand accent / "build" / launched / public / primary action.
+- **blue** = "video" entries.
+- **amber** = "research" entries, the **garden** nav segment (glyph `❧`), warnings, and "locked/gated".
+- **dot colors** in timelines: `.dot` green (build), `.dot.video` blue, `.dot.research` amber (`global.css:498-500`).
+- One hard-coded non-token color: PipelineCPC mark uses `#f97316` (orange) on `#0f172a` (`global.css:289,395-399`).
 
-| Script | What it does |
+### Typography
+
+```
+--font:  'Inter', system-ui, sans-serif
+--mono:  'IBM Plex Mono', 'SF Mono', Consolas, monospace
+```
+
+- Loaded from Google Fonts: `Inter` weights 400/500/600/700, `IBM Plex Mono` weights 400/500/600/700 (`BaseLayout.astro:39`).
+- **Base body:** `font-size: 14px` (desktop), `13px` at `≤720px`; `-webkit-font-smoothing: antialiased`.
+- **Type scale in use** (literal px): 8.5, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13, 13.5, 14, 14.5, 15, 17, 21, 23, 24, 26, 29, 30. (`.page-h1` 30px; brand 29px; section headers `.sec-h` 11px uppercase, `letter-spacing:1.8px`; mono labels 10–11px uppercase with `letter-spacing:1–1.4px`.)
+- **Mono is used for all "system/terminal" chrome**: nav segments, meta lines, counts, status pills, the day pills, admin chrome.
+
+### Spacing, radii, layout constants (literal — no named tokens)
+
+- **Border-radius scale:** `2, 3, 4, 5, 7, 8, 9, 10, 11, 15, 18px`; pills/chips use `20px` or `999px`.
+- **Layout widths:** content `max-width: 1240px` (`.col`), reading width `760px`/`820px` (`.narrow`, `.garden-note`), graph world `2200px`.
+- **Topbar:** height `72px` desktop / `54px` mobile; sticky; `z-index:40`.
+- **Page padding:** `16px 30px 110px` desktop, `12px 13px 88px` mobile.
+- **Mobile breakpoint:** single `@media (max-width:720px)`.
+- **Standard card:** `1px solid var(--border-strong)`, radius `9–11px`, `background:var(--surface)`, `box-shadow:var(--node-shadow)`.
+- **Status pills:** `.status` (green) default; `.building` amber; `.idea` neutral; `.abandoned` dim (`global.css:509-512`).
+
+### Theme behavior
+
+- Persisted in `localStorage` under key **`artlu-theme`**.
+- Default when unset: **mobile (`≤720px`) → light, desktop → dark** (`BaseLayout.astro:27-36`).
+- Toggled by a global `window.toggleTheme()` flipping `data-theme` (`BaseLayout.astro:69-74`).
+- Favicon: `/favicon.svg`.
+
+---
+
+## 3. The Graveyard (dead code & dead config)
+
+The repo contains **two generations of the app**. Only the Astro generation is built. The following are present but **unreachable / unused**.
+
+### Dead generation: the old React + Vite SPA
+
+These files are not wired into the Astro build and cannot run:
+
+| File(s) | Why dead |
 |---|---|
-| `dev` | `astro dev` — local dev server. |
-| `build` / `build:strict` | `astro build` (strict forces snapshot presence). |
-| `preview` | Serve the built `dist/`. |
-| `sync:data` | Export Firestore → `tracker-snapshot.json`. |
-| `validate:stack` | Referential integrity check on stack metadata. |
-| `seed:main-projects` / `seed:series` / `seed:technologies` | One-off Firestore seeders. |
-| `audit:stack` / `migrate:stack-refs` | Stack taxonomy audit + migration helpers. |
+| root `index.html`, `src/main.jsx`, `src/App.jsx` | Vite SPA entry (`ReactDOM.createRoot` + `BrowserRouter`). Not Astro's entry. |
+| `src/components/*.jsx` — `Header.jsx`, `Dashboard.jsx`, `ProjectTable.jsx`, `ProjectPage.jsx`, `ProjectDetail.jsx`, `ProjectForm.jsx`, `VideoPage.jsx`, `VideoCard.jsx`, `VideoShowcase.jsx`, `JournalView.jsx`, `JournalEntry.jsx`, `JournalForm.jsx`, `PublicView.jsx`, `FeaturedCard.jsx`, `FeaturedGrid.jsx`, `FileBrowser.jsx`, `EmbedFrame.jsx`, `Links.jsx`, `ActivityCard.jsx` | React components. Astro config declares **no `@astrojs/react`** integration (not in `package.json`/lockfile), and there are **zero `client:*` directives** in `src/`. Astro cannot render or hydrate them. |
+| `src/lib/db.js`, `src/lib/auth.jsx`, `src/lib/theme.jsx`, `src/lib/firebase.js` | SPA-era data/auth/theme modules, superseded by `src/lib/data.ts`, `src/scripts/admin.ts`, the inline theme script, and `firebaseConfig.ts`. |
+| `src/index.css` | SPA stylesheet; live theme is `src/styles/global.css`. |
+| `vite.config.js` | Vite SPA build config; the real build is `astro.config.mjs`. |
+
+**Unused dependencies** that linger only because of the dead SPA: `react`, `react-dom`, `react-router-dom`, `react-markdown`, `remark-gfm`, `@vitejs/plugin-react`, `@types/react`, `vite`. (Note: the *garden* renderer uses `remark-math`/`remark-breaks`/`rehype-katex` directly, so those are **live**; `react-markdown`/`remark-gfm` are the dead pair.)
+
+### Dead data paths & unportable config
+
+- **Hard-coded foreign absolute paths** in `src/lib/data.ts:158-159` (`/Users/ralphxu/...` backup + `~/Documents/keys/...` service account). Only meaningful on one specific machine; dead everywhere else.
+- The **client-SDK live-read fallbacks** in `data.ts` are effectively dead in production: the Netlify build sets `ARTLU_REQUIRE_SNAPSHOT`, so the snapshot path always wins and the Firestore/back-up/defaults branches never execute during a real build.
+
+### Stale / placeholder UI in the admin
+
+- `src/pages/admin/settings.astro` is almost entirely **non-functional placeholders**: every "config / connect / new job" button is `disabled` with "coming soon"; the connection rows are static labels; the "general" toggles/inputs are not wired to persistence (only a cosmetic switch toggle in script).
+- Admin "create series" is a **dead button**: it just sets a status message saying series creation still happens via Firestore/seed scripts (`src/scripts/admin.ts:621-625`).
+- The `siteMeta/publishState` "dirty flag" + `changes` change-journal is written on every admin edit but is **informational only** — nothing consumes it to trigger a publish (publishing is still a manual git push). (`src/scripts/admin.ts:136-155`.)
+
+### Duplication worth noting (not dead, but redundant)
+
+- **`slugify` is implemented three times** with slightly different rules: `src/lib/format.ts:3`, `src/scripts/admin.ts:34`, and `scripts/validate-stack-metadata.mjs:11` (the validator additionally strips apostrophes). These can silently disagree on edge cases.
+- Two markdown renderers coexist: the hand-rolled `renderMarkdownLite` (`format.ts`, used live for project/log bodies) and the full garden processor (`src/lib/garden/`). The React-era `react-markdown` is the third, dead one.
+
+### Unused token
+
+- `--pink` is defined in both themes but referenced nowhere (`global.css:9` even annotates it "token unused").
 
 ---
 
-## 3. Data layer (Firestore)
-
-**Project:** a single Firebase project (`artluai-tracker`). Firestore collections:
-
-| Collection | Holds |
-|---|---|
-| `projects` | Work items (projects + videos). |
-| `journal` | Dated log entries. |
-| `mainProjects` | Product-line groupings + branding. |
-| `series` | Sub-groupings within a line. |
-| `technologies` | Canonical tech taxonomy (id, category, aliases). |
-| `siteMeta/publishState` (+ `changes` subcollection) | The "dirty" flag, pending-change counter, and an append-only change journal written on every admin edit. |
-
-**Three ways the data is read** (the build layer tries them in order):
-1. The baked **snapshot JSON** (preferred; produced by `sync:data`).
-2. **Live Firestore via Admin SDK** (service account credentials).
-3. **Live Firestore via the client SDK** (`firestore/lite`).
-4. A **local backup JSON** at a fixed path, then bundled **default seed JSON** (`*-defaults.json`) as last resorts.
-
-**Credentials:** the service account is resolved from (in order) an inline JSON env var, a base64 env var, `GOOGLE_APPLICATION_CREDENTIALS`, or a conventional local key path. The client-side Firebase web config (apiKey, authDomain, etc.) is embedded in the front-end as usual for Firebase web apps.
-
----
-
-## 4. Authoring & auth
-
-- **Admin surface:** `/admin` (and `/admin/settings`) — Astro pages whose interactivity is a single imported **vanilla TypeScript module** (`src/scripts/admin.ts`). No React. It does its own DOM rendering, Firestore reads/writes, and the stack-tag picker.
-- **Auth:** Firebase Auth with the Google provider (popup sign-in). Authorization is an **email allow-list of exactly one operator**; an authenticated-but-unauthorized user is immediately signed out.
-- **Write side-effects:** every create/update also writes to `siteMeta/publishState` (sets `dirty: true`, increments a counter, records last-changed-by) and appends a record to the `changes` subcollection. This is the change journal — currently informational; publishing is still triggered manually (push to git → Netlify rebuild).
-- **Automated authoring:** an MCP server (referenced in `CLAUDE.md`) lets AI agents write the same Firestore collections through a tool bridge.
-
----
-
-## 5. Routing & pages (Astro)
-
-File-based routing under `src/pages/`. Dynamic routes use `getStaticPaths` to pre-render one page per record at build time.
-
-| Route | Source | Notes |
-|---|---|---|
-| `/` | snapshot | Home = interactive **stack/relationship graph** (desktop) + mobile stack view. |
-| `/list`, `/map` | snapshot | Alternate views of the same entries. |
-| `/project/[slug]` | snapshot (`getStaticPaths`) | Per-work-item detail; emits JSON-LD `CreativeWork`. |
-| `/video/[id]` | `public/videos/<id>/bundle.json` | Long vs short component by `format`; JSON-LD `VideoObject`. |
-| `/log`, `/log/[slug]` | snapshot | Journal list + permalinks; client-side author filter. |
-| `/research`, `/research/[slug]` | **Content Collection** (`src/content/research/*.md`) | Zod-validated front-matter. |
-| `/rss.xml`, `/llms.txt`, `/robots.txt` | snapshot + collections | Custom endpoint files (`*.ts`). |
-| `/admin`, `/admin/settings` | live Firestore | Client-rendered, `noindex`, excluded from sitemap. |
-
-**Redirects (Netlify):** `/journal → /log`, `/journal/* → /log/*`, `/dashboard → /admin` (301s).
-
----
-
-## 6. Front-end interactivity
-
-There is **no client-side UI framework in the running site.** Interactivity is plain JavaScript/TypeScript:
-
-- **Theme toggle** (light/dark) persisted to `localStorage`, applied via a `data-theme` attribute and CSS variables.
-- **Filter bars** (log author filter, etc.) — inline `<script>` reading URL params and toggling DOM visibility.
-- **The stack graph** on the home page — a hand-written pan/zoom/`SVG`-wire canvas: nodes for tech, work, projects, and showcases, with focus/lineage highlighting. ~900 lines of vanilla JS in the page's `<script>` block (data injected via Astro's `define:vars`).
-- **Admin console** — the single TS module described above.
-
-Styling is inline `<style>`/`<style is:global>` in Astro components driven by a closed set of CSS variables (two themes). No CSS framework.
-
----
-
-## 7. Media pipeline (`scripts/sync-video.mjs`)
-
-A standalone Node ETL, separate from the Astro build:
-
-- **Input:** a sibling checkout `../spoolcast-content/` (sessions, shows, styles) plus a manifest (`scripts/shipped-videos.json`).
-- **Long videos:** read session/shot-list/manifest/audit JSON; copy + downscale scene images.
-- **Short videos:** **regex-parse human-edited `script.md`** to recover beats, narration, sources, cost, voice, model; **extract first frames** from clip `.mp4`s.
-- **External tools:** **`ffmpeg`** (decode a frame to PNG) → **`cwebp`** (downscale to `webp`, ~640px). ffmpeg's default build lacks libwebp, hence the two-step. Missing tools degrade gracefully (warn + skip).
-- **Output:** `public/videos/<id>/bundle.json` (a deliberately path-free, URL-only contract) + `public/videos/index.json`. These are committed to the repo.
-
----
-
-## 8. ⚠️ Live vs. dead code (important)
-
-The repo contains **two generations of the app**. Only the Astro one is built:
-
-| Status | Files | Why |
-|---|---|---|
-| **LIVE (Astro)** | `src/pages/**`, `src/layouts/**`, `src/components/*.astro`, `src/scripts/admin.ts`, `src/lib/data.ts`, `src/lib/format.ts`, `src/content.config.ts`, `astro.config.mjs`, `scripts/*.mjs` | The current static site + pipeline. |
-| **DEAD (old React+Vite SPA)** | root `index.html`, `src/main.jsx`, `src/App.jsx`, the `src/components/*.jsx` (`Header.jsx`, `ProjectTable.jsx`, `ProjectPage.jsx`, `VideoPage.jsx`, `JournalView.jsx`, `ProjectDetail.jsx`, `Dashboard.jsx`, etc.), `src/lib/db.js`, `src/lib/auth.jsx`, `src/lib/theme.jsx`, `src/lib/firebase.js`, `vite.config.js` | The previous SPA. **Not wired into the Astro build.** |
-
-**How I know they're dead:**
-- `astro.config.mjs` declares **no React integration** (`@astrojs/react` is not installed — confirmed absent from `package.json` and `package-lock.json`). Without it, Astro physically cannot render or hydrate `.jsx` components.
-- There are **zero `client:*` directives** anywhere in `src/` (the one `client:` match is a string literal in `admin.ts`).
-- The `.jsx` components import `react-router-dom` — a *client-side SPA router*, incompatible with Astro's file-based static routing. Their entry is the root `index.html` → `src/main.jsx` (`ReactDOM.createRoot` + `BrowserRouter`), which is the **Vite** entry, not Astro's.
-- `react`, `react-dom`, `react-router-dom`, `react-markdown`, and `vite.config.js` therefore linger as **unused dependencies** of the prior build.
-
-> **Rebuild note:** these legacy files can be deleted wholesale without affecting the live site. They mostly duplicate logic that now lives in the Astro layer (e.g. `db.js` vs `data.ts`, multiple `slugify` implementations). The duplication is flagged as debt in `CLEANROOM_SPEC.md` §3.1.
-
----
-
-## 9. Configuration & environment
-
-| Concern | Mechanism |
-|---|---|
-| Firebase web config | Embedded in the client config module. |
-| Service account (build export) | Env vars (`FIREBASE_SERVICE_ACCOUNT_JSON` / `_B64`, `GOOGLE_APPLICATION_CREDENTIALS`) or a conventional local key path. |
-| Data source override | `ARTLU_DATA_SOURCE=firestore` (skip snapshot), `ARTLU_REQUIRE_SNAPSHOT=1` (fail if snapshot missing), `NETLIFY=true` (implies require-snapshot). |
-| Admin authorization | Single email constant checked after Google sign-in. |
-| Git-ignored | `node_modules`, `dist`, `.astro`, `.env*`, and `src/data/tracker-snapshot.json` (build artifact). |
-| Campaign anchor | A fixed start date constant drives all "day N / 100" math. |
-
----
-
-*Companion to `CLEANROOM_SPEC.md`. That document is the technology-agnostic "what & why"; this one is the concrete "how" as the code stands today.*
+*Companion documents: `DOMAIN_PRIMER.md` (the business rules and fallbacks) and `BEHAVIOR_INVENTORY.md` (observable capabilities).*
