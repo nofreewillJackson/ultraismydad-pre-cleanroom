@@ -12,6 +12,18 @@
 
 ## Start here — the toolkit and how to use it
 
+**What this analysis produced** (committed on branch `docs/onboarding-static-analysis`):
+
+- `ONBOARDING.md` — this file. *How this app works* **and** *how the analysis was done* (§2).
+- `docs/studying-a-codebase.md` — the same method generalized to **any** language/project.
+- `scripts/trace-reachability.mjs` — the tool that does the work (follow imports → alive/dead → graph).
+- `.gitignore` — updated to ignore the generated `graph.*` files.
+
+The headline findings, in one breath: this is an **Astro static site** with **17 page
+entry points**; all data is loaded **at build time** and funnels through one hub file,
+`src/lib/data.ts`; and **25 files are dead** — an old React app (`index.html` → `main.jsx`)
+that was replaced but never deleted. §2 shows the exact commands that proved each of these.
+
 You own two things that do this analysis for you, plus a portable playbook. No AI required.
 
 | File | What it is |
@@ -106,49 +118,97 @@ nothing about the live site. (Proof: §6.)
 
 ---
 
-## 2. How to reproduce this whole analysis yourself
+## 2. The investigation, replayed (what happened + how to reproduce it)
 
-You do **not** need an AI to do any of this. Run these and read the output.
+This is the actual trail that produced this document — eight steps, each one a
+**question**, the **command** that answers it, **what you'll see**, and **what it proves.**
+Run them top to bottom and you will arrive at every conclusion in this file yourself.
+You do **not** need an AI for any of it. (Run `npm install` once first.)
 
+### Step 1 — What kind of project is this?
 ```bash
-# 0. Install deps once
-npm install
+cat package.json                                   # framework + dependencies
+find src -type f | sed 's/.*\.//' | sort | uniq -c # file types in the source
+```
+**You'll see:** `astro ^6.x` with `output: "static"`, *but also* `react` and `firebase`
+in the dependencies; and counts like `25 .astro`, `23 .jsx`, `14 .ts`.
+**Proves:** it's an Astro static site — yet there's a large pile of React (`.jsx`) too.
+Two worlds in one repo. Flag that for Step 2.
 
-# 1. GROUND TRUTH — build the site and see exactly what ships.
-#    On a static site, if it's not in dist/, it isn't used.
+### Step 2 — Where does it start, and is anything a decoy?
+Astro's rule: every file in `src/pages/` is a route (an entry point). But the root
+`index.html` loads a React app. Which one is the *real* app?
+```bash
+grep -rln "main.jsx\|src/App" . --include=*.html | grep -v node_modules  # who loads React?
+grep -rln "components/.*jsx" src/pages src/layouts                       # do pages use React?
+```
+**You'll see:** the first prints only `index.html`; the second prints **nothing.**
+**Proves:** the React app is referenced *only* by the root `index.html`, and no Astro
+page touches it. Hypothesis: React is dead; the live entry points are `src/pages/*`.
+
+### Step 3 — Confirm with ground truth: what actually ships?
+Source code can lie about what's used; the build can't. On a static site, only files
+that end up in `dist/` are real.
+```bash
 npm run build
-find dist -name '*.html'     # every page the site actually produces
-find dist -name '*.js'       # the only JavaScript that runs in the browser
-
-# 2. ALIVE vs DEAD — follow imports from the real entry points (src/pages/*).
-#    This script reads each file's `import` lines and walks them recursively.
-node scripts/trace-reachability.mjs
-#    -> "Reachable from roots: 41/64" and a list of the 25 dead files.
-
-# 3. PICTURE of the live import graph (needs graphviz: `sudo apt-get install graphviz`)
-node scripts/trace-reachability.mjs --graph
-dot -Tsvg graph.dot -o graph.svg     # open graph.svg in a browser
-
-# 4. INSPECT THE DEAD REACT APP on its own (optional, just to confirm it's separate)
-npx madge --extensions js,jsx,ts src/main.jsx     # 26 files, none of which ship
+find dist -name '*.js'        # the only JavaScript that ships to browsers
 ```
+**You'll see:** just **3** JS bundles (garden graph, homepage, admin settings) — zero of
+the 23 React components.
+**Proves:** the entire React layer is dead. Hypothesis from Step 2 confirmed.
 
-Two manual greps you'll use constantly:
-
+### Step 4 — Get the exact alive/dead split (mechanized)
+Eyeballing greps doesn't scale. `scripts/trace-reachability.mjs` starts at every
+`src/pages/*` file and follows every `import` recursively.
 ```bash
-# What does a file pull in? (read the top of any page)
-grep -n "^import" src/pages/index.astro
-
-# Who references a given file? (find a file's callers)
-grep -rln "lib/data" src --include=*.astro --include=*.ts
+node scripts/trace-reachability.mjs
 ```
+**You'll see:** `Entry points (roots): 17`, `Reachable from roots: 41/64`, then a list of
+dead files.
+**Proves:** 41 files are actually used; the rest are the graveyard.
+**Caveat:** it lists `content.config.ts` and `env.d.ts` as dead — *false positives.*
+Astro loads those by convention, not via `import`, so the tracer can't see the edge.
 
-> **Caveat about tools:** `madge` and `dependency-cruiser` cannot read `.astro`
-> import lines, so they wrongly report `.astro` components as "orphans." The little
-> `scripts/trace-reachability.mjs` in this repo exists *specifically* to handle
-> `.astro`. Also, pure import-following can't see files Astro loads *by convention*
-> rather than by `import` — namely `src/content.config.ts` and `src/env.d.ts`.
-> Those two are **alive** even though the tracer lists them as dead.
+### Step 5 — Second opinion + isolate the dead tree
+```bash
+npx madge --extensions js,jsx,ts src/main.jsx
+```
+**You'll see:** a 26-file tree rooted at `main.jsx` (App.jsx → all the `.jsx` components → `db.js` → `firebase.js`).
+**Proves:** the dead React code is one self-contained island, reachable only from `main.jsx`
+(which only the dead `index.html` loads). Independent confirmation of Step 4.
+
+### Step 6 — How does a *live* page get its data?
+```bash
+grep -nE "readFile|snapshot|firebase" src/lib/data.ts                       # where data comes from
+grep -rln "lib/firebase\|lib/db" src --include=*.astro --include=*.ts --include=*.jsx  # who uses Firestore
+```
+**You'll see:** `data.ts` reads `src/data/tracker-snapshot.json` (with Firestore + a local
+backup as fallbacks); the Firestore *client* is imported only by the dead `.jsx` and the
+admin editor.
+**Proves:** there are **two data layers** — a live snapshot reader (`data.ts`) and a dead
+Firestore client. Details in §3 and §5.
+
+### Step 7 — Map every route at once
+```bash
+for f in $(find src/pages -type f | sort); do
+  echo "$f"; grep -oE "get[A-Z][a-zA-Z]+|getGardenData|getCollection" "$f" | sort -u | sed 's/^/    /'
+  grep -q getStaticPaths "$f" && echo "    DYNAMIC (one page per item)"
+done
+```
+**You'll see:** each page, the data functions it calls, and whether it's dynamic.
+**Proves:** the full route table in §4 — every URL, its data, and its source.
+
+### Step 8 — Draw the picture
+```bash
+node scripts/trace-reachability.mjs --graph        # writes graph.dot
+dot -Tsvg graph.dot -o graph.svg                   # needs: sudo apt-get install graphviz
+```
+**You'll see:** the live import graph. Every page funnels into one node: `src/lib/data.ts`.
+**Proves:** visually, the 4-layer shape and the data hub from §3.
+
+> **The two greps you'll reuse forever:** `grep -n "^import" <file>` (what a file pulls in)
+> and `grep -rln "<file>" src` (who pulls that file in). Those two answer "what references
+> what" in any language.
 
 ---
 
