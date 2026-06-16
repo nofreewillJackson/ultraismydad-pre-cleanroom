@@ -1207,6 +1207,18 @@ const mobileStackData = {
     function activeTechnologyId() {
       return activeNodeId?.startsWith("t_") ? activeNodeId.slice(2) : "";
     }
+    function activeProjectFocusId() {
+      if (activeNodeId?.startsWith("pr_")) return activeNodeId.slice(3);
+      if (activeNodeId?.startsWith("ro_")) return activeNodeId.slice(3);
+      return "";
+    }
+    function activeWorkFocusId() {
+      return activeNodeId?.startsWith("w_") ? activeNodeId.slice(2) : "";
+    }
+    function projectEntryIds(projectId) {
+      if (!projectId) return new Set();
+      return new Set(data.entries.filter((entry) => entry.projectId === projectId).map((entry) => entry.id));
+    }
     function entriesForTechnology(techId) {
       if (!techId) return [];
       return data.entries
@@ -1357,14 +1369,21 @@ const mobileStackData = {
     function syncVisibility() {
       let hidden = 0;
       const activeTech = activeTechnologyId();
+      const activeProject = activeProjectFocusId();
+      const activeWork = activeWorkFocusId();
       const activeTechEntries = entriesForTechnology(activeTech);
       const activeTechEntryIds = new Set(activeTechEntries.map((entry) => entry.id));
       const activeTechProjectIds = new Set(activeTechEntries.map((entry) => entry.projectId).filter(Boolean));
+      const activeProjectEntryIds = projectEntryIds(activeProject);
       data.entries.forEach((entry) => {
         const node = nodes[`w_${entry.id}`];
         if (!node) return;
         const isHidden = activeTech
           ? !activeTechEntryIds.has(entry.id)
+          : entry.id === activeWork
+            ? false
+          : activeProjectEntryIds.has(entry.id)
+            ? false
           : !!entry.hiddenDefault && !expanded;
         node.visible = !isHidden;
         node.el.classList.toggle("hidden-work", isHidden);
@@ -1445,14 +1464,33 @@ const mobileStackData = {
         ty += 12;
       });
       visibleTechs.filter((tech) => !placedTechIds.has(tech.id)).forEach(placeTech);
+      const activeProject = activeProjectFocusId();
       const works = [...data.entries].sort((a, b) => {
+        if (activeProject) {
+          const aRelated = a.projectId === activeProject;
+          const bRelated = b.projectId === activeProject;
+          if (aRelated !== bRelated) return Number(bRelated) - Number(aRelated);
+        }
         const byDate = b.dateValue - a.dateValue;
         if (byDate) return byDate;
         return a.title.localeCompare(b.title);
       }).filter((entry) => nodes[`w_${entry.id}`]?.visible !== false);
+      const focusedWorks = activeProject ? works.filter((entry) => entry.projectId === activeProject) : [];
+      const focusNode = activeProject ? nodes[activeNodeId] : null;
       let wy = 192;
+      if (focusNode && focusedWorks.length) {
+        const totalFocusedWorkHeight = Math.max(0, focusedWorks.reduce((sum, entry) => {
+          const node = nodes[`w_${entry.id}`];
+          return sum + (node?.h || 0) + 26;
+        }, 0) - 26);
+        wy = Math.max(126, Math.round(focusNode.y + focusNode.h / 2 - totalFocusedWorkHeight / 2));
+      }
+      let previousWorkRelated = null;
       works.forEach((entry) => {
         const node = nodes[`w_${entry.id}`];
+        const related = activeProject ? entry.projectId === activeProject : false;
+        if (activeProject && previousWorkRelated === true && !related) wy += 34;
+        previousWorkRelated = related;
         node.x = WORK_X;
         node.y = wy;
         wy += node.h + 26;
