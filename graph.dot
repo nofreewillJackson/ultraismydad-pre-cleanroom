@@ -1,0 +1,154 @@
+digraph deps {
+  rankdir=LR; labelloc=t; fontname=Helvetica;
+  label="Arrow  A -> B  means: A imports (consumes) B.\lDarker box = consumed by more files = a hub; start reading there.\l";
+  node [shape=box, style="rounded,filled", fillcolor="#f5f5f5", fontname="Helvetica", fontsize=10];
+  edge [color="#bbbbbb", arrowsize=0.8];
+  subgraph "cluster_pages" {
+    label="pages"; color="#cccccc";
+    "pages/404.astro" [fillcolor="#f5f5f5"];
+    "pages/admin/index.astro" [fillcolor="#f5f5f5"];
+    "pages/admin/settings.astro" [fillcolor="#f5f5f5"];
+    "pages/garden/[slug].astro" [fillcolor="#f5f5f5"];
+    "pages/garden/index.astro" [fillcolor="#f5f5f5"];
+    "pages/index.astro" [fillcolor="#f5f5f5"];
+    "pages/list.astro" [fillcolor="#f5f5f5"];
+    "pages/llms.txt.ts" [fillcolor="#f5f5f5"];
+    "pages/log/[slug].astro" [fillcolor="#f5f5f5"];
+    "pages/log/index.astro" [fillcolor="#f5f5f5"];
+    "pages/map.astro" [fillcolor="#f5f5f5"];
+    "pages/project/[slug].astro" [fillcolor="#f5f5f5"];
+    "pages/research.astro" [fillcolor="#f5f5f5"];
+    "pages/research/[slug].astro" [fillcolor="#f5f5f5"];
+    "pages/robots.txt.ts" [fillcolor="#f5f5f5"];
+    "pages/rss.xml.ts" [fillcolor="#f5f5f5"];
+    "pages/video/[id].astro" [fillcolor="#f5f5f5"];
+  }
+  subgraph "cluster_layouts" {
+    label="layouts"; color="#cccccc";
+    "layouts/BaseLayout.astro" [fillcolor="#f4a259"];
+  }
+  subgraph "cluster_components" {
+    label="components"; color="#cccccc";
+    "components/ActivityStrip.astro" [fillcolor="#f5f5f5"];
+    "components/FileBrowser.astro" [fillcolor="#f5f5f5"];
+    "components/GardenGraph.astro" [fillcolor="#ffe2bd"];
+    "components/Header.astro" [fillcolor="#f4a259"];
+    "components/MobileStackView.astro" [fillcolor="#f5f5f5"];
+    "components/ProjectDetail.astro" [fillcolor="#f5f5f5"];
+    "components/ProjectStrip.astro" [fillcolor="#f5f5f5"];
+    "components/TimelineList.astro" [fillcolor="#ffe2bd"];
+    "components/VideoLong.astro" [fillcolor="#f5f5f5"];
+    "components/VideoShort.astro" [fillcolor="#f5f5f5"];
+  }
+  subgraph "cluster_scripts" {
+    label="scripts"; color="#cccccc";
+    "scripts/admin.ts" [fillcolor="#ffe2bd"];
+  }
+  subgraph "cluster_lib" {
+    label="lib"; color="#cccccc";
+    "lib/data.ts" [fillcolor="#f4a259"];
+    "lib/firebaseConfig.ts" [fillcolor="#ffe2bd"];
+    "lib/format.ts" [fillcolor="#f4a259"];
+    "lib/garden/analytics.ts" [fillcolor="#ffe2bd"];
+    "lib/garden/index.ts" [fillcolor="#ffe2bd"];
+    "lib/garden/plugins.ts" [fillcolor="#f5f5f5"];
+    "lib/garden/render.ts" [fillcolor="#f5f5f5"];
+    "lib/main-project-defaults.json" [fillcolor="#f5f5f5"];
+    "lib/projectRefs.ts" [fillcolor="#ffe2bd"];
+    "lib/series-defaults.json" [fillcolor="#f5f5f5"];
+    "lib/technology-defaults.json" [fillcolor="#f5f5f5"];
+  }
+  subgraph "cluster_styles" {
+    label="styles"; color="#cccccc";
+    "styles/global.css" [fillcolor="#f5f5f5"];
+  }
+  "pages/404.astro" -> "layouts/BaseLayout.astro";
+  "pages/admin/index.astro" -> "layouts/BaseLayout.astro";
+  "pages/admin/index.astro" -> "components/Header.astro";
+  "pages/admin/index.astro" -> "scripts/admin.ts";
+  "pages/admin/settings.astro" -> "layouts/BaseLayout.astro";
+  "pages/admin/settings.astro" -> "components/Header.astro";
+  "pages/admin/settings.astro" -> "scripts/admin.ts";
+  "pages/garden/[slug].astro" -> "layouts/BaseLayout.astro";
+  "pages/garden/[slug].astro" -> "components/Header.astro";
+  "pages/garden/[slug].astro" -> "components/GardenGraph.astro";
+  "pages/garden/[slug].astro" -> "lib/data.ts";
+  "pages/garden/[slug].astro" -> "lib/garden/index.ts";
+  "pages/garden/[slug].astro" -> "lib/format.ts";
+  "pages/garden/index.astro" -> "layouts/BaseLayout.astro";
+  "pages/garden/index.astro" -> "components/Header.astro";
+  "pages/garden/index.astro" -> "components/GardenGraph.astro";
+  "pages/garden/index.astro" -> "lib/data.ts";
+  "pages/garden/index.astro" -> "lib/garden/index.ts";
+  "pages/garden/index.astro" -> "lib/format.ts";
+  "pages/index.astro" -> "layouts/BaseLayout.astro";
+  "pages/index.astro" -> "components/Header.astro";
+  "pages/index.astro" -> "components/MobileStackView.astro";
+  "pages/index.astro" -> "lib/data.ts";
+  "pages/index.astro" -> "lib/format.ts";
+  "pages/list.astro" -> "layouts/BaseLayout.astro";
+  "pages/list.astro" -> "components/Header.astro";
+  "pages/list.astro" -> "components/ProjectStrip.astro";
+  "pages/list.astro" -> "components/TimelineList.astro";
+  "pages/list.astro" -> "lib/data.ts";
+  "pages/list.astro" -> "lib/format.ts";
+  "pages/llms.txt.ts" -> "lib/data.ts";
+  "pages/log/[slug].astro" -> "layouts/BaseLayout.astro";
+  "pages/log/[slug].astro" -> "components/Header.astro";
+  "pages/log/[slug].astro" -> "lib/data.ts";
+  "pages/log/[slug].astro" -> "lib/format.ts";
+  "pages/log/[slug].astro" -> "lib/projectRefs.ts";
+  "pages/log/index.astro" -> "layouts/BaseLayout.astro";
+  "pages/log/index.astro" -> "components/Header.astro";
+  "pages/log/index.astro" -> "lib/data.ts";
+  "pages/log/index.astro" -> "lib/format.ts";
+  "pages/log/index.astro" -> "lib/projectRefs.ts";
+  "pages/map.astro" -> "layouts/BaseLayout.astro";
+  "pages/map.astro" -> "components/Header.astro";
+  "pages/map.astro" -> "components/TimelineList.astro";
+  "pages/map.astro" -> "lib/data.ts";
+  "pages/map.astro" -> "lib/format.ts";
+  "pages/project/[slug].astro" -> "layouts/BaseLayout.astro";
+  "pages/project/[slug].astro" -> "components/Header.astro";
+  "pages/project/[slug].astro" -> "components/ProjectDetail.astro";
+  "pages/project/[slug].astro" -> "lib/data.ts";
+  "pages/research/[slug].astro" -> "layouts/BaseLayout.astro";
+  "pages/research/[slug].astro" -> "components/Header.astro";
+  "pages/research/[slug].astro" -> "lib/data.ts";
+  "pages/research/[slug].astro" -> "lib/format.ts";
+  "pages/research.astro" -> "layouts/BaseLayout.astro";
+  "pages/research.astro" -> "components/Header.astro";
+  "pages/research.astro" -> "lib/data.ts";
+  "pages/research.astro" -> "lib/format.ts";
+  "pages/video/[id].astro" -> "layouts/BaseLayout.astro";
+  "pages/video/[id].astro" -> "components/Header.astro";
+  "pages/video/[id].astro" -> "components/VideoLong.astro";
+  "pages/video/[id].astro" -> "components/VideoShort.astro";
+  "pages/video/[id].astro" -> "lib/data.ts";
+  "layouts/BaseLayout.astro" -> "styles/global.css";
+  "layouts/BaseLayout.astro" -> "lib/firebaseConfig.ts";
+  "components/Header.astro" -> "components/ActivityStrip.astro";
+  "scripts/admin.ts" -> "lib/firebaseConfig.ts";
+  "components/GardenGraph.astro" -> "lib/garden/analytics.ts";
+  "lib/data.ts" -> "lib/firebaseConfig.ts";
+  "lib/data.ts" -> "lib/format.ts";
+  "lib/data.ts" -> "lib/main-project-defaults.json";
+  "lib/data.ts" -> "lib/series-defaults.json";
+  "lib/data.ts" -> "lib/technology-defaults.json";
+  "lib/garden/index.ts" -> "lib/format.ts";
+  "lib/garden/index.ts" -> "lib/garden/render.ts";
+  "lib/garden/index.ts" -> "lib/garden/analytics.ts";
+  "lib/garden/index.ts" -> "lib/garden/analytics.ts";
+  "components/ProjectStrip.astro" -> "lib/data.ts";
+  "components/TimelineList.astro" -> "lib/data.ts";
+  "components/TimelineList.astro" -> "lib/format.ts";
+  "lib/projectRefs.ts" -> "lib/data.ts";
+  "lib/projectRefs.ts" -> "lib/format.ts";
+  "components/ProjectDetail.astro" -> "lib/data.ts";
+  "components/ProjectDetail.astro" -> "lib/format.ts";
+  "components/ProjectDetail.astro" -> "components/FileBrowser.astro";
+  "components/VideoLong.astro" -> "lib/format.ts";
+  "components/VideoShort.astro" -> "lib/format.ts";
+  "lib/garden/render.ts" -> "lib/garden/plugins.ts";
+  "lib/garden/plugins.ts" -> "lib/format.ts";
+}

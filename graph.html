@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script>
+try{
+  var _t=localStorage.getItem("artlu-theme");
+  document.documentElement.dataset.theme = (_t === "dark" || _t === "light")
+    ? _t
+    : (window.matchMedia("(max-width: 720px)").matches ? "light" : "dark");
+}catch(e){
+  document.documentElement.dataset.theme = "dark";
+}
+</script>
+<title>Dependency Explorer</title>
+<style>
+  html[data-theme="dark"] {
+    color-scheme:dark;
+    --bg:#21211d; --surface:#0f0f0e; --surface-2:#181816;
+    --border:#42403a; --border-strong:#514e47; --border-hover:#5c5b52;
+    --text:#fff7d4; --text-bright:#fffff1; --text-sub:#eddbba;
+    --dim:#d6c3a4; --dimmer:#ddcaab;
+    --green:#6ad39e; --green-bg:#1a291f; --green-border:#45654c;
+    --blue:#7da9d1; --amber:#ffffae; --amber-bg:#2a210d; --amber-border:#876e3d;
+    --pink:#e58ab0;
+    --port:#2f2e2a; --wire:#3b3934; --wire-on:#6ad39e; --grid-line:transparent; --timeline:#3b3934;
+    --node-shadow:0 8px 26px rgba(0,0,0,0.6);
+    --font:'Inter',system-ui,sans-serif;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    --graph-bg:#141412; --node:#2f2e2a; --node-dead:#1c1c1a; --node-selected:#1a291f;
+    --node-hub:#5b421d; --edge:#6f6b61; --edge-faded:#514e47; --up:#e58ab0; --down:#7da9d1;
+  }
+  html[data-theme="light"] {
+    color-scheme:light;
+    --bg:#e9eaec; --surface:#ffffff; --surface-2:#f2f3f5;
+    --border:#dcdfe2; --border-strong:#b7bcc3; --border-hover:#9ba0a8;
+    --text:#34373c; --text-bright:#15171a; --text-sub:#50545a;
+    --dim:#676c74; --dimmer:#9298a0;
+    --green:#0a7d5e; --green-bg:#e6f4ee; --green-border:#a9ddc9;
+    --blue:#2563eb; --amber:#8a6300; --amber-bg:#f3e9d2; --amber-border:#d3b16d;
+    --pink:#be185d;
+    --port:#d7dce1; --wire:#c8cdd3; --wire-on:#0a7d5e; --grid-line:transparent; --timeline:#c8cdd3;
+    --node-shadow:0 1px 2px rgba(22,24,27,0.07), 0 4px 14px rgba(22,24,27,0.06);
+    --font:'Inter',system-ui,sans-serif;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    --graph-bg:#f2f3f5; --node:#ffffff; --node-dead:#f3f4f6; --node-selected:#e6f4ee;
+    --node-hub:#f3e9d2; --edge:#9298a0; --edge-faded:#c8cdd3; --up:#be185d; --down:#2563eb;
+  }
+  *{box-sizing:border-box;} html{background:var(--bg);} body{margin:0;display:flex;height:100vh;font-family:var(--font);font-size:14px;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;}
+  button,input{font:inherit;} input[type=checkbox]{accent-color:var(--green);}
+  #side{width:330px;flex:0 0 330px;border-right:1px solid var(--border);background:var(--surface);padding:16px;overflow:auto;box-shadow:var(--node-shadow);z-index:2;}
+  #main{flex:1;overflow:auto;background:var(--graph-bg);}
+  .toprow{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+  h1{font-size:16px;margin:0;color:var(--text-bright);font-weight:600;}
+  .theme-tog{margin-left:auto;width:30px;height:28px;border:1px solid var(--border);background:transparent;color:var(--text-sub);border-radius:5px;cursor:pointer;font-size:13px;line-height:1;}
+  .theme-tog:hover{border-color:var(--border-hover);color:var(--text-bright);}
+  p.hint{font-size:12px;color:var(--text-sub);line-height:1.5;margin:6px 0 12px;}
+  .down{color:var(--down);} .up{color:var(--up);}
+  input[type=search]{width:100%;padding:6px 8px;border:1px solid var(--border-strong);border-radius:6px;font-size:13px;margin-bottom:8px;background:var(--surface-2);color:var(--text-bright);}
+  input[type=search]::placeholder{color:var(--dimmer);}
+  label.ctl{display:flex;align-items:center;gap:6px;font-size:13px;margin:6px 0;cursor:pointer;color:var(--text);}
+  .legend div{font-size:12px;color:var(--text-sub);margin:2px 0;} .legend span{display:inline-block;width:11px;height:11px;border-radius:2px;vertical-align:middle;margin-right:5px;}
+  #info{margin-top:14px;font-size:12.5px;line-height:1.5;border-top:1px solid var(--border);padding-top:10px;}
+  #info h2{font-size:13px;margin:6px 0 4px;font-family:var(--mono);word-break:break-all;color:var(--text-bright);}
+  #info .lab{font-weight:600;margin:8px 0 2px;}
+  #info ul{margin:2px 0 4px;padding-left:16px;} #info li{font-family:var(--mono);font-size:11.5px;word-break:break-all;color:var(--text);}
+  .node{cursor:pointer;}
+  .node rect{fill:var(--node);stroke:var(--border-strong);} .node.hub rect{fill:var(--node-hub);stroke:var(--amber-border);}
+  .node.dead rect{fill:var(--node-dead);stroke:var(--border);stroke-dasharray:3 2;} .node text{font:11px var(--mono);fill:var(--text-bright);} .node.dead text{fill:var(--dimmer);}
+  .node.sel rect{stroke:var(--green);stroke-width:2.5;fill:var(--node-selected);} .node.down rect{stroke:var(--down);stroke-width:1.8;} .node.up rect{stroke:var(--up);stroke-width:1.8;}
+  .node.match rect{stroke:var(--green);stroke-width:2.4;} .node.faded{opacity:.1;}
+  .colhead{font:600 12px var(--font);fill:var(--dim);text-transform:uppercase;letter-spacing:.04em;}
+  .marker-edge{fill:var(--edge);} .marker-down{fill:var(--down);} .marker-up{fill:var(--up);} .marker-faded{fill:var(--edge-faded);}
+  /* Edges are HIDDEN by default — the canvas stays clean until you focus a file.
+     Selecting/hovering a node reveals only that file's links (down/up). */
+  .edge{stroke:var(--edge);stroke-width:1;fill:none;display:none;marker-end:url(#arrow-edge);}
+  svg.show-all .edge{display:inline;opacity:.10;}
+  .edge.down{display:inline;stroke:var(--down);opacity:.95;stroke-width:1.7;marker-end:url(#arrow-down);}
+  .edge.up{display:inline;stroke:var(--up);opacity:.95;stroke-width:1.7;marker-end:url(#arrow-up);}
+  .edge.faded{display:none;}
+  svg.hide-dead .node.dead,svg.hide-dead .edge.deadedge{display:none;}
+</style></head>
+<body>
+<div id="side">
+  <div class="toprow"><h1>Dependency Explorer</h1><button type="button" class="theme-tog" id="theme" title="toggle theme" aria-label="toggle theme">◐</button></div>
+  <p class="hint"><b>Click a file</b> to reveal its links — they stay hidden until you do, so the canvas stays clean. Arrows point importer&rarr;imported: <b class="down">blue</b> = what it consumes, <b class="up">pink</b> = who consumes it. Click empty space to reset.</p>
+  <input id="search" type="search" placeholder="filter files...">
+  <label class="ctl"><input type="checkbox" id="trans" checked> trace the whole chain (transitive)</label>
+  <label class="ctl"><input type="checkbox" id="alllinks"> show all links faintly (overview)</label>
+  <label class="ctl"><input type="checkbox" id="dead"> show dead code</label>
+  <div class="legend">
+    <div><span style="background:var(--node-hub);border:1px solid var(--amber-border)"></span>hub (consumed by many)</div>
+    <div><span style="background:var(--node);border:1px solid var(--border-strong)"></span>live file</div>
+    <div><span style="background:var(--node-dead);border:1px dashed var(--border)"></span>dead file</div>
+  </div>
+  <div id="info"><p class="hint">Nothing selected.</p></div>
+</div>
+<div id="main"><svg id="svg" class="hide-dead" xmlns="http://www.w3.org/2000/svg"><defs><marker id="arrow-edge" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth"><path class="marker-edge" d="M0,0 L8,4 L0,8 z"></path></marker><marker id="arrow-down" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth"><path class="marker-down" d="M0,0 L8,4 L0,8 z"></path></marker><marker id="arrow-up" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth"><path class="marker-up" d="M0,0 L8,4 L0,8 z"></path></marker><marker id="arrow-faded" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth"><path class="marker-faded" d="M0,0 L8,4 L0,8 z"></path></marker></defs><g id="edges"></g><g id="nodes"></g></svg></div>
+<script>
+const DATA = {"nodes":[{"id":"App.jsx","group":"App.jsx","dead":true},{"id":"components/ActivityCard.jsx","group":"components","dead":true},{"id":"components/ActivityStrip.astro","group":"components","dead":false},{"id":"components/Dashboard.jsx","group":"components","dead":true},{"id":"components/EmbedFrame.jsx","group":"components","dead":true},{"id":"components/FeaturedCard.jsx","group":"components","dead":true},{"id":"components/FeaturedGrid.jsx","group":"components","dead":true},{"id":"components/FileBrowser.astro","group":"components","dead":false},{"id":"components/FileBrowser.jsx","group":"components","dead":true},{"id":"components/GardenGraph.astro","group":"components","dead":false},{"id":"components/Header.astro","group":"components","dead":false},{"id":"components/Header.jsx","group":"components","dead":true},{"id":"components/JournalEntry.jsx","group":"components","dead":true},{"id":"components/JournalForm.jsx","group":"components","dead":true},{"id":"components/JournalView.jsx","group":"components","dead":true},{"id":"components/Links.jsx","group":"components","dead":true},{"id":"components/MobileStackView.astro","group":"components","dead":false},{"id":"components/ProjectDetail.astro","group":"components","dead":false},{"id":"components/ProjectDetail.jsx","group":"components","dead":true},{"id":"components/ProjectForm.jsx","group":"components","dead":true},{"id":"components/ProjectPage.jsx","group":"components","dead":true},{"id":"components/ProjectStrip.astro","group":"components","dead":false},{"id":"components/ProjectTable.jsx","group":"components","dead":true},{"id":"components/PublicView.jsx","group":"components","dead":true},{"id":"components/TimelineList.astro","group":"components","dead":false},{"id":"components/VideoCard.jsx","group":"components","dead":true},{"id":"components/VideoLong.astro","group":"components","dead":false},{"id":"components/VideoPage.jsx","group":"components","dead":true},{"id":"components/VideoShort.astro","group":"components","dead":false},{"id":"components/VideoShowcase.jsx","group":"components","dead":true},{"id":"content.config.ts","group":"content.config.ts","dead":true},{"id":"env.d.ts","group":"env.d.ts","dead":true},{"id":"layouts/BaseLayout.astro","group":"layouts","dead":false},{"id":"lib/auth.jsx","group":"lib","dead":true},{"id":"lib/data.ts","group":"lib","dead":false},{"id":"lib/db.js","group":"lib","dead":true},{"id":"lib/firebase.js","group":"lib","dead":true},{"id":"lib/firebaseConfig.ts","group":"lib","dead":false},{"id":"lib/format.ts","group":"lib","dead":false},{"id":"lib/garden/analytics.ts","group":"lib","dead":false},{"id":"lib/garden/index.ts","group":"lib","dead":false},{"id":"lib/garden/plugins.ts","group":"lib","dead":false},{"id":"lib/garden/render.ts","group":"lib","dead":false},{"id":"lib/projectRefs.ts","group":"lib","dead":false},{"id":"lib/theme.jsx","group":"lib","dead":true},{"id":"main.jsx","group":"main.jsx","dead":true},{"id":"pages/404.astro","group":"pages","dead":false},{"id":"pages/admin/index.astro","group":"pages","dead":false},{"id":"pages/admin/settings.astro","group":"pages","dead":false},{"id":"pages/garden/[slug].astro","group":"pages","dead":false},{"id":"pages/garden/index.astro","group":"pages","dead":false},{"id":"pages/index.astro","group":"pages","dead":false},{"id":"pages/list.astro","group":"pages","dead":false},{"id":"pages/llms.txt.ts","group":"pages","dead":false},{"id":"pages/log/[slug].astro","group":"pages","dead":false},{"id":"pages/log/index.astro","group":"pages","dead":false},{"id":"pages/map.astro","group":"pages","dead":false},{"id":"pages/project/[slug].astro","group":"pages","dead":false},{"id":"pages/research/[slug].astro","group":"pages","dead":false},{"id":"pages/research.astro","group":"pages","dead":false},{"id":"pages/robots.txt.ts","group":"pages","dead":false},{"id":"pages/rss.xml.ts","group":"pages","dead":false},{"id":"pages/video/[id].astro","group":"pages","dead":false},{"id":"scripts/admin.ts","group":"scripts","dead":false}],"edges":[["App.jsx","components/Dashboard.jsx"],["App.jsx","components/PublicView.jsx"],["App.jsx","components/JournalView.jsx"],["App.jsx","components/ProjectPage.jsx"],["App.jsx","components/VideoPage.jsx"],["components/ActivityCard.jsx","lib/theme.jsx"],["components/Dashboard.jsx","lib/auth.jsx"],["components/Dashboard.jsx","lib/db.js"],["components/Dashboard.jsx","components/Header.astro"],["components/Dashboard.jsx","components/ProjectTable.jsx"],["components/Dashboard.jsx","components/ProjectForm.jsx"],["components/FeaturedCard.jsx","lib/theme.jsx"],["components/FeaturedGrid.jsx","components/FeaturedCard.jsx"],["components/FeaturedGrid.jsx","lib/theme.jsx"],["components/GardenGraph.astro","lib/garden/analytics.ts"],["components/Header.astro","components/ActivityStrip.astro"],["components/Header.jsx","lib/auth.jsx"],["components/Header.jsx","lib/theme.jsx"],["components/JournalForm.jsx","lib/db.js"],["components/JournalView.jsx","lib/auth.jsx"],["components/JournalView.jsx","lib/db.js"],["components/JournalView.jsx","components/Header.astro"],["components/JournalView.jsx","components/JournalEntry.jsx"],["components/JournalView.jsx","components/JournalForm.jsx"],["components/ProjectDetail.astro","lib/data.ts"],["components/ProjectDetail.astro","lib/format.ts"],["components/ProjectDetail.astro","components/FileBrowser.astro"],["components/ProjectDetail.jsx","components/EmbedFrame.jsx"],["components/ProjectDetail.jsx","components/FileBrowser.astro"],["components/ProjectPage.jsx","lib/db.js"],["components/ProjectPage.jsx","lib/auth.jsx"],["components/ProjectPage.jsx","components/EmbedFrame.jsx"],["components/ProjectPage.jsx","components/FileBrowser.astro"],["components/ProjectStrip.astro","lib/data.ts"],["components/ProjectTable.jsx","components/ProjectDetail.astro"],["components/ProjectTable.jsx","components/Links.jsx"],["components/PublicView.jsx","lib/db.js"],["components/PublicView.jsx","lib/theme.jsx"],["components/PublicView.jsx","components/Header.astro"],["components/PublicView.jsx","components/ProjectTable.jsx"],["components/PublicView.jsx","components/ActivityCard.jsx"],["components/PublicView.jsx","components/FeaturedGrid.jsx"],["components/PublicView.jsx","components/VideoShowcase.jsx"],["components/TimelineList.astro","lib/data.ts"],["components/TimelineList.astro","lib/format.ts"],["components/VideoCard.jsx","lib/theme.jsx"],["components/VideoLong.astro","lib/format.ts"],["components/VideoPage.jsx","lib/theme.jsx"],["components/VideoPage.jsx","components/Header.astro"],["components/VideoShort.astro","lib/format.ts"],["components/VideoShowcase.jsx","lib/theme.jsx"],["components/VideoShowcase.jsx","components/VideoCard.jsx"],["layouts/BaseLayout.astro","lib/firebaseConfig.ts"],["lib/auth.jsx","lib/firebase.js"],["lib/data.ts","lib/firebaseConfig.ts"],["lib/data.ts","lib/format.ts"],["lib/db.js","lib/firebase.js"],["lib/garden/index.ts","lib/format.ts"],["lib/garden/index.ts","lib/garden/render.ts"],["lib/garden/index.ts","lib/garden/analytics.ts"],["lib/garden/index.ts","lib/garden/analytics.ts"],["lib/garden/plugins.ts","lib/format.ts"],["lib/garden/render.ts","lib/garden/plugins.ts"],["lib/projectRefs.ts","lib/data.ts"],["lib/projectRefs.ts","lib/format.ts"],["main.jsx","lib/auth.jsx"],["main.jsx","lib/theme.jsx"],["main.jsx","App.jsx"],["pages/404.astro","layouts/BaseLayout.astro"],["pages/admin/index.astro","layouts/BaseLayout.astro"],["pages/admin/index.astro","components/Header.astro"],["pages/admin/index.astro","scripts/admin.ts"],["pages/admin/settings.astro","layouts/BaseLayout.astro"],["pages/admin/settings.astro","components/Header.astro"],["pages/admin/settings.astro","scripts/admin.ts"],["pages/garden/[slug].astro","layouts/BaseLayout.astro"],["pages/garden/[slug].astro","components/Header.astro"],["pages/garden/[slug].astro","components/GardenGraph.astro"],["pages/garden/[slug].astro","lib/data.ts"],["pages/garden/[slug].astro","lib/garden/index.ts"],["pages/garden/[slug].astro","lib/format.ts"],["pages/garden/index.astro","layouts/BaseLayout.astro"],["pages/garden/index.astro","components/Header.astro"],["pages/garden/index.astro","components/GardenGraph.astro"],["pages/garden/index.astro","lib/data.ts"],["pages/garden/index.astro","lib/garden/index.ts"],["pages/garden/index.astro","lib/format.ts"],["pages/index.astro","layouts/BaseLayout.astro"],["pages/index.astro","components/Header.astro"],["pages/index.astro","components/MobileStackView.astro"],["pages/index.astro","lib/data.ts"],["pages/index.astro","lib/format.ts"],["pages/list.astro","layouts/BaseLayout.astro"],["pages/list.astro","components/Header.astro"],["pages/list.astro","components/ProjectStrip.astro"],["pages/list.astro","components/TimelineList.astro"],["pages/list.astro","lib/data.ts"],["pages/list.astro","lib/format.ts"],["pages/llms.txt.ts","lib/data.ts"],["pages/log/[slug].astro","layouts/BaseLayout.astro"],["pages/log/[slug].astro","components/Header.astro"],["pages/log/[slug].astro","lib/data.ts"],["pages/log/[slug].astro","lib/format.ts"],["pages/log/[slug].astro","lib/projectRefs.ts"],["pages/log/index.astro","layouts/BaseLayout.astro"],["pages/log/index.astro","components/Header.astro"],["pages/log/index.astro","lib/data.ts"],["pages/log/index.astro","lib/format.ts"],["pages/log/index.astro","lib/projectRefs.ts"],["pages/map.astro","layouts/BaseLayout.astro"],["pages/map.astro","components/Header.astro"],["pages/map.astro","components/TimelineList.astro"],["pages/map.astro","lib/data.ts"],["pages/map.astro","lib/format.ts"],["pages/project/[slug].astro","layouts/BaseLayout.astro"],["pages/project/[slug].astro","components/Header.astro"],["pages/project/[slug].astro","components/ProjectDetail.astro"],["pages/project/[slug].astro","lib/data.ts"],["pages/research/[slug].astro","layouts/BaseLayout.astro"],["pages/research/[slug].astro","components/Header.astro"],["pages/research/[slug].astro","lib/data.ts"],["pages/research/[slug].astro","lib/format.ts"],["pages/research.astro","layouts/BaseLayout.astro"],["pages/research.astro","components/Header.astro"],["pages/research.astro","lib/data.ts"],["pages/research.astro","lib/format.ts"],["pages/video/[id].astro","layouts/BaseLayout.astro"],["pages/video/[id].astro","components/Header.astro"],["pages/video/[id].astro","components/VideoLong.astro"],["pages/video/[id].astro","components/VideoShort.astro"],["pages/video/[id].astro","lib/data.ts"],["scripts/admin.ts","lib/firebaseConfig.ts"]]};
+(function(){
+  var NS="http://www.w3.org/2000/svg", SEP="|", COLW=255, ROWH=30, NW=216, NH=22, PADX=20, PADY=64;
+  var order=["pages","layouts","components","scripts","styles","lib"];
+  var svg=document.getElementById("svg"), gE=document.getElementById("edges"), gN=document.getElementById("nodes"), info=document.getElementById("info");
+  document.getElementById("theme").addEventListener("click",function(){
+    var root=document.documentElement;
+    var next=root.dataset.theme==="light"?"dark":"light";
+    root.dataset.theme=next;
+    try{localStorage.setItem("artlu-theme",next);}catch(e){}
+  });
+  var out={}, inn={}, deadMap={};
+  DATA.nodes.forEach(function(n){ deadMap[n.id]=n.dead; });
+  DATA.edges.forEach(function(e){ (out[e[0]]=out[e[0]]||[]).push(e[1]); (inn[e[1]]=inn[e[1]]||[]).push(e[0]); });
+  function ci(g){ var i=order.indexOf(g); return i<0?order.length:i; }
+  var cols={};
+  DATA.nodes.forEach(function(n){ var c=ci(n.group); (cols[c]=cols[c]||[]).push(n); });
+  var pos={}, maxRows=0, colKeys=Object.keys(cols).map(Number).sort(function(a,b){return a-b;});
+  colKeys.forEach(function(c){ cols[c].sort(function(a,b){return a.id<b.id?-1:1;}); maxRows=Math.max(maxRows,cols[c].length);
+    cols[c].forEach(function(n,i){ pos[n.id]={x:PADX+colKeys.indexOf(c)*COLW, y:PADY+i*ROWH}; }); });
+  svg.setAttribute("width", PADX*2+colKeys.length*COLW); svg.setAttribute("height", PADY+maxRows*ROWH+24);
+  function mk(t){return document.createElementNS(NS,t);}
+  colKeys.forEach(function(c,idx){ var t=mk("text"); t.setAttribute("x",PADX+idx*COLW); t.setAttribute("y",44); t.setAttribute("class","colhead"); t.textContent=(order[c]||"other"); gN.appendChild(t); });
+  var edgeEls={};
+  DATA.edges.forEach(function(e){ var s=pos[e[0]],t=pos[e[1]]; if(!s||!t)return;
+    var forward=t.x>=s.x, x1=forward?s.x+NW:s.x, y1=s.y+NH/2, x2=(forward?t.x:t.x+NW)+(forward?-8:8), y2=t.y+NH/2, mx=(x1+x2)/2;
+    var p=mk("path"); p.setAttribute("d","M"+x1+" "+y1+" C "+mx+" "+y1+" "+mx+" "+y2+" "+x2+" "+y2);
+    var cls="edge"; if(deadMap[e[0]]||deadMap[e[1]])cls+=" deadedge"; p.setAttribute("class",cls);
+    gE.appendChild(p); edgeEls[e[0]+SEP+e[1]]=p; });
+  var nodeEls={};
+  DATA.nodes.forEach(function(n){ var p=pos[n.id]; if(!p)return;
+    var g=mk("g"), cls="node"; if(n.dead)cls+=" dead"; if((inn[n.id]||[]).length>=6)cls+=" hub";
+    g.setAttribute("class",cls); g.setAttribute("transform","translate("+p.x+","+p.y+")");
+    var r=mk("rect"); r.setAttribute("width",NW); r.setAttribute("height",NH); r.setAttribute("rx",5);
+    var tx=mk("text"); tx.setAttribute("x",8); tx.setAttribute("y",15); tx.textContent=n.id;
+    g.appendChild(r); g.appendChild(tx);
+    g.addEventListener("click",function(ev){ev.stopPropagation();paint(n.id,true);});
+    g.addEventListener("mouseenter",function(){ if(!selected)paint(n.id,false); });
+    g.addEventListener("mouseleave",function(){ if(!selected)reset(); });
+    gN.appendChild(g); nodeEls[n.id]=g; });
+  function walk(start,adj,lim){ var ns={},ek={},q=[[start,0]];
+    while(q.length){ var it=q.shift(),n=it[0],d=it[1]; if(lim&&d>=lim)continue;
+      (adj[n]||[]).forEach(function(m){ var k=(adj===out)?(n+SEP+m):(m+SEP+n); ek[k]=true; if(!ns[m]){ns[m]=true;q.push([m,d+1]);} }); }
+    return {ns:ns,ek:ek}; }
+  var selected=null;
+  function reset(){ selected=null;
+    Object.keys(nodeEls).forEach(function(id){ nodeEls[id].classList.remove("faded","sel","up","down","match"); });
+    Object.keys(edgeEls).forEach(function(k){ edgeEls[k].classList.remove("up","down","faded"); });
+    info.innerHTML='<p class="hint">Nothing selected.</p>'; }
+  function paint(id,sticky){ if(sticky)selected=id;
+    var lim = sticky ? (document.getElementById("trans").checked?0:1) : 1;
+    var dn=walk(id,out,lim), up=walk(id,inn,lim);
+    Object.keys(nodeEls).forEach(function(nid){ var c=nodeEls[nid].classList; c.remove("faded","sel","up","down","match");
+      if(nid===id)c.add("sel"); else if(dn.ns[nid])c.add("down"); else if(up.ns[nid])c.add("up"); else c.add("faded"); });
+    Object.keys(edgeEls).forEach(function(k){ var c=edgeEls[k].classList; c.remove("up","down","faded");
+      if(dn.ek[k])c.add("down"); else if(up.ek[k])c.add("up"); else c.add("faded"); });
+    renderInfo(id,dn,up); }
+  function lst(arr){ return (arr&&arr.length)? "<ul>"+arr.slice().sort().map(function(x){return "<li>"+x+"</li>";}).join("")+"</ul>" : '<p class="hint" style="margin:0">none</p>'; }
+  function renderInfo(id,dn,up){ var dc=Object.keys(dn.ns).length, uc=Object.keys(up.ns).length;
+    info.innerHTML = "<h2>"+id+"</h2>"
+      + (deadMap[id]?'<p class="hint" style="color:#b45309;margin:0">dead code &mdash; not reached by any route</p>':"")
+      + '<p class="lab down">Consumes (direct '+((out[id]||[]).length)+')</p>'+lst(out[id])
+      + '<p class="lab up">Consumed by (direct '+((inn[id]||[]).length)+')</p>'+lst(inn[id])
+      + '<p class="hint" style="margin-top:8px">Reaches '+dc+' downstream &middot; '+uc+' upstream'+(document.getElementById("trans").checked?"":" (direct only)")+'</p>'; }
+  svg.addEventListener("click",function(){reset();});
+  document.getElementById("trans").addEventListener("change",function(){ if(selected)paint(selected,true); });
+  document.getElementById("dead").addEventListener("change",function(e){ svg.classList.toggle("hide-dead",!e.target.checked); });
+  document.getElementById("alllinks").addEventListener("change",function(e){ svg.classList.toggle("show-all",e.target.checked); });
+  document.getElementById("search").addEventListener("input",function(e){ var v=e.target.value.trim().toLowerCase(); reset();
+    if(v) Object.keys(nodeEls).forEach(function(id){ var c=nodeEls[id].classList; if(id.toLowerCase().indexOf(v)>=0)c.add("match"); else c.add("faded"); }); });
+})();
+</script>
+</body></html>
